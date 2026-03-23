@@ -69,7 +69,6 @@ html, body {
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
   min-height: 100vh;
-  overflow-x: hidden;
 }
 
 /* ── GRAIN OVERLAY ── */
@@ -301,13 +300,12 @@ body::before {
 
 .week-header {
   padding: 0.8rem 1.2rem;
-  border: 1px solid var(--border);
-  border-bottom: none;
-  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: var(--surface2);
+  border-radius: 8px 8px 0 0;
 }
 
 .week-label {
@@ -332,18 +330,22 @@ body::before {
 }
 .week-stat span { color: var(--accent); font-weight: 500; }
 
-.days-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
+.days-grid-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  border-radius: 0 0 8px 8px;
   border: 1px solid var(--border);
   border-top: none;
-  border-radius: 0 0 8px 8px;
 }
 
-@media (max-width: 900px) {
-  .days-grid { grid-template-columns: repeat(7, minmax(145px, 1fr)); }
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 160px);
+  min-width: max-content;
+}
+
+@media (min-width: 900px) {
+  .days-grid { grid-template-columns: repeat(7, 1fr); min-width: unset; }
 }
 
 /* ── GÜN SÜTUNU ── */
@@ -1274,7 +1276,9 @@ function createWeekBlock(days, label) {
         <div class="week-stat"><span>${hrs > 0 ? hrs+'s ' : ''}${mins}dk</span> toplam</div>
       </div>
     </div>
-    <div class="days-grid" id="days-grid-${label.replace(/\s/g,'')}"></div>
+    <div class="days-grid-wrapper">
+      <div class="days-grid" id="days-grid-${label.replace(/\s/g,'')}"></div>
+    </div>
   `;
 
   const grid = block.querySelector('.days-grid');
@@ -1340,7 +1344,6 @@ function createTaskCard(task, inPool) {
       setTimeout(() => card.style.opacity = '0.5', 0);
     });
     card.addEventListener('dragend', () => { card.style.opacity = ''; });
-    setupTouchDrag(card, task.id);
   }
 
   const examBadge = task.examType ? `<span class="task-badge badge-${task.examType.toLowerCase()}">${task.examType}</span>` : '';
@@ -1367,139 +1370,6 @@ function createTaskCard(task, inPool) {
   `;
 
   return card;
-}
-
-// ═══════════════════════════════════════════
-// TOUCH DRAG & DROP — iOS 6S uyumlu
-// ═══════════════════════════════════════════
-let _touchClone = null;
-let _touchDragEl = null;
-let _touchTaskId = null;
-let _touchLongPressTimer = null;
-let _touchCurrentDropZone = null;
-let _isDragging = false;
-
-// Sayfa scroll'unu drag sırasında durdur
-function blockScroll(e) { if (_isDragging) e.preventDefault(); }
-document.addEventListener('touchmove', blockScroll, { passive: false });
-
-function setupTouchDrag(card, taskId) {
-  card.addEventListener('touchstart', e => {
-    if (_isGuest) return;
-    const touch = e.touches[0];
-    _touchTaskId = taskId;
-    _touchDragEl = card;
-
-    _touchLongPressTimer = setTimeout(() => {
-      _isDragging = true;
-      startTouchDrag(card, touch);
-    }, 350);
-  }, { passive: true });
-
-  card.addEventListener('touchmove', e => {
-    if (!_isDragging || !_touchClone) {
-      // Henüz drag başlamadıysa timer'ı iptal et
-      clearTimeout(_touchLongPressTimer);
-      _touchLongPressTimer = null;
-      return;
-    }
-
-    const touch = e.touches[0];
-
-    // Clone'u parmakla taşı
-    _touchClone.style.left = (touch.clientX - _touchClone._ox) + 'px';
-    _touchClone.style.top  = (touch.clientY - _touchClone._oy) + 'px';
-
-    // Drop zone bul
-    _touchClone.style.visibility = 'hidden';
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    _touchClone.style.visibility = 'visible';
-
-    if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
-    const zone = el?.closest('.day-tasks, #pool-tasks');
-    _touchCurrentDropZone = zone || null;
-    if (zone) zone.classList.add('drag-over');
-
-  }, { passive: true });
-
-  card.addEventListener('touchend', e => {
-    clearTimeout(_touchLongPressTimer);
-    _touchLongPressTimer = null;
-
-    if (!_isDragging || !_touchClone) {
-      _isDragging = false;
-      return;
-    }
-
-    const touch = e.changedTouches[0];
-
-    // Clone'u kaldır, arkadaki elementi bul
-    _touchClone.remove();
-    _touchClone = null;
-
-    if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
-
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const zone = el?.closest('.day-tasks, #pool-tasks');
-
-    if (zone) {
-      const dayKey = zone.id.startsWith('day-') ? zone.id.replace('day-', '') : null;
-      handleDropTouch(dayKey);
-    }
-
-    // Temizle
-    if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
-    _isDragging = false;
-    _dragTaskId = null;
-    _touchTaskId = null;
-    _touchCurrentDropZone = null;
-  });
-
-  card.addEventListener('touchcancel', () => {
-    clearTimeout(_touchLongPressTimer);
-    if (_touchClone) { _touchClone.remove(); _touchClone = null; }
-    if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
-    if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
-    _isDragging = false;
-    _dragTaskId = null;
-    _touchTaskId = null;
-    _touchCurrentDropZone = null;
-  });
-}
-
-function startTouchDrag(card, touch) {
-  const rect = card.getBoundingClientRect();
-  _touchClone = card.cloneNode(true);
-  _touchClone._ox = touch.clientX - rect.left;
-  _touchClone._oy = touch.clientY - rect.top;
-  _touchClone.style.cssText = `
-    position: fixed !important;
-    width: ${rect.width}px !important;
-    left: ${rect.left}px;
-    top: ${rect.top}px;
-    opacity: 0.92;
-    z-index: 99999;
-    pointer-events: none;
-    transform: scale(1.06) rotate(1deg);
-    box-shadow: 0 12px 36px rgba(0,0,0,0.7);
-    border: 1px solid var(--accent) !important;
-    border-radius: 4px;
-    transition: none;
-    margin: 0 !important;
-    background: var(--surface3);
-  `;
-  document.body.appendChild(_touchClone);
-  card.style.opacity = '0.15';
-  _dragTaskId = _touchTaskId;
-}
-
-async function handleDropTouch(dayKey) {
-  if (!_dragTaskId || _isGuest) return;
-  try {
-    const { doc, updateDoc } = _firestore;
-    await updateDoc(doc(_db, `users/${_uid}/tasks`, _dragTaskId), { dayKey: dayKey || null });
-    showToast(dayKey ? 'Görev güne atandı' : 'Görev havuza taşındı');
-  } catch(err) { showToast('Hata: ' + err.message); }
 }
 
 // ═══════════════════════════════════════════
