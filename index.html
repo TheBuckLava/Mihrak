@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mihrak</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Firebase -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // =============================================
+  // BURAYA KENDİ FİREBASE CONFIG'İNİ YAPISTIR
+  // =============================================
+  const firebaseConfig = {
+    apiKey: "AIzaSyC8QOo1PP0M-3PxMZ6oWO9p0vEF6fosZFU",
+    authDomain: "mihrak-ff2a9.firebaseapp.com",
+    projectId: "mihrak-ff2a9",
+    storageBucket: "mihrak-ff2a9.firebasestorage.app",
+    messagingSenderId: "816000351968",
+    appId: "1:816000351968:web:686f7418114c1b2b411a85",
+    measurementId: "G-P23J3YNK01"
+  };
+  // =============================================
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window._mihrak = { auth, db, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, setDoc, getDoc };
+</script>
+
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #080810;
+  --surface: #0f0f1a;
+  --surface2: #161625;
+  --surface3: #1e1e30;
+  --border: #2a2a40;
+  --border2: #3a3a55;
+  --accent: #c4a35a;
+  --accent2: #e8c97a;
+  --accent-glow: rgba(196,163,90,0.15);
+  --text: #e8e4f0;
+  --text-muted: #7a7590;
+  --text-dim: #4a4560;
+
+  /* Ders renkleri */
+  --color-turkce: #e05c7a;
+  --color-matematik: #5c9ee0;
+  --color-fizik: #e08c5c;
+  --color-kimya: #5ce0a8;
+  --color-biyoloji: #a05ce0;
+  --color-geometri: #5ce0d4;
+  --color-tarih: #e0c55c;
+  --color-cografya: #7ae05c;
+  --color-felsefe: #e05ce0;
+  --color-dil: #5c7ae0;
+  --color-default: #8a8aaa;
+}
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── GRAIN OVERLAY ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ── LOGIN SCREEN ── */
+#login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 2rem;
+  padding: 2rem;
+  background: radial-gradient(ellipse at 50% 40%, rgba(196,163,90,0.08) 0%, transparent 70%);
+}
+
+.login-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 10vw, 5rem);
+  font-weight: 300;
+  letter-spacing: 0.3em;
+  color: var(--accent);
+  text-shadow: 0 0 60px rgba(196,163,90,0.4);
+  animation: fadeUp 0.8s ease both;
+}
+
+.login-subtitle {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  animation: fadeUp 0.8s 0.2s ease both;
+}
+
+.login-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 2rem;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s;
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+.login-btn:hover { background: var(--surface3); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
+.login-btn svg { width: 18px; height: 18px; }
+
+.guest-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.1em;
+  transition: all 0.3s;
+  animation: fadeUp 0.8s 0.5s ease both;
+}
+.guest-btn:hover { border-color: var(--text-muted); color: var(--text); }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── APP LAYOUT ── */
+#app { display: none; flex-direction: column; min-height: 100vh; }
+#app.visible { display: flex; }
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.header-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(196,163,90,0.3);
+}
+
+.header-actions { display: flex; align-items: center; gap: 0.8rem; }
+
+.nav-btn {
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+.nav-btn:hover, .nav-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+.signout-btn {
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.2s;
+}
+.signout-btn:hover { border-color: #e05c7a; color: #e05c7a; }
+
+/* ── VIEWS ── */
+.view { display: none; padding: 1.5rem; }
+.view.active { display: block; }
+
+/* ── MAIN PLANNER ── */
+.planner-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 768px) {
+  .planner-layout { grid-template-columns: 1fr; }
+}
+
+/* ── GÖREV HAVUZU ── */
+.pool-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  position: sticky;
+  top: 72px;
+}
+
+.pool-header {
+  padding: 1rem 1.2rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pool-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+.pool-count {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  background: var(--surface3);
+  padding: 0.2rem 0.5rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.add-task-btn {
+  width: 100%;
+  padding: 0.7rem;
+  background: transparent;
+  border: 1px dashed var(--border2);
+  border-radius: 4px;
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 0.8rem 0 0;
+}
+.add-task-btn:hover { background: var(--accent-glow); border-color: var(--accent); }
+
+.pool-tasks {
+  padding: 0.8rem;
+  min-height: 100px;
+  max-height: calc(100vh - 220px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.pool-tasks::-webkit-scrollbar { width: 3px; }
+.pool-tasks::-webkit-scrollbar-track { background: transparent; }
+.pool-tasks::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ── HAFTALAR ── */
+.weeks-container { display: flex; flex-direction: column; gap: 2rem; }
+
+.week-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.week-header {
+  padding: 0.8rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface2);
+}
+
+.week-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.week-summary {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.week-stat {
+  font-size: 0.6rem;
+  color: var(--text-dim);
+  letter-spacing: 0.05em;
+}
+.week-stat span { color: var(--accent); font-weight: 500; }
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  overflow-x: auto;
+}
+
+@media (max-width: 900px) {
+  .days-grid { grid-template-columns: repeat(7, minmax(130px, 1fr)); }
+}
+
+/* ── GÜN SÜTUNU ── */
+.day-col {
+  border-right: 1px solid var(--border);
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+.day-col:last-child { border-right: none; }
+
+.day-header {
+  padding: 0.6rem 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  position: sticky;
+  top: 0;
+}
+
+.day-name {
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.15rem;
+}
+
+.day-date {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+}
+
+.day-date.today { color: var(--accent); }
+
+.day-progress {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  margin-top: 0.2rem;
+}
+
+.day-progress-bar {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  margin-top: 0.3rem;
+  overflow: hidden;
+}
+.day-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 1px;
+  transition: width 0.4s ease;
+}
+
+.day-note-btn {
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.15rem 0.3rem;
+  border-radius: 2px;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.05em;
+}
+.day-note-btn:hover { color: var(--accent); }
+.day-note-btn.has-note { color: var(--accent2); }
+
+.day-tasks {
+  flex: 1;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-height: 80px;
+}
+
+.day-tasks.drag-over { background: rgba(196,163,90,0.05); }
+
+/* ── GÖREV KARTI ── */
+.task-card {
+  border-radius: 4px;
+  padding: 0.5rem 0.6rem;
+  cursor: grab;
+  position: relative;
+  transition: all 0.2s;
+  border-left: 3px solid transparent;
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.task-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+}
+
+.task-card:active { cursor: grabbing; opacity: 0.85; transform: scale(0.98); }
+.task-card:hover { border-color: var(--border2); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+
+.task-card.completed { opacity: 0.45; }
+.task-card.completed .task-name { text-decoration: line-through; }
+
+.task-name {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+.task-badge {
+  font-size: 0.48rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.badge-tyt { background: rgba(94,148,224,0.15); color: #5e94e0; }
+.badge-ayt { background: rgba(224,92,122,0.15); color: #e05c7a; }
+
+.task-duration {
+  font-size: 0.48rem;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  align-items: center;
+}
+
+.complete-btn {
+  font-size: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+}
+.complete-btn:hover { border-color: #5ce0a8; color: #5ce0a8; }
+.task-card.completed .complete-btn { border-color: #5ce0a8; color: #5ce0a8; background: rgba(92,224,168,0.08); }
+
+.view-btn {
+  font-size: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.2s;
+}
+.view-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+.delete-btn {
+  font-size: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  transition: all 0.2s;
+  margin-left: auto;
+}
+.delete-btn:hover { border-color: #e05c7a; color: #e05c7a; }
+
+/* ── DERS RENKLERİ ── */
+.task-card[data-lesson*="ürkçe"]::before,
+.task-card[data-lesson*="urkce"]::before { background: var(--color-turkce); }
+.task-card[data-lesson*=" matematik"]::before,
+.task-card[data-lesson*="Matematik"]::before { background: var(--color-matematik); }
+.task-card[data-lesson*="izik"]::before,
+.task-card[data-lesson*="izik"]::before { background: var(--color-fizik); }
+.task-card[data-lesson*="imya"]::before { background: var(--color-kimya); }
+.task-card[data-lesson*="iyoloji"]::before { background: var(--color-biyoloji); }
+.task-card[data-lesson*="eometri"]::before { background: var(--color-geometri); }
+.task-card[data-lesson*="arih"]::before { background: var(--color-tarih); }
+.task-card[data-lesson*="ografya"]::before { background: var(--color-cografya); }
+.task-card[data-lesson*="elsefe"]::before { background: var(--color-felsefe); }
+.task-card[data-lesson*="il"]::before { background: var(--color-dil); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  animation: modalIn 0.25s ease both;
+}
+.modal::-webkit-scrollbar { width: 3px; }
+.modal::-webkit-scrollbar-thumb { background: var(--border2); }
+
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.modal-header {
+  padding: 1.2rem 1.4rem 1rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--text);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.2rem;
+  line-height: 1;
+  transition: color 0.2s;
+}
+.modal-close:hover { color: var(--text); }
+
+.modal-body { padding: 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 1rem; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.form-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.form-input, .form-select, .form-textarea {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-textarea { resize: vertical; min-height: 70px; }
+.form-select { cursor: pointer; }
+.form-select option { background: var(--surface2); }
+
+.toggle-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 0.5rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.toggle-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+.modal-footer {
+  padding: 1rem 1.4rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.7rem;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  padding: 0.6rem 1.4rem;
+  background: var(--accent);
+  border: none;
+  border-radius: 4px;
+  color: var(--bg);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary:hover { background: var(--accent2); box-shadow: 0 0 15px rgba(196,163,90,0.3); }
+
+.btn-secondary {
+  padding: 0.6rem 1.2rem;
+  background: transparent;
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+/* ── GÖREV DETAY ── */
+.detail-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-start;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.detail-row:last-child { border-bottom: none; }
+.detail-key {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  min-width: 90px;
+  padding-top: 0.1rem;
+}
+.detail-val {
+  font-size: 0.72rem;
+  color: var(--text);
+  flex: 1;
+  line-height: 1.5;
+}
+.detail-completed { color: #5ce0a8; }
+.detail-pending { color: var(--text-muted); }
+
+/* ── ARŞİV VIEW ── */
+.archive-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.archive-week {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.archive-week-header {
+  padding: 0.8rem 1.2rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.archive-week-header:hover { background: var(--surface3); }
+
+.archive-week-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.archive-stats {
+  display: flex;
+  gap: 1.2rem;
+}
+.archive-stat {
+  font-size: 0.58rem;
+  color: var(--text-dim);
+}
+.archive-stat span { color: var(--accent); }
+
+.archive-week-body { display: none; padding: 1rem; }
+.archive-week-body.open { display: block; }
+
+.archive-tasks { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ── HAFTA ÖZETİ PANEL ── */
+.summary-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 0.8rem;
+}
+
+.summary-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.summary-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.summary-key {
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.lesson-bars { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+
+.lesson-bar-row { display: flex; align-items: center; gap: 0.7rem; }
+.lesson-bar-name { font-size: 0.6rem; color: var(--text-muted); min-width: 80px; }
+.lesson-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+.lesson-bar-fill { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
+.lesson-bar-count { font-size: 0.55rem; color: var(--text-dim); min-width: 30px; text-align: right; }
+
+/* ── GÜN NOTU MODAL ── */
+.day-note-display {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  padding: 0.4rem 0.6rem;
+  margin: 0 0.4rem 0.4rem;
+  background: var(--surface2);
+  border-radius: 3px;
+  border-left: 2px solid var(--accent);
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(60px);
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  z-index: 9000;
+  transition: transform 0.3s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── EMPTY STATE ── */
+.empty-drop {
+  font-size: 0.55rem;
+  color: var(--text-dim);
+  text-align: center;
+  padding: 1rem 0.5rem;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+/* ── TEKRARLAYAN BADGE ── */
+.repeat-badge {
+  font-size: 0.45rem;
+  color: var(--accent2);
+  letter-spacing: 0.05em;
+}
+
+/* ── LOADING ── */
+#loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+}
+
+.dot-pulse::after {
+  content: '...';
+  animation: dots 1.5s infinite;
+}
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading"><span class="dot-pulse">yükleniyor</span></div>
+
+<!-- Login -->
+<div id="login-screen" style="display:none">
+  <div class="login-logo">MİHRAK</div>
+  <div class="login-subtitle">haftalık çalışma planlayıcı</div>
+  <button class="login-btn" id="google-login-btn">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+    Google ile Giriş Yap
+  </button>
+  <button class="guest-btn" id="guest-btn">misafir olarak görüntüle</button>
+</div>
+
+<!-- App -->
+<div id="app">
+  <header class="header">
+    <div class="header-logo">MİHRAK</div>
+    <div class="header-actions">
+      <button class="nav-btn active" id="nav-planner">Program</button>
+      <button class="nav-btn" id="nav-archive">Arşiv</button>
+      <button class="signout-btn" id="signout-btn">çıkış</button>
+    </div>
+  </header>
+
+  <!-- Planner View -->
+  <div class="view active" id="view-planner">
+    <div id="summary-container"></div>
+    <div class="planner-layout">
+      <!-- Pool -->
+      <div class="pool-panel">
+        <div class="pool-header">
+          <div class="pool-title">Bu Haftanın Görevleri</div>
+          <div class="pool-count" id="pool-count">0</div>
+        </div>
+        <div class="pool-tasks" id="pool-tasks" ondragover="event.preventDefault(); this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleDrop(event, null)">
+          <div class="empty-drop" id="pool-empty">henüz görev yok</div>
+        </div>
+        <div style="padding: 0 0.8rem 0.8rem;">
+          <button class="add-task-btn" id="add-task-btn">+ yeni görev ekle</button>
+        </div>
+      </div>
+
+      <!-- Weeks -->
+      <div class="weeks-container" id="weeks-container"></div>
+    </div>
+  </div>
+
+  <!-- Archive View -->
+  <div class="view" id="view-archive">
+    <div class="archive-list" id="archive-list"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Add/Edit Task Modal -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Yeni Görev</div>
+      <button class="modal-close" onclick="closeModal('task-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Ders *</label>
+        <input class="form-input" id="f-lesson" placeholder="TYT Türkçe, AYT Matematik...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Konu</label>
+        <input class="form-input" id="f-topic" placeholder="Paragraf, Logaritma...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">TYT / AYT</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" data-val="TYT" onclick="selectToggle(this, 'exam-type')">TYT</button>
+          <button class="toggle-btn" data-val="AYT" onclick="selectToggle(this, 'exam-type')">AYT</button>
+          <button class="toggle-btn active" data-val="" onclick="selectToggle(this, 'exam-type')">Boş</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Görev Türü</label>
+        <input class="form-input" id="f-type" placeholder="Test, Konu Anlatımı, Video, Deneme...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kaynak</label>
+        <input class="form-input" id="f-source" placeholder="Hoca / Kitap / Kanal adı...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Soru Sayısı</label>
+        <input class="form-input" id="f-questions" type="number" placeholder="40">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tahmini Süre (dakika) *</label>
+        <input class="form-input" id="f-duration" type="number" placeholder="45">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Not</label>
+        <textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tekrarlayan Görev</label>
+        <div class="toggle-group">
+          <button class="toggle-btn active" data-val="false" onclick="selectToggle(this, 'recurring')">Hayır</button>
+          <button class="toggle-btn" data-val="true" onclick="selectToggle(this, 'recurring')">Evet, her hafta</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('task-modal')">İptal</button>
+      <button class="btn-primary" id="save-task-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Task Detail Modal -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="detail-title">Görev Detayı</div>
+      <button class="modal-close" onclick="closeModal('detail-modal')">×</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('detail-modal')">Kapat</button>
+      <button class="btn-primary" id="detail-edit-btn">Düzenle</button>
+    </div>
+  </div>
+</div>
+
+<!-- Day Note Modal -->
+<div class="modal-overlay" id="day-note-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="day-note-title">Gün Notu</div>
+      <button class="modal-close" onclick="closeModal('day-note-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <textarea class="form-textarea" id="day-note-input" placeholder="Bu gün için notlar..." style="min-height:120px"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('day-note-modal')">İptal</button>
+      <button class="btn-primary" id="save-day-note-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let _auth, _db, _firestore, _uid = null;
+let _tasks = [];
+let _dayNotes = {};
+let _archivedWeeks = [];
+let _isGuest = false;
+let _editingTaskId = null;
+let _currentDayNoteKey = null;
+let _dragTaskId = null;
+let _examTypeVal = '';
+let _recurringVal = 'false';
+let _unsubTasks = null;
+let _unsubNotes = null;
+let _unsubArchive = null;
+
+const DAYS_TR = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+const DAYS_SHORT = ['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+window.addEventListener('load', () => {
+  const interval = setInterval(() => {
+    if (window._mihrak) {
+      clearInterval(interval);
+      const m = window._mihrak;
+      _auth = m.auth;
+      _db = m.db;
+      _firestore = m;
+
+      m.onAuthStateChanged(_auth, user => {
+        document.getElementById('loading').style.display = 'none';
+        if (user) {
+
+  if (user.email !== "sen@gmail.com") {
+    alert("Bu hesapla giriş izni yok.");
+    _firestore.signOut(_auth);
+    document.getElementById('login-screen').style.display = 'flex';
+    return;
+  }
+
+  _uid = user.uid;
+  _isGuest = false;
+  startApp();
+} else {
+          document.getElementById('login-screen').style.display = 'flex';
+        }
+      });
+    }
+  }, 100);
+});
+
+document.getElementById('google-login-btn').onclick = async () => {
+  const provider = new _firestore.GoogleAuthProvider();
+  try { await _firestore.signInWithPopup(_auth, provider); }
+  catch(e) { showToast('Giriş başarısız'); }
+};
+
+document.getElementById('guest-btn').onclick = () => {
+  _uid = null;
+  _isGuest = true;
+  document.getElementById('login-screen').style.display = 'none';
+  startApp();
+};
+
+document.getElementById('signout-btn').onclick = async () => {
+  if (_isGuest) { location.reload(); return; }
+  if (_unsubTasks) _unsubTasks();
+  if (_unsubNotes) _unsubNotes();
+  if (_unsubArchive) _unsubArchive();
+  await _firestore.signOut(_auth);
+  location.reload();
+};
+
+// ═══════════════════════════════════════════
+// START APP
+// ═══════════════════════════════════════════
+function startApp() {
+  const app = document.getElementById('app');
+  app.classList.add('visible');
+
+  if (_isGuest) {
+    document.getElementById('add-task-btn').style.display = 'none';
+    document.getElementById('signout-btn').textContent = 'çıkış';
+  }
+
+  if (!_isGuest && _uid) {
+    subscribeData();
+  } else {
+    renderAll();
+  }
+
+  checkWeekArchive();
+}
+
+// ═══════════════════════════════════════════
+// FIRESTORE SUBSCRIPTIONS
+// ═══════════════════════════════════════════
+function subscribeData() {
+  const { collection, onSnapshot, query, orderBy } = _firestore;
+
+  // Tasks
+  const tasksRef = collection(_db, `users/${_uid}/tasks`);
+  _unsubTasks = onSnapshot(tasksRef, snap => {
+    _tasks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll();
+  });
+
+  // Day notes
+  const notesRef = collection(_db, `users/${_uid}/dayNotes`);
+  _unsubNotes = onSnapshot(notesRef, snap => {
+    _dayNotes = {};
+    snap.docs.forEach(d => { _dayNotes[d.id] = d.data().text; });
+    renderAll();
+  });
+
+  // Archive
+  const archiveRef = collection(_db, `users/${_uid}/archivedWeeks`);
+  _unsubArchive = onSnapshot(archiveRef, snap => {
+    _archivedWeeks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderArchive();
+  });
+}
+
+// ═══════════════════════════════════════════
+// DATE HELPERS
+// ═══════════════════════════════════════════
+function getWeekStart(offset = 0) {
+  const today = new Date();
+  const day = today.getDay(); // 0=Sun
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - day + 1 + offset * 7);
+  monday.setHours(0,0,0,0);
+  return monday;
+}
+
+function getDaysOfWeek(weekStart) {
+  return Array.from({length: 7}, (_, i) => {
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + i);
+    return d;
+  });
+}
+
+function dateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+}
+
+function isToday(date) {
+  const t = new Date();
+  return date.getFullYear() === t.getFullYear() && date.getMonth() === t.getMonth() && date.getDate() === t.getDate();
+}
+
+function formatWeekRange(days) {
+  const fmt = d => `${d.getDate()} ${['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'][d.getMonth()]}`;
+  return `${fmt(days[0])} – ${fmt(days[6])}`;
+}
+
+// ═══════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════
+function renderAll() {
+  renderPool();
+  renderWeeks();
+  renderSummary();
+}
+
+// ═══════════════════════════════════════════
+// POOL
+// ═══════════════════════════════════════════
+function renderPool() {
+  const container = document.getElementById('pool-tasks');
+  const empty = document.getElementById('pool-empty');
+  const count = document.getElementById('pool-count');
+  const poolTasks = _tasks.filter(t => !t.dayKey);
+
+  count.textContent = poolTasks.length;
+  empty.style.display = poolTasks.length ? 'none' : 'block';
+
+  // Remove existing cards
+  container.querySelectorAll('.task-card').forEach(el => el.remove());
+
+  poolTasks.forEach(t => {
+    container.appendChild(createTaskCard(t, true));
+  });
+}
+
+// ═══════════════════════════════════════════
+// WEEKS
+// ═══════════════════════════════════════════
+function renderWeeks() {
+  const container = document.getElementById('weeks-container');
+  container.innerHTML = '';
+
+  for (let w = 0; w < 2; w++) {
+    const weekStart = getWeekStart(w);
+    const days = getDaysOfWeek(weekStart);
+    container.appendChild(createWeekBlock(days, w === 0 ? '1. Hafta' : '2. Hafta'));
+  }
+}
+
+function createWeekBlock(days, label) {
+  const block = document.createElement('div');
+  block.className = 'week-block';
+
+  const weekTasks = _tasks.filter(t => t.dayKey && days.some(d => dateKey(d) === t.dayKey));
+  const completed = weekTasks.filter(t => t.completed).length;
+  const totalMin = weekTasks.reduce((s, t) => s + (parseInt(t.duration) || 0), 0);
+  const hrs = Math.floor(totalMin / 60);
+  const mins = totalMin % 60;
+
+  block.innerHTML = `
+    <div class="week-header">
+      <div class="week-label">${label} · ${formatWeekRange(days)}</div>
+      <div class="week-summary">
+        <div class="week-stat"><span>${completed}/${weekTasks.length}</span> tamamlandı</div>
+        <div class="week-stat"><span>${hrs > 0 ? hrs+'s ' : ''}${mins}dk</span> toplam</div>
+      </div>
+    </div>
+    <div class="days-grid" id="days-grid-${label.replace(/\s/g,'')}"></div>
+  `;
+
+  const grid = block.querySelector('.days-grid');
+  days.forEach(day => {
+    grid.appendChild(createDayCol(day));
+  });
+
+  return block;
+}
+
+function createDayCol(date) {
+  const key = dateKey(date);
+  const dayTasks = _tasks.filter(t => t.dayKey === key);
+  const completed = dayTasks.filter(t => t.completed).length;
+  const pct = dayTasks.length ? Math.round(completed / dayTasks.length * 100) : 0;
+  const note = _dayNotes[key];
+
+  const col = document.createElement('div');
+  col.className = 'day-col';
+  col.dataset.daykey = key;
+
+  const dayIdx = date.getDay();
+
+  col.innerHTML = `
+    <div class="day-header">
+      <div class="day-name">${DAYS_SHORT[dayIdx]}</div>
+      <div class="day-date ${isToday(date) ? 'today' : ''}">${date.getDate()}</div>
+      <div class="day-progress">${pct}%</div>
+      <div class="day-progress-bar"><div class="day-progress-fill" style="width:${pct}%"></div></div>
+      <button class="day-note-btn ${note ? 'has-note' : ''}" onclick="openDayNote('${key}', '${DAYS_TR[dayIdx]} ${date.getDate()}')" title="${note ? 'Not var' : 'Not ekle'}">${note ? '✦ not' : '+ not'}</button>
+    </div>
+    ${note ? `<div class="day-note-display">${escHtml(note)}</div>` : ''}
+    <div class="day-tasks" id="day-${key}"
+      ondragover="event.preventDefault(); this.classList.add('drag-over')"
+      ondragleave="this.classList.remove('drag-over')"
+      ondrop="handleDrop(event, '${key}')">
+      ${dayTasks.length === 0 ? '<div class="empty-drop">bırak</div>' : ''}
+    </div>
+  `;
+
+  const tasksDiv = col.querySelector(`#day-${key}`);
+  dayTasks.forEach(t => {
+    tasksDiv.appendChild(createTaskCard(t, false));
+  });
+
+  return col;
+}
+
+// ═══════════════════════════════════════════
+// TASK CARD
+// ═══════════════════════════════════════════
+function createTaskCard(task, inPool) {
+  const card = document.createElement('div');
+  card.className = `task-card ${task.completed ? 'completed' : ''}`;
+  card.dataset.id = task.id;
+  card.dataset.lesson = (task.lesson || '').toLowerCase();
+  card.draggable = !_isGuest;
+
+  if (!_isGuest) {
+    card.addEventListener('dragstart', e => {
+      _dragTaskId = task.id;
+      e.dataTransfer.effectAllowed = 'move';
+      setTimeout(() => card.style.opacity = '0.5', 0);
+    });
+    card.addEventListener('dragend', () => { card.style.opacity = ''; });
+  }
+
+  const examBadge = task.examType ? `<span class="task-badge badge-${task.examType.toLowerCase()}">${task.examType}</span>` : '';
+  const repeatBadge = task.recurring === 'true' ? `<span class="repeat-badge">↻</span>` : '';
+  const duration = task.duration ? `<span class="task-duration">${task.duration}dk</span>` : '';
+
+  card.innerHTML = `
+    <div class="task-name">${escHtml(task.lesson || '')}${task.topic ? ' · ' + escHtml(task.topic) : ''}</div>
+    <div class="task-meta">
+      ${examBadge}
+      ${task.taskType ? `<span class="task-badge" style="background:rgba(196,163,90,0.1);color:var(--accent2)">${escHtml(task.taskType)}</span>` : ''}
+      ${repeatBadge}
+      ${duration}
+    </div>
+    ${!_isGuest ? `
+    <div class="task-actions">
+      <button class="complete-btn" onclick="toggleComplete('${task.id}')">${task.completed ? '✓ tamamlandı' : 'tamamlandı'}</button>
+      <button class="view-btn" onclick="openDetail('${task.id}')">detay</button>
+      <button class="delete-btn" onclick="deleteTask('${task.id}')">sil</button>
+    </div>` : `
+    <div class="task-actions">
+      <button class="view-btn" onclick="openDetail('${task.id}')">detay</button>
+    </div>`}
+  `;
+
+  return card;
+}
+
+// ═══════════════════════════════════════════
+// DRAG & DROP
+// ═══════════════════════════════════════════
+async function handleDrop(e, dayKey) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (!_dragTaskId || _isGuest) return;
+
+  const task = _tasks.find(t => t.id === _dragTaskId);
+  if (!task) return;
+
+  try {
+    const { doc, updateDoc } = _firestore;
+    await updateDoc(doc(_db, `users/${_uid}/tasks`, _dragTaskId), { dayKey: dayKey || null });
+    showToast(dayKey ? 'Görev güne atandı' : 'Görev havuza taşındı');
+  } catch(err) {
+    showToast('Hata: ' + err.message);
+  }
+  _dragTaskId = null;
+}
+
+// ═══════════════════════════════════════════
+// SUMMARY
+// ═══════════════════════════════════════════
+function renderSummary() {
+  const container = document.getElementById('summary-container');
+  if (!_tasks.length) { container.innerHTML = ''; return; }
+
+  const weekStart = getWeekStart(0);
+  const days = getDaysOfWeek(weekStart);
+  const weekKeys = days.map(dateKey);
+  const weekTasks = _tasks.filter(t => t.dayKey && weekKeys.includes(t.dayKey));
+
+  const total = weekTasks.length;
+  const done = weekTasks.filter(t => t.completed).length;
+  const totalMin = weekTasks.reduce((s, t) => s + (parseInt(t.duration)||0), 0);
+  const hrs = Math.floor(totalMin/60);
+  const mins = totalMin % 60;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  // Ders dağılımı
+  const lessonMap = {};
+  weekTasks.forEach(t => {
+    const key = t.lesson || 'Diğer';
+    lessonMap[key] = (lessonMap[key] || 0) + 1;
+  });
+  const lessonEntries = Object.entries(lessonMap).sort((a,b) => b[1]-a[1]).slice(0,6);
+  const maxCount = lessonEntries[0]?.[1] || 1;
+
+  const lessonBars = lessonEntries.map(([name, count]) => {
+    const pctBar = Math.round(count/maxCount*100);
+    return `<div class="lesson-bar-row">
+      <div class="lesson-bar-name">${escHtml(name)}</div>
+      <div class="lesson-bar-track"><div class="lesson-bar-fill" style="width:${pctBar}%;background:var(--accent)"></div></div>
+      <div class="lesson-bar-count">${count}</div>
+    </div>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="summary-panel">
+      <div class="summary-title">Bu Hafta · Özet</div>
+      <div class="summary-grid">
+        <div class="summary-card"><div class="summary-val">${total}</div><div class="summary-key">görev</div></div>
+        <div class="summary-card"><div class="summary-val">${done}</div><div class="summary-key">tamamlanan</div></div>
+        <div class="summary-card"><div class="summary-val">${pct}%</div><div class="summary-key">ilerleme</div></div>
+        <div class="summary-card"><div class="summary-val">${hrs > 0 ? hrs+'s' : mins+'dk'}</div><div class="summary-key">toplam süre</div></div>
+      </div>
+      ${lessonBars ? `<div class="lesson-bars">${lessonBars}</div>` : ''}
+    </div>
+  `;
+}
+
+// ═══════════════════════════════════════════
+// ARCHIVE
+// ═══════════════════════════════════════════
+function renderArchive() {
+  const container = document.getElementById('archive-list');
+  container.innerHTML = '';
+
+  if (!_archivedWeeks.length) {
+    container.innerHTML = '<div style="text-align:center;color:var(--text-dim);font-size:0.65rem;padding:3rem;letter-spacing:0.1em">henüz arşivlenmiş hafta yok</div>';
+    return;
+  }
+
+  const sorted = [..._archivedWeeks].sort((a,b) => b.weekStart - a.weekStart);
+
+  sorted.forEach(week => {
+    const tasks = week.tasks || [];
+    const done = tasks.filter(t => t.completed).length;
+    const totalMin = tasks.reduce((s,t) => s+(parseInt(t.duration)||0),0);
+    const hrs = Math.floor(totalMin/60);
+    const mins = totalMin%60;
+
+    const weekEl = document.createElement('div');
+    weekEl.className = 'archive-week';
+
+    weekEl.innerHTML = `
+      <div class="archive-week-header" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="archive-week-label">${week.label || 'Hafta'}</div>
+        <div class="archive-stats">
+          <div class="archive-stat"><span>${done}/${tasks.length}</span> tamamlandı</div>
+          <div class="archive-stat"><span>${hrs > 0 ? hrs+'s ' : ''}${mins}dk</span></div>
+        </div>
+      </div>
+      <div class="archive-week-body">
+        <div class="archive-tasks">
+          ${tasks.map(t => `
+            <div style="font-size:0.6rem;padding:0.35rem 0.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:3px;color:${t.completed?'var(--text-dim)':'var(--text-muted)'}">
+              ${t.completed ? '✓ ' : ''}<span style="${t.completed ? 'text-decoration:line-through' : ''}">${escHtml(t.lesson||'')}${t.topic ? ' · '+escHtml(t.topic) : ''}</span>
+              ${t.duration ? `<span style="color:var(--text-dim);margin-left:0.4rem">${t.duration}dk</span>` : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    container.appendChild(weekEl);
+  });
+}
+
+// ═══════════════════════════════════════════
+// WEEK ARCHIVE CHECK
+// ═══════════════════════════════════════════
+async function checkWeekArchive() {
+  if (_isGuest || !_uid) return;
+  // Bu özellik: her Pazar gecesi otomatik arşivleme yapılır
+  // Burada sadece manuel tetikle şimdilik
+}
+
+// ═══════════════════════════════════════════
+// ADD / EDIT TASK
+// ═══════════════════════════════════════════
+document.getElementById('add-task-btn').onclick = () => {
+  _editingTaskId = null;
+  document.getElementById('modal-title').textContent = 'Yeni Görev';
+  document.getElementById('f-lesson').value = '';
+  document.getElementById('f-topic').value = '';
+  document.getElementById('f-type').value = '';
+  document.getElementById('f-source').value = '';
+  document.getElementById('f-questions').value = '';
+  document.getElementById('f-duration').value = '';
+  document.getElementById('f-note').value = '';
+  _examTypeVal = '';
+  _recurringVal = 'false';
+  resetToggle('exam-type', '');
+  resetToggle('recurring', 'false');
+  document.getElementById('task-modal').classList.add('open');
+};
+
+document.getElementById('save-task-btn').onclick = async () => {
+  const lesson = document.getElementById('f-lesson').value.trim();
+  const duration = document.getElementById('f-duration').value.trim();
+  if (!lesson) { showToast('Ders alanı zorunlu'); return; }
+
+  const data = {
+    lesson,
+    topic: document.getElementById('f-topic').value.trim(),
+    examType: _examTypeVal,
+    taskType: document.getElementById('f-type').value.trim(),
+    source: document.getElementById('f-source').value.trim(),
+    questions: document.getElementById('f-questions').value.trim(),
+    duration: duration,
+    note: document.getElementById('f-note').value.trim(),
+    recurring: _recurringVal,
+    completed: false,
+  };
+
+  if (!_editingTaskId) {
+    data.createdAt = Date.now();
+    data.dayKey = null;
+  }
+
+  try {
+    const { collection, doc, addDoc, updateDoc } = _firestore;
+    if (_editingTaskId) {
+      await updateDoc(doc(_db, `users/${_uid}/tasks`, _editingTaskId), data);
+      showToast('Görev güncellendi');
+    } else {
+      await addDoc(collection(_db, `users/${_uid}/tasks`), data);
+      showToast('Görev eklendi');
+    }
+    closeModal('task-modal');
+  } catch(err) {
+    showToast('Hata: ' + err.message);
+  }
+};
+
+async function toggleComplete(id) {
+  const task = _tasks.find(t => t.id === id);
+  if (!task) return;
+  const { doc, updateDoc } = _firestore;
+  await updateDoc(doc(_db, `users/${_uid}/tasks`, id), { completed: !task.completed });
+}
+
+async function deleteTask(id) {
+  if (!confirm('Bu görevi silmek istediğinden emin misin?')) return;
+  const { doc, deleteDoc } = _firestore;
+  await deleteDoc(doc(_db, `users/${_uid}/tasks`, id));
+  showToast('Görev silindi');
+}
+
+// ═══════════════════════════════════════════
+// DETAIL
+// ═══════════════════════════════════════════
+function openDetail(id) {
+  const task = _tasks.find(t => t.id === id);
+  if (!task) return;
+
+  document.getElementById('detail-title').textContent = task.lesson || 'Görev';
+
+  const rows = [
+    ['Ders', task.lesson],
+    ['Konu', task.topic],
+    ['TYT/AYT', task.examType || '—'],
+    ['Tür', task.taskType],
+    ['Kaynak', task.source],
+    ['Soru Sayısı', task.questions],
+    ['Süre', task.duration ? task.duration + ' dakika' : null],
+    ['Not', task.note],
+    ['Tekrarlayan', task.recurring === 'true' ? 'Evet' : 'Hayır'],
+    ['Durum', task.completed ? '✓ Tamamlandı' : 'Bekliyor'],
+    ['Oluşturma', task.createdAt ? new Date(task.createdAt).toLocaleDateString('tr-TR') : '—'],
+    ['Gün', task.dayKey || 'Havuzda'],
+  ].filter(([k,v]) => v);
+
+  document.getElementById('detail-body').innerHTML = rows.map(([k,v]) => `
+    <div class="detail-row">
+      <div class="detail-key">${k}</div>
+      <div class="detail-val ${k==='Durum' && task.completed ? 'detail-completed' : ''}">${escHtml(String(v))}</div>
+    </div>
+  `).join('');
+
+  document.getElementById('detail-edit-btn').onclick = () => {
+    closeModal('detail-modal');
+    openEdit(id);
+  };
+
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function openEdit(id) {
+  const task = _tasks.find(t => t.id === id);
+  if (!task) return;
+  _editingTaskId = id;
+  document.getElementById('modal-title').textContent = 'Görevi Düzenle';
+  document.getElementById('f-lesson').value = task.lesson || '';
+  document.getElementById('f-topic').value = task.topic || '';
+  document.getElementById('f-type').value = task.taskType || '';
+  document.getElementById('f-source').value = task.source || '';
+  document.getElementById('f-questions').value = task.questions || '';
+  document.getElementById('f-duration').value = task.duration || '';
+  document.getElementById('f-note').value = task.note || '';
+  _examTypeVal = task.examType || '';
+  _recurringVal = task.recurring || 'false';
+  resetToggle('exam-type', _examTypeVal);
+  resetToggle('recurring', _recurringVal);
+  document.getElementById('task-modal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════
+// DAY NOTE
+// ═══════════════════════════════════════════
+function openDayNote(key, label) {
+  if (_isGuest) return;
+  _currentDayNoteKey = key;
+  document.getElementById('day-note-title').textContent = label + ' · Not';
+  document.getElementById('day-note-input').value = _dayNotes[key] || '';
+  document.getElementById('day-note-modal').classList.add('open');
+}
+
+document.getElementById('save-day-note-btn').onclick = async () => {
+  const text = document.getElementById('day-note-input').value.trim();
+  const { doc, setDoc, deleteDoc } = _firestore;
+  const ref = doc(_db, `users/${_uid}/dayNotes`, _currentDayNoteKey);
+  if (text) {
+    await setDoc(ref, { text });
+  } else {
+    try { await deleteDoc(ref); } catch(e) {}
+    delete _dayNotes[_currentDayNoteKey];
+  }
+  closeModal('day-note-modal');
+  showToast(text ? 'Not kaydedildi' : 'Not silindi');
+};
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+document.getElementById('nav-planner').onclick = () => {
+  document.getElementById('view-planner').classList.add('active');
+  document.getElementById('view-archive').classList.remove('active');
+  document.getElementById('nav-planner').classList.add('active');
+  document.getElementById('nav-archive').classList.remove('active');
+};
+
+document.getElementById('nav-archive').onclick = () => {
+  document.getElementById('view-archive').classList.add('active');
+  document.getElementById('view-planner').classList.remove('active');
+  document.getElementById('nav-archive').classList.add('active');
+  document.getElementById('nav-planner').classList.remove('active');
+  renderArchive();
+};
+
+// ═══════════════════════════════════════════
+// TOGGLE HELPERS
+// ═══════════════════════════════════════════
+function selectToggle(btn, group) {
+  btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (group === 'exam-type') _examTypeVal = btn.dataset.val;
+  if (group === 'recurring') _recurringVal = btn.dataset.val;
+}
+
+function resetToggle(group, val) {
+  if (group === 'exam-type') {
+    document.querySelectorAll('#task-modal .toggle-group')[0]?.querySelectorAll('.toggle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.val === val);
+    });
+  }
+  if (group === 'recurring') {
+    document.querySelectorAll('#task-modal .toggle-group')[1]?.querySelectorAll('.toggle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.val === val);
+    });
+  }
+}
+
+// ═══════════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════════
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+});
+
+// ═══════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════
+let _toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
