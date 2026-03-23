@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mihrak</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <!-- Firebase -->
 <script type="module">
@@ -67,7 +67,7 @@
 html, body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -96,9 +96,9 @@ body::before {
 }
 
 .login-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: clamp(3rem, 10vw, 5rem);
-  font-weight: 800;
+  font-weight: 300;
   letter-spacing: 0.3em;
   color: var(--accent);
   text-shadow: 0 0 60px rgba(196,163,90,0.4);
@@ -122,7 +122,12 @@ body::before {
   border: 1px solid var(--border2);
   border-radius: 4px;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: all 0.3s;
+  animation: fadeUp 0.8s 0.4s ease both;
 }
 .login-btn:hover { background: var(--surface3); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
 .login-btn svg { width: 18px; height: 18px; }
@@ -135,7 +140,7 @@ body::before {
   padding: 0.6rem 1.5rem;
   border-radius: 4px;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   letter-spacing: 0.1em;
   transition: all 0.3s;
   animation: fadeUp 0.8s 0.5s ease both;
@@ -166,7 +171,7 @@ body::before {
 }
 
 .header-logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1.6rem;
   font-weight: 600;
   letter-spacing: 0.25em;
@@ -182,7 +187,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: 3px;
   color: var(--text-muted);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -199,7 +204,7 @@ body::before {
   color: var(--text-dim);
   font-size: 0.65rem;
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   transition: all 0.2s;
 }
 .signout-btn:hover { border-color: #e05c7a; color: #e05c7a; }
@@ -239,7 +244,7 @@ body::before {
 }
 
 .pool-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -262,7 +267,7 @@ body::before {
   border: 1px dashed var(--border2);
   border-radius: 4px;
   color: var(--accent);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.7rem;
   letter-spacing: 0.1em;
   cursor: pointer;
@@ -306,7 +311,7 @@ body::before {
 }
 
 .week-label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.15em;
@@ -332,9 +337,9 @@ body::before {
   grid-template-columns: repeat(7, 1fr);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: 0 0 8px 8px;
   border: 1px solid var(--border);
   border-top: none;
+  border-radius: 0 0 8px 8px;
 }
 
 @media (max-width: 900px) {
@@ -367,7 +372,7 @@ body::before {
 }
 
 .day-date {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--text);
@@ -405,7 +410,7 @@ body::before {
   transition: all 0.2s;
   border: none;
   background: none;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   letter-spacing: 0.05em;
 }
 .day-note-btn:hover { color: var(--accent); }
@@ -498,7 +503,7 @@ body::before {
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   transition: all 0.2s;
   letter-spacing: 0.05em;
 }
@@ -513,7 +518,7 @@ body::before {
   background: transparent;
   color: var(--text-dim);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   transition: all 0.2s;
 }
 .view-btn:hover { border-color: var(--accent); color: var(--accent); }
@@ -526,7 +531,7 @@ body::before {
   background: transparent;
   color: var(--text-dim);
   cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   transition: all 0.2s;
   margin-left: auto;
 }
@@ -589,7 +594,7 @@ body::before {
 }
 
 .modal-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1.1rem;
   font-weight: 600;
   letter-spacing: 0.1em;
@@ -624,7 +629,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.75rem;
   padding: 0.6rem 0.8rem;
   transition: border-color 0.2s;
@@ -650,7 +655,7 @@ body::before {
   border: 1px solid var(--border);
   border-radius: 4px;
   color: var(--text-muted);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.65rem;
   letter-spacing: 0.08em;
   cursor: pointer;
@@ -673,7 +678,7 @@ body::before {
   border: none;
   border-radius: 4px;
   color: var(--bg);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.7rem;
   font-weight: 500;
   letter-spacing: 0.1em;
@@ -688,7 +693,7 @@ body::before {
   border: 1px solid var(--border2);
   border-radius: 4px;
   color: var(--text-muted);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'IBM Plex Mono', monospace;
   font-size: 0.7rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -744,7 +749,7 @@ body::before {
 .archive-week-header:hover { background: var(--surface3); }
 
 .archive-week-label {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--text-muted);
@@ -776,7 +781,7 @@ body::before {
 }
 
 .summary-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.15em;
@@ -800,7 +805,7 @@ body::before {
 }
 
 .summary-val {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cormorant Garamond', serif;
   font-size: 1.8rem;
   font-weight: 600;
   color: var(--accent);
@@ -1369,101 +1374,90 @@ function createTaskCard(task, inPool) {
 // ═══════════════════════════════════════════
 let _touchDragEl = null;
 let _touchClone = null;
-let _touchStartX = 0;
-let _touchStartY = 0;
 let _touchTaskId = null;
+let _touchLongPressTimer = null;
+let _touchCurrentDropZone = null;
 
 function setupTouchDrag(card, taskId) {
   card.addEventListener('touchstart', e => {
     if (_isGuest) return;
     const touch = e.touches[0];
-    _touchStartX = touch.clientX;
-    _touchStartY = touch.clientY;
     _touchTaskId = taskId;
     _touchDragEl = card;
-
-    // Uzun basma ile başlasın
-    card._touchTimer = setTimeout(() => {
+    _touchLongPressTimer = setTimeout(() => {
       startTouchDrag(card, touch);
-    }, 300);
+    }, 280);
   }, { passive: true });
 
   card.addEventListener('touchmove', e => {
-    if (!card._touchTimer && !_touchClone) return;
-    clearTimeout(card._touchTimer);
-    card._touchTimer = null;
-
-    if (!_touchClone) return;
+    if (!_touchClone) {
+      clearTimeout(_touchLongPressTimer);
+      _touchLongPressTimer = null;
+      return;
+    }
     e.preventDefault();
-
     const touch = e.touches[0];
     _touchClone.style.left = (touch.clientX - _touchClone._offsetX) + 'px';
-    _touchClone.style.top = (touch.clientY - _touchClone._offsetY) + 'px';
+    _touchClone.style.top  = (touch.clientY - _touchClone._offsetY) + 'px';
 
-    // Hangi drop zone üzerindeyiz?
-    _touchClone.style.display = 'none';
+    _touchClone.style.visibility = 'hidden';
     const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    _touchClone.style.display = '';
+    _touchClone.style.visibility = '';
 
-    // Önceki highlight'ı kaldır
-    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-
-    const dropZone = el?.closest('.day-tasks, .pool-tasks');
+    if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
+    const dropZone = el?.closest('.day-tasks, #pool-tasks');
+    _touchCurrentDropZone = dropZone || null;
     if (dropZone) dropZone.classList.add('drag-over');
-
   }, { passive: false });
 
   card.addEventListener('touchend', e => {
-    clearTimeout(card._touchTimer);
-    card._touchTimer = null;
-
+    clearTimeout(_touchLongPressTimer);
+    _touchLongPressTimer = null;
     if (!_touchClone) return;
 
     const touch = e.changedTouches[0];
-    _touchClone.style.display = 'none';
+    _touchClone.remove();
+    _touchClone = null;
+
+    if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
+
     const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    _touchClone.style.display = '';
-
-    document.querySelectorAll('.drag-over').forEach(el => el.classList.remove('drag-over'));
-
-    const dropZone = el?.closest('.day-tasks, .pool-tasks');
+    const dropZone = el?.closest('.day-tasks, #pool-tasks');
     if (dropZone) {
       const dayKey = dropZone.id.startsWith('day-') ? dropZone.id.replace('day-', '') : null;
       handleDropTouch(dayKey);
     }
+    if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
+    _dragTaskId = null; _touchTaskId = null; _touchCurrentDropZone = null;
+  });
 
-    endTouchDrag();
+  card.addEventListener('touchcancel', () => {
+    clearTimeout(_touchLongPressTimer);
+    if (_touchClone) { _touchClone.remove(); _touchClone = null; }
+    if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
+    if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
+    _dragTaskId = null; _touchTaskId = null; _touchCurrentDropZone = null;
   });
 }
 
 function startTouchDrag(card, touch) {
   const rect = card.getBoundingClientRect();
   _touchClone = card.cloneNode(true);
-  _touchClone.style.cssText = `
-    position: fixed;
-    width: ${rect.width}px;
-    left: ${rect.left}px;
-    top: ${rect.top}px;
-    opacity: 0.85;
-    z-index: 9999;
-    pointer-events: none;
-    transform: scale(1.03);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-    border-color: var(--accent);
-    transition: none;
-  `;
   _touchClone._offsetX = touch.clientX - rect.left;
   _touchClone._offsetY = touch.clientY - rect.top;
+  _touchClone.style.cssText = `
+    position:fixed; width:${rect.width}px;
+    left:${rect.left}px; top:${rect.top}px;
+    opacity:0.9; z-index:9999; pointer-events:none;
+    transform:scale(1.05);
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    border:1px solid var(--accent) !important;
+    border-radius:4px; transition:none; margin:0;
+    background:var(--surface3);
+  `;
   document.body.appendChild(_touchClone);
-  card.style.opacity = '0.3';
+  card.style.opacity = '0.2';
   _dragTaskId = _touchTaskId;
-}
-
-function endTouchDrag() {
-  if (_touchClone) { _touchClone.remove(); _touchClone = null; }
-  if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
-  _dragTaskId = null;
-  _touchTaskId = null;
 }
 
 async function handleDropTouch(dayKey) {
@@ -1472,9 +1466,7 @@ async function handleDropTouch(dayKey) {
     const { doc, updateDoc } = _firestore;
     await updateDoc(doc(_db, `users/${_uid}/tasks`, _dragTaskId), { dayKey: dayKey || null });
     showToast(dayKey ? 'Görev güne atandı' : 'Görev havuza taşındı');
-  } catch(err) {
-    showToast('Hata: ' + err.message);
-  }
+  } catch(err) { showToast('Hata: ' + err.message); }
 }
 
 // ═══════════════════════════════════════════
