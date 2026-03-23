@@ -69,6 +69,7 @@ html, body {
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* ── GRAIN OVERLAY ── */
@@ -220,8 +221,22 @@ body::before {
   align-items: start;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 899px) {
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 1rem;
+  }
+  .day-name { margin-bottom: 0; }
+  .day-date { font-size: 1rem; }
+  .day-progress-bar { flex: 1; margin-top: 0; }
+  .day-progress { display: none; }
+  .day-note-btn { margin-left: auto; }
+
   .planner-layout { grid-template-columns: 1fr; }
+
+  .pool-panel { position: static; }
 }
 
 /* ── GÖREV HAVUZU ── */
@@ -295,7 +310,7 @@ body::before {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .week-header {
@@ -305,7 +320,6 @@ body::before {
   align-items: center;
   justify-content: space-between;
   background: var(--surface2);
-  border-radius: 8px 8px 0 0;
 }
 
 .week-label {
@@ -330,22 +344,16 @@ body::before {
 }
 .week-stat span { color: var(--accent); font-weight: 500; }
 
-.days-grid-wrapper {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  border-radius: 0 0 8px 8px;
-  border: 1px solid var(--border);
-  border-top: none;
-}
-
 .days-grid {
-  display: grid;
-  grid-template-columns: repeat(7, 160px);
-  min-width: max-content;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 900px) {
-  .days-grid { grid-template-columns: repeat(7, 1fr); min-width: unset; }
+  .days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+  }
 }
 
 /* ── GÜN SÜTUNU ── */
@@ -356,6 +364,15 @@ body::before {
   flex-direction: column;
 }
 .day-col:last-child { border-right: none; }
+
+@media (max-width: 899px) {
+  .day-col {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    min-height: unset;
+  }
+  .day-col:last-child { border-bottom: none; }
+}
 
 .day-header {
   padding: 0.6rem 0.7rem 0.5rem;
@@ -1276,9 +1293,7 @@ function createWeekBlock(days, label) {
         <div class="week-stat"><span>${hrs > 0 ? hrs+'s ' : ''}${mins}dk</span> toplam</div>
       </div>
     </div>
-    <div class="days-grid-wrapper">
-      <div class="days-grid" id="days-grid-${label.replace(/\s/g,'')}"></div>
-    </div>
+    <div class="days-grid" id="days-grid-${label.replace(/\s/g,'')}"></div>
   `;
 
   const grid = block.querySelector('.days-grid');
