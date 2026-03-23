@@ -343,7 +343,7 @@ body::before {
 }
 
 @media (max-width: 900px) {
-  .days-grid { grid-template-columns: repeat(7, minmax(140px, 1fr)); }
+  .days-grid { grid-template-columns: repeat(7, minmax(145px, 1fr)); }
 }
 
 /* ── GÜN SÜTUNU ── */
@@ -1370,13 +1370,18 @@ function createTaskCard(task, inPool) {
 }
 
 // ═══════════════════════════════════════════
-// TOUCH DRAG & DROP (iOS Safari için)
+// TOUCH DRAG & DROP — iOS 6S uyumlu
 // ═══════════════════════════════════════════
-let _touchDragEl = null;
 let _touchClone = null;
+let _touchDragEl = null;
 let _touchTaskId = null;
 let _touchLongPressTimer = null;
 let _touchCurrentDropZone = null;
+let _isDragging = false;
+
+// Sayfa scroll'unu drag sırasında durdur
+function blockScroll(e) { if (_isDragging) e.preventDefault(); }
+document.addEventListener('touchmove', blockScroll, { passive: false });
 
 function setupTouchDrag(card, taskId) {
   card.addEventListener('touchstart', e => {
@@ -1384,51 +1389,70 @@ function setupTouchDrag(card, taskId) {
     const touch = e.touches[0];
     _touchTaskId = taskId;
     _touchDragEl = card;
+
     _touchLongPressTimer = setTimeout(() => {
+      _isDragging = true;
       startTouchDrag(card, touch);
-    }, 280);
+    }, 350);
   }, { passive: true });
 
   card.addEventListener('touchmove', e => {
-    if (!_touchClone) {
+    if (!_isDragging || !_touchClone) {
+      // Henüz drag başlamadıysa timer'ı iptal et
       clearTimeout(_touchLongPressTimer);
       _touchLongPressTimer = null;
       return;
     }
-    e.preventDefault();
-    const touch = e.touches[0];
-    _touchClone.style.left = (touch.clientX - _touchClone._offsetX) + 'px';
-    _touchClone.style.top  = (touch.clientY - _touchClone._offsetY) + 'px';
 
+    const touch = e.touches[0];
+
+    // Clone'u parmakla taşı
+    _touchClone.style.left = (touch.clientX - _touchClone._ox) + 'px';
+    _touchClone.style.top  = (touch.clientY - _touchClone._oy) + 'px';
+
+    // Drop zone bul
     _touchClone.style.visibility = 'hidden';
     const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    _touchClone.style.visibility = '';
+    _touchClone.style.visibility = 'visible';
 
     if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
-    const dropZone = el?.closest('.day-tasks, #pool-tasks');
-    _touchCurrentDropZone = dropZone || null;
-    if (dropZone) dropZone.classList.add('drag-over');
-  }, { passive: false });
+    const zone = el?.closest('.day-tasks, #pool-tasks');
+    _touchCurrentDropZone = zone || null;
+    if (zone) zone.classList.add('drag-over');
+
+  }, { passive: true });
 
   card.addEventListener('touchend', e => {
     clearTimeout(_touchLongPressTimer);
     _touchLongPressTimer = null;
-    if (!_touchClone) return;
+
+    if (!_isDragging || !_touchClone) {
+      _isDragging = false;
+      return;
+    }
 
     const touch = e.changedTouches[0];
+
+    // Clone'u kaldır, arkadaki elementi bul
     _touchClone.remove();
     _touchClone = null;
 
     if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
 
     const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const dropZone = el?.closest('.day-tasks, #pool-tasks');
-    if (dropZone) {
-      const dayKey = dropZone.id.startsWith('day-') ? dropZone.id.replace('day-', '') : null;
+    const zone = el?.closest('.day-tasks, #pool-tasks');
+
+    if (zone) {
+      const dayKey = zone.id.startsWith('day-') ? zone.id.replace('day-', '') : null;
       handleDropTouch(dayKey);
     }
+
+    // Temizle
     if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
-    _dragTaskId = null; _touchTaskId = null; _touchCurrentDropZone = null;
+    _isDragging = false;
+    _dragTaskId = null;
+    _touchTaskId = null;
+    _touchCurrentDropZone = null;
   });
 
   card.addEventListener('touchcancel', () => {
@@ -1436,27 +1460,36 @@ function setupTouchDrag(card, taskId) {
     if (_touchClone) { _touchClone.remove(); _touchClone = null; }
     if (_touchDragEl) { _touchDragEl.style.opacity = ''; _touchDragEl = null; }
     if (_touchCurrentDropZone) _touchCurrentDropZone.classList.remove('drag-over');
-    _dragTaskId = null; _touchTaskId = null; _touchCurrentDropZone = null;
+    _isDragging = false;
+    _dragTaskId = null;
+    _touchTaskId = null;
+    _touchCurrentDropZone = null;
   });
 }
 
 function startTouchDrag(card, touch) {
   const rect = card.getBoundingClientRect();
   _touchClone = card.cloneNode(true);
-  _touchClone._offsetX = touch.clientX - rect.left;
-  _touchClone._offsetY = touch.clientY - rect.top;
+  _touchClone._ox = touch.clientX - rect.left;
+  _touchClone._oy = touch.clientY - rect.top;
   _touchClone.style.cssText = `
-    position:fixed; width:${rect.width}px;
-    left:${rect.left}px; top:${rect.top}px;
-    opacity:0.9; z-index:9999; pointer-events:none;
-    transform:scale(1.05);
-    box-shadow:0 10px 30px rgba(0,0,0,0.6);
-    border:1px solid var(--accent) !important;
-    border-radius:4px; transition:none; margin:0;
-    background:var(--surface3);
+    position: fixed !important;
+    width: ${rect.width}px !important;
+    left: ${rect.left}px;
+    top: ${rect.top}px;
+    opacity: 0.92;
+    z-index: 99999;
+    pointer-events: none;
+    transform: scale(1.06) rotate(1deg);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.7);
+    border: 1px solid var(--accent) !important;
+    border-radius: 4px;
+    transition: none;
+    margin: 0 !important;
+    background: var(--surface3);
   `;
   document.body.appendChild(_touchClone);
-  card.style.opacity = '0.2';
+  card.style.opacity = '0.15';
   _dragTaskId = _touchTaskId;
 }
 
