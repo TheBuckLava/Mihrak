@@ -8,6 +8,8 @@
 
 <!-- Firebase -->
 <script type="module">
+  import { initializeAppCheck, ReCaptchaV3Provider } 
+from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -27,6 +29,12 @@
   // =============================================
 
   const app = initializeApp(firebaseConfig);
+
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider("6LcBbZUsAAAAALJ-0WdbCcKGhK1ZFlAn-LYQK7xF"),
+    isTokenAutoRefreshEnabled: true
+  });
+
   const auth = getAuth(app);
   const db = getFirestore(app);
 
@@ -177,6 +185,18 @@ body::before {
   letter-spacing: 0.25em;
   color: var(--accent);
   text-shadow: 0 0 20px rgba(196,163,90,0.3);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.header-byline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.4rem;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  font-weight: 300;
+  text-shadow: none;
 }
 
 .header-actions { display: flex; align-items: center; gap: 0.8rem; }
@@ -186,7 +206,7 @@ body::before {
   .header-logo { font-size: 1.3rem; }
   .header-actions { width: 100%; flex-wrap: wrap; justify-content: center; gap: 0.4rem; }
   .nav-btn { flex: 1; text-align: center; }
-  .signout-btn { width: 100%; text-align: center; margin-top: 0.1rem; }
+  .signout-btn { width: 100%; text-align: center; }
 }
 
 .nav-btn {
@@ -984,7 +1004,7 @@ body::before {
 <!-- App -->
 <div id="app">
   <header class="header">
-    <div class="header-logo">MİHRAK</div>
+    <div class="header-logo">MİHRAK<span class="header-byline">Made by TheBuckLava · Powered by AI</span></div>
     <div class="header-actions">
       <button class="nav-btn active" id="nav-planner">Program</button>
       <button class="nav-btn" id="nav-archive">Arşiv</button>
@@ -1405,6 +1425,7 @@ function createTaskCard(task, inPool) {
       setTimeout(() => card.style.opacity = '0.5', 0);
     });
     card.addEventListener('dragend', () => { card.style.opacity = ''; });
+    _setupTouch(card, task.id);
   }
 
   const examBadge = task.examType ? `<span class="task-badge badge-${task.examType.toLowerCase()}">${task.examType}</span>` : '';
@@ -1431,6 +1452,95 @@ function createTaskCard(task, inPool) {
   `;
 
   return card;
+}
+
+// ═══════════════════════════════════════════
+// TOUCH DRAG — smooth + auto-scroll
+// ═══════════════════════════════════════════
+let _tc=null, _tEl=null, _tId=null, _tTmr=null, _tZone=null, _tOn=false, _tX=0, _tY=0, _tRaf=null;
+
+function _setupTouch(card, taskId) {
+  card.addEventListener('touchstart', e => {
+    if (_isGuest) return;
+    _tId = taskId; _tEl = card;
+    const t = e.touches[0]; _tX = t.clientX; _tY = t.clientY;
+    _tTmr = setTimeout(() => { _tOn = true; _beginDrag(card, t); }, 300);
+  }, { passive: true });
+
+  card.addEventListener('touchmove', e => {
+    if (!_tOn || !_tc) { clearTimeout(_tTmr); _tTmr = null; return; }
+    e.preventDefault();
+    const t = e.touches[0]; _tX = t.clientX; _tY = t.clientY;
+
+    // rAF ile smooth hareket
+    if (!_tRaf) _tRaf = requestAnimationFrame(_moveDrag);
+
+    // drop zone
+    _tc.style.visibility = 'hidden';
+    const el = document.elementFromPoint(_tX, _tY);
+    _tc.style.visibility = 'visible';
+    if (_tZone) _tZone.classList.remove('drag-over');
+    _tZone = el?.closest('.day-tasks, #pool-tasks') || null;
+    if (_tZone) _tZone.classList.add('drag-over');
+  }, { passive: false });
+
+  card.addEventListener('touchend', e => {
+    clearTimeout(_tTmr); _tTmr = null;
+    if (_tRaf) { cancelAnimationFrame(_tRaf); _tRaf = null; }
+    if (!_tOn || !_tc) { _tOn = false; return; }
+    _tc.remove(); _tc = null;
+    if (_tZone) _tZone.classList.remove('drag-over');
+    const t = e.changedTouches[0];
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const zone = el?.closest('.day-tasks, #pool-tasks');
+    if (zone) { const dk = zone.id.startsWith('day-') ? zone.id.replace('day-','') : null; _dropTouch(dk); }
+    if (_tEl) { _tEl.style.opacity = ''; _tEl = null; }
+    _tOn = false; _dragTaskId = null; _tId = null; _tZone = null;
+  });
+
+  card.addEventListener('touchcancel', () => {
+    clearTimeout(_tTmr);
+    if (_tRaf) { cancelAnimationFrame(_tRaf); _tRaf = null; }
+    if (_tc) { _tc.remove(); _tc = null; }
+    if (_tEl) { _tEl.style.opacity = ''; _tEl = null; }
+    if (_tZone) _tZone.classList.remove('drag-over');
+    _tOn = false; _dragTaskId = null; _tId = null; _tZone = null;
+  });
+}
+
+function _beginDrag(card, touch) {
+  const r = card.getBoundingClientRect();
+  _tc = card.cloneNode(true);
+  _tc._ox = touch.clientX - r.left;
+  _tc._oy = touch.clientY - r.top;
+  _tc.style.cssText = `position:fixed;width:${r.width}px;left:${r.left}px;top:${r.top}px;
+    opacity:0.93;z-index:99999;pointer-events:none;
+    transform:scale(1.04) rotate(0.5deg);
+    box-shadow:0 12px 36px rgba(0,0,0,0.7);
+    border:1px solid var(--accent)!important;
+    border-radius:4px;transition:none;margin:0;background:var(--surface3);`;
+  document.body.appendChild(_tc);
+  card.style.opacity = '0.15';
+  _dragTaskId = _tId;
+}
+
+function _moveDrag() {
+  _tRaf = null;
+  if (!_tc) return;
+  _tc.style.left = (_tX - _tc._ox) + 'px';
+  _tc.style.top  = (_tY - _tc._oy) + 'px';
+  // auto-scroll
+  if (_tY < 80) window.scrollBy(0, -10);
+  else if (_tY > window.innerHeight - 80) window.scrollBy(0, 10);
+}
+
+async function _dropTouch(dayKey) {
+  if (!_dragTaskId || _isGuest) return;
+  try {
+    const { doc, updateDoc } = _firestore;
+    await updateDoc(doc(_db, `users/${_uid}/tasks`, _dragTaskId), { dayKey: dayKey || null });
+    showToast(dayKey ? 'Görev güne atandı' : 'Görev havuza taşındı');
+  } catch(e) { showToast('Hata: ' + e.message); }
 }
 
 // ═══════════════════════════════════════════
