@@ -1191,18 +1191,31 @@ async function handleReorder(draggedId, targetId) {
   const dragged=_tasks.find(t=>t.id===draggedId);
   const target=_tasks.find(t=>t.id===targetId);
   if(!dragged||!target)return;
-  // Aynı container içinde mi?
   if(dragged.dayKey!==target.dayKey)return;
-  // Target'ın order'ını al, dragged'a ver, aralarını kaydır
-  const containerTasks=[..._tasks.filter(t=>t.dayKey===target.dayKey)].sort((a,b)=>(a.order||a.createdAt||0)-(b.order||b.createdAt||0));
-  const newOrder=[];
+
+  const scopeKey = target.dayKey ?? null;
+  const containerTasks=[..._tasks
+    .filter(t => (t.dayKey ?? null)===scopeKey)
+    .sort((a,b)=>(Number(a.order) || Number(a.createdAt) || 0) - (Number(b.order) || Number(b.createdAt) || 0))];
+
   const withoutDragged=containerTasks.filter(t=>t.id!==draggedId);
   const targetIdx=withoutDragged.findIndex(t=>t.id===targetId);
+  if(targetIdx===-1)return;
+
   withoutDragged.splice(targetIdx,0,dragged);
-  withoutDragged.forEach((t,i)=>newOrder.push({id:t.id,order:i*10}));
+  withoutDragged.forEach((t,i)=>{ t.order=(i+1)*1000; });
+
+  _tasks = _tasks.map(t => {
+    const updated = withoutDragged.find(x => x.id===t.id);
+    return updated ? {...t, order: updated.order} : t;
+  });
+  renderAll();
+
   try{
     const{doc,updateDoc}=_firestore;
-    await Promise.all(newOrder.map(({id,order})=>updateDoc(doc(_db,`users/${_uid}/tasks`,id),{order})));
+    for (const t of withoutDragged) {
+      await updateDoc(doc(_db,`users/${_uid}/tasks`,t.id),{order:t.order});
+    }
   }catch(e){showToast('Hata: '+e.message);}
 }
 
@@ -1384,8 +1397,9 @@ async function toggleArchiveComplete(weekId, taskId) {
 
 async function deleteArchiveTask(weekId, taskId) {
   if(_isGuest||!_uid) return;
-  if(!confirm('Bu arşiv görevini silmek istediğinden emin misin?')) return;
   const week=_archivedWeeks.find(w=>w.id===weekId); if(!week) return;
+  const task=(week.tasks||[]).find(t=>t.id===taskId); if(!task) return;
+  addToRecentDeleted({...task, _deletedSource:'archive', _archiveWeekId:weekId});
   const {doc,setDoc}= _firestore;
   const updated=(week.tasks||[]).filter(t=>t.id!==taskId);
   await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,weekId),{...week,tasks:updated});
@@ -1471,10 +1485,7 @@ async function toggleComplete(id) {
 async function deleteTask(id, skipConfirm=false) {
   const task=_tasks.find(t=>t.id===id);
   if(!task) return;
-  if(!skipConfirm && !confirm('Silmek istediğinden emin misin?')) return;
-  const deletedSnapshot = { ...task, deletedAt: Date.now(), restoreUntil: Date.now() + 12*60*60*1000 };
-  _recentDeleted = [deletedSnapshot, ..._recentDeleted.filter(t => t.id !== id)].filter(t => t.restoreUntil > Date.now()).slice(0, 50);
-  renderRecentDeletedList();
+  addToRecentDeleted({...task, _deletedSource:'task'});
   const {doc,deleteDoc}=_firestore;
   await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));
   showToast('Görev silindi');
@@ -2057,6 +2068,20 @@ document.querySelectorAll('.rich-btn, .rich-color').forEach(el=>{
   el.addEventListener('mousedown', e => { e.preventDefault(); _restoreNoteSelection(); });
 });
 
+function addToRecentDeleted(taskLike) {
+  const uniqueId = `${taskLike._deletedSource || 'task'}::${taskLike._archiveWeekId || ''}::${taskLike.id || Date.now()}::${Date.now()}`;
+  const deletedSnapshot = {
+    ...taskLike,
+    _recentDeletedId: uniqueId,
+    deletedAt: Date.now(),
+    restoreUntil: Date.now() + 12*60*60*1000
+  };
+  _recentDeleted = [deletedSnapshot, ..._recentDeleted]
+    .filter(item => (item.restoreUntil || 0) > Date.now())
+    .slice(0, 50);
+  renderRecentDeletedList();
+}
+
 function purgeExpiredRecentDeleted() {
   const now = Date.now();
   _recentDeleted = _recentDeleted.filter(item => (item.restoreUntil || 0) > now);
@@ -2074,9 +2099,11 @@ function renderRecentDeletedList() {
     const leftMs = Math.max(0, (item.restoreUntil || 0) - Date.now());
     const hours = Math.floor(leftMs / 3600000);
     const mins = Math.floor((leftMs % 3600000) / 60000);
-    const location = item.dayKey ? item.dayKey : 'Görev Havuzu';
+    const location = item._deletedSource === 'archive'
+      ? `Arşiv · ${escHtml(item._archiveWeekId || '')}`
+      : (item.dayKey ? escHtml(item.dayKey) : 'Görev Havuzu');
     return `<div class="recent-deleted-item">
-      <div class="recent-meta">${hours}s ${mins}dk kaldı · ${escHtml(location)}</div>
+      <div class="recent-meta">${hours}s ${mins}dk kaldı · ${location}</div>
       <div class="task-name">${escHtml(item.lesson || '')}${item.topic ? ' · ' + escHtml(item.topic) : ''}</div>
       ${item.note ? `<div class="task-note-chip-wrap"><span class="task-note-chip">${escHtml(item.note.substring(0,40))}${item.note.length>40?'…':''}</span></div>` : ''}
       <div class="task-meta">
@@ -2084,7 +2111,7 @@ function renderRecentDeletedList() {
         ${item.duration ? `<span class="task-duration">${escHtml(String(item.duration))}dk</span>` : ''}
       </div>
       <div class="task-actions" style="margin-top:0.45rem">
-        <button class="restore-btn" onclick="restoreDeletedTask('${item.id}')">geri al</button>
+        <button class="restore-btn" onclick="restoreDeletedTask('${item._recentDeletedId}')">geri al</button>
       </div>
     </div>`;
   }).join('');
@@ -2095,21 +2122,40 @@ function openRecentDeletedModal() {
   document.getElementById('recent-deleted-modal').classList.add('open');
 }
 
-async function restoreDeletedTask(deletedId) {
+async function restoreDeletedTask(recentDeletedId) {
   purgeExpiredRecentDeleted();
-  const item = _recentDeleted.find(t => t.id === deletedId);
+  const item = _recentDeleted.find(t => t._recentDeletedId === recentDeletedId);
   if (!item || _isGuest || !_uid) {
     showToast('Geri alınacak görev bulunamadı');
     return;
   }
-  const clone = { ...item };
-  delete clone.id;
-  delete clone.deletedAt;
-  delete clone.restoreUntil;
   try {
-    const {collection, addDoc} = _firestore;
-    await addDoc(collection(_db, `users/${_uid}/tasks`), clone);
-    _recentDeleted = _recentDeleted.filter(t => t.id !== deletedId);
+    if (item._deletedSource === 'archive') {
+      const {doc, getDoc, setDoc} = _firestore;
+      const archiveRef = doc(_db, `users/${_uid}/archivedWeeks`, item._archiveWeekId);
+      const snap = await getDoc(archiveRef);
+      if (!snap.exists()) throw new Error('archive missing');
+      const week = snap.data();
+      const restoredTask = { ...item };
+      delete restoredTask._recentDeletedId;
+      delete restoredTask._deletedSource;
+      delete restoredTask._archiveWeekId;
+      delete restoredTask.deletedAt;
+      delete restoredTask.restoreUntil;
+      const tasks = [...(week.tasks || []), restoredTask].sort((a,b)=>(Number(a.order)||Number(a.createdAt)||0)-(Number(b.order)||Number(b.createdAt)||0));
+      await setDoc(archiveRef, {...week, tasks});
+    } else {
+      const clone = { ...item };
+      delete clone.id;
+      delete clone._recentDeletedId;
+      delete clone._deletedSource;
+      delete clone._archiveWeekId;
+      delete clone.deletedAt;
+      delete clone.restoreUntil;
+      const {collection, addDoc} = _firestore;
+      await addDoc(collection(_db, `users/${_uid}/tasks`), clone);
+    }
+    _recentDeleted = _recentDeleted.filter(t => t._recentDeletedId !== recentDeletedId);
     renderRecentDeletedList();
     showToast('Görev geri alındı');
   } catch(e) {
