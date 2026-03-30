@@ -1295,12 +1295,31 @@ async function restoreUnfinishedFromArchive(weekId) {
   if(_isGuest||!_uid)return;
   const week=_archivedWeeks.find(w=>w.id===weekId);
   if(!week)return;
+
   const unfinished=(week.tasks||[]).filter(t=>!t.completed);
-  if(!unfinished.length){showToast('Aktarılacak tamamlanmayan görev yok');return;}
+  if(!unfinished.length){
+    showToast('Aktarılacak tamamlanmayan görev yok');
+    return;
+  }
+
+  const existingCloneKeys=new Set(
+    _tasks
+      .filter(t=>t.isPastClone && t.originalArchiveWeekId===weekId && t.originalArchivedTaskId)
+      .map(t=>`${t.originalArchiveWeekId}__${t.originalArchivedTaskId}`)
+  );
+
+  const tasksToAdd=unfinished.filter(task=>!existingCloneKeys.has(`${weekId}__${task.id}`));
+
+  if(!tasksToAdd.length){
+    showToast('Eklenmemiş tamamlanmayan görev yok');
+    return;
+  }
+
   const {collection,addDoc}= _firestore;
   const poolTasks=_tasks.filter(t=>!t.dayKey);
   let maxOrder=poolTasks.length?Math.max(...poolTasks.map(t=>t.order||t.createdAt||0)):0;
-  for(const task of unfinished){
+
+  for(const task of tasksToAdd){
     maxOrder+=10;
     const clone={...task};
     delete clone.id;
@@ -1312,7 +1331,17 @@ async function restoreUnfinishedFromArchive(weekId) {
     clone.originalArchivedTaskId=task.id;
     await addDoc(collection(_db,`users/${_uid}/tasks`),clone);
   }
-  showToast('Tamamlanmayan görevler havuza aktarıldı');
+
+  _snd('save');
+  const plannerBtn=document.getElementById('nav-planner');
+  if(plannerBtn){
+    plannerBtn.classList.remove('flash');
+    void plannerBtn.offsetWidth;
+    plannerBtn.classList.add('flash');
+    setTimeout(()=>plannerBtn.classList.remove('flash'), 2400);
+  }
+
+  showToast(tasksToAdd.length===1 ? '1 tamamlanmayan görev havuza eklendi' : `${tasksToAdd.length} tamamlanmayan görev havuza eklendi`);
 }
 
 // ══════════════════════════════════════════
