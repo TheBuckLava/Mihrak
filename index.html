@@ -100,8 +100,6 @@ body::before {
 .login-btn { display:flex;align-items:center;gap:0.8rem;padding:0.9rem 2rem;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--ff-body);font-size:0.9rem;cursor:pointer;transition:all 0.3s;animation:fadeUp 0.8s 0.4s ease both; }
 .login-btn:hover { background:var(--surface3);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px var(--accent-glow); }
 .login-btn svg { width:18px;height:18px; }
-.guest-btn { background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;padding:0.6rem 1.5rem;border-radius:6px;cursor:pointer;font-family:var(--ff-body);transition:all 0.3s;animation:fadeUp 0.8s 0.5s ease both; }
-.guest-btn:hover { border-color:var(--text-muted);color:var(--text); }
 @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
 
 /* ── APP ── */
@@ -495,7 +493,6 @@ body::before {
     <svg viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
     Google ile Giriş Yap
   </button>
-  <button class="guest-btn" id="guest-btn">misafir olarak görüntüle</button>
 </div>
 
 <div id="app">
@@ -899,10 +896,8 @@ document.getElementById('google-login-btn').onclick = async () => {
   const p = new _firestore.GoogleAuthProvider();
   try { await _firestore.signInWithPopup(_auth,p); } catch(e) { showToast('Giriş başarısız'); }
 };
-document.getElementById('guest-btn').onclick = () => { _uid=null;_isGuest=true;document.getElementById('login-screen').style.display='none';startApp(); };
 document.getElementById('signout-btn').onclick = async () => {
   _snd('click');
-  if (_isGuest) { location.reload(); return; }
   [_unsubTasks,_unsubNotes,_unsubArchive,_unsubExams,_unsubNotesDb].forEach(u=>u&&u());
   await _firestore.signOut(_auth); location.reload();
 };
@@ -912,8 +907,7 @@ document.getElementById('signout-btn').onclick = async () => {
 // ══════════════════════════════════════════
 function startApp() {
   document.getElementById('app').classList.add('visible');
-  if (_isGuest) { document.getElementById('add-task-btn').style.display='none'; }
-  if (!_isGuest && _uid) { subscribeData(); } else { renderAll(); }
+  if (_uid) { subscribeData(); } else { renderAll(); }
   checkWeekArchive();
   buildNoteCategorySelect();
 }
@@ -1474,10 +1468,16 @@ async function toggleComplete(id) {
   await updateDoc(doc(_db,`users/${_uid}/tasks`,id),{completed:!task.completed});
 }
 
-async function deleteTask(id) {
-  if(!confirm('Silmek istediğinden emin misin?'))return;
-  const{doc,deleteDoc}=_firestore;
-  await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));showToast('Görev silindi');
+async function deleteTask(id, skipConfirm=false) {
+  const task=_tasks.find(t=>t.id===id);
+  if(!task) return;
+  if(!skipConfirm && !confirm('Silmek istediğinden emin misin?')) return;
+  const deletedSnapshot = { ...task, deletedAt: Date.now(), restoreUntil: Date.now() + 12*60*60*1000 };
+  _recentDeleted = [deletedSnapshot, ..._recentDeleted.filter(t => t.id !== id)].filter(t => t.restoreUntil > Date.now()).slice(0, 50);
+  renderRecentDeletedList();
+  const {doc,deleteDoc}=_firestore;
+  await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));
+  showToast('Görev silindi');
 }
 
 // ══════════════════════════════════════════
@@ -2056,6 +2056,74 @@ function resetRichState(applyToEditor=true){
 document.querySelectorAll('.rich-btn, .rich-color').forEach(el=>{
   el.addEventListener('mousedown', e => { e.preventDefault(); _restoreNoteSelection(); });
 });
+
+function purgeExpiredRecentDeleted() {
+  const now = Date.now();
+  _recentDeleted = _recentDeleted.filter(item => (item.restoreUntil || 0) > now);
+}
+
+function renderRecentDeletedList() {
+  purgeExpiredRecentDeleted();
+  const list = document.getElementById('recent-deleted-list');
+  if (!list) return;
+  if (!_recentDeleted.length) {
+    list.innerHTML = '<div style="color:var(--text-dim);font-size:0.78rem;padding:0.6rem 0">Son 12 saatte silinen görev yok.</div>';
+    return;
+  }
+  list.innerHTML = _recentDeleted.map(item => {
+    const leftMs = Math.max(0, (item.restoreUntil || 0) - Date.now());
+    const hours = Math.floor(leftMs / 3600000);
+    const mins = Math.floor((leftMs % 3600000) / 60000);
+    const location = item.dayKey ? item.dayKey : 'Görev Havuzu';
+    return `<div class="recent-deleted-item">
+      <div class="recent-meta">${hours}s ${mins}dk kaldı · ${escHtml(location)}</div>
+      <div class="task-name">${escHtml(item.lesson || '')}${item.topic ? ' · ' + escHtml(item.topic) : ''}</div>
+      ${item.note ? `<div class="task-note-chip-wrap"><span class="task-note-chip">${escHtml(item.note.substring(0,40))}${item.note.length>40?'…':''}</span></div>` : ''}
+      <div class="task-meta">
+        ${item.examType ? `<span class="task-badge badge-${String(item.examType).toLowerCase()}">${escHtml(item.examType)}</span>` : ''}
+        ${item.duration ? `<span class="task-duration">${escHtml(String(item.duration))}dk</span>` : ''}
+      </div>
+      <div class="task-actions" style="margin-top:0.45rem">
+        <button class="restore-btn" onclick="restoreDeletedTask('${item.id}')">geri al</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openRecentDeletedModal() {
+  renderRecentDeletedList();
+  document.getElementById('recent-deleted-modal').classList.add('open');
+}
+
+async function restoreDeletedTask(deletedId) {
+  purgeExpiredRecentDeleted();
+  const item = _recentDeleted.find(t => t.id === deletedId);
+  if (!item || _isGuest || !_uid) {
+    showToast('Geri alınacak görev bulunamadı');
+    return;
+  }
+  const clone = { ...item };
+  delete clone.id;
+  delete clone.deletedAt;
+  delete clone.restoreUntil;
+  try {
+    const {collection, addDoc} = _firestore;
+    await addDoc(collection(_db, `users/${_uid}/tasks`), clone);
+    _recentDeleted = _recentDeleted.filter(t => t.id !== deletedId);
+    renderRecentDeletedList();
+    showToast('Görev geri alındı');
+  } catch(e) {
+    showToast('Geri alınamadı');
+  }
+}
+
+setInterval(() => {
+  const before = _recentDeleted.length;
+  purgeExpiredRecentDeleted();
+  if (_recentDeleted.length !== before) renderRecentDeletedList();
+}, 60000);
+
+
 // ══════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════
@@ -2103,6 +2171,7 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
 
   window.addEventListener('load', ()=>{
     initPoolDangerControls();
+    renderRecentDeletedList();
     toolbarHtmlReady();
     const observer=new MutationObserver(()=>{ updateRichToolbarUI(); initPoolDangerControls(); });
     const toolbar=document.getElementById('rich-toolbar');
