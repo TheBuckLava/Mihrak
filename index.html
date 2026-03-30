@@ -326,6 +326,21 @@ body::before {
 .pool-danger-btn:hover { background:rgba(224,92,122,0.16); border-color:#e05c7a; color:#ffd0da; }
 .pool-danger-btn.full { width:100%; }
 
+.pool-danger-actions-wrap { margin-top:0.85rem; padding:0.75rem; border:1px solid var(--border); border-radius:10px; background:rgba(255,255,255,0.02); }
+.pool-danger-row.full-row { grid-template-columns:1fr; }
+.pool-danger-btn.confirm-mode { border-color:rgba(224,92,122,0.45); background:rgba(224,92,122,0.14); color:#ffd0da; }
+.pool-danger-btn.cancel-mode { border-color:rgba(90,158,224,0.35); background:rgba(90,158,224,0.10); color:#b9d8ff; }
+.btn-priority { padding:0.6rem 1.1rem;background:transparent;border:1px solid rgba(90,158,224,0.35);border-radius:6px;color:#9cc4ff;font-family:var(--ff-body);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s; }
+.btn-priority:hover { border-color:#5c9ee0;color:#d9ebff;background:rgba(90,158,224,0.10); }
+.btn-priority.active { border-color:#e05c7a;color:#ffd0da;background:rgba(224,92,122,0.12); }
+.task-card.priority { box-shadow: inset 0 0 0 2px rgba(224,92,122,0.32); }
+.task-card.priority:hover { box-shadow: inset 0 0 0 2px rgba(224,92,122,0.38), 0 4px 14px rgba(0,0,0,0.35); }
+.bulk-check-wrap { display:flex; align-items:center; justify-content:flex-end; margin-top:0.35rem; }
+.bulk-check { width:18px; height:18px; accent-color:#e05c7a; cursor:pointer; }
+.task-card.bulk-mode .task-actions { display:none; }
+.task-card.bulk-mode { border-color:rgba(224,92,122,0.35); }
+
+
 .bulk-check-wrap { display:flex; align-items:center; justify-content:flex-end; margin-top:0.35rem; }
 .bulk-check { width:16px; height:16px; accent-color:#e05c7a; cursor:pointer; }
 .task-card.bulk-mode { border-color:rgba(224,92,122,0.35); }
@@ -442,6 +457,8 @@ body::before {
 .rich-toolbar { display:flex;gap:0.3rem;flex-wrap:wrap;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px 6px 0 0;border-bottom:none; }
 .rich-btn { padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text-muted);font-size:0.7rem;cursor:pointer;transition:all 0.15s;font-family:var(--ff-body); }
 .rich-btn:hover { border-color:var(--accent);color:var(--accent); }
+.rich-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
+.rich-color.active { outline:2px solid rgba(255,255,255,0.9); outline-offset:2px; }
 .rich-btn.b { font-weight:700; }
 .rich-btn.i { font-style:italic; }
 .rich-color { width:18px;height:18px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0; }
@@ -508,14 +525,18 @@ body::before {
         </div>
         <div style="padding:0 0.8rem 0.8rem">
           <button class="add-task-btn" id="add-task-btn">+ yeni görev ekle</button>
-          <div class="pool-danger-actions" id="pool-danger-actions">
-            <div class="pool-danger-row">
-              <button class="pool-danger-btn" id="bulk-delete-btn">Toplu silme</button>
-              <button class="pool-danger-btn" id="recent-deleted-btn">Son silinenler</button>
-            </div>
-            <div class="pool-danger-row">
-              <button class="pool-danger-btn" id="clear-pool-btn">Görev havuzunu temizle</button>
-              <button class="pool-danger-btn" id="bulk-cancel-btn" style="display:none">Vazgeç</button>
+          <div class="pool-danger-actions-wrap">
+            <div class="pool-danger-actions" id="pool-danger-actions">
+              <div class="pool-danger-row">
+                <button class="pool-danger-btn" id="bulk-delete-btn">Toplu silme</button>
+                <button class="pool-danger-btn" id="recent-deleted-btn">Son silinenler</button>
+              </div>
+              <div class="pool-danger-row full-row">
+                <button class="pool-danger-btn full" id="clear-pool-btn">Görev havuzunu temizle</button>
+              </div>
+              <div class="pool-danger-row full-row" id="bulk-cancel-row" style="display:none">
+                <button class="pool-danger-btn full secondary-mode" id="bulk-cancel-btn">Vazgeç</button>
+              </div>
             </div>
           </div>
         </div>
@@ -601,6 +622,7 @@ body::before {
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('detail-modal')">Kapat</button>
       <button class="btn-success" id="detail-copy-btn">Kopya oluştur</button>
+      <button class="btn-priority" id="detail-priority-btn">Öncelik ver</button>
       <button class="btn-primary" id="detail-edit-btn">Düzenle</button>
     </div>
   </div>
@@ -686,22 +708,22 @@ body::before {
       <div class="form-group">
         <label class="form-label">Not</label>
         <div class="rich-toolbar" id="rich-toolbar">
-          <button class="rich-btn b" onclick="execRich('bold')">K</button>
-          <button class="rich-btn i" onclick="execRich('italic')">İ</button>
-          <button class="rich-btn" onclick="execRich('underline')" style="text-decoration:underline">A</button>
+          <button class="rich-btn b" id="rich-bold-btn" onclick="execRich('bold')">K</button>
+          <button class="rich-btn i" id="rich-italic-btn" onclick="execRich('italic')">İ</button>
+          <button class="rich-btn" id="rich-underline-btn" onclick="execRich('underline')" style="text-decoration:underline">A</button>
           
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
-          <button class="rich-btn" onclick="execFontSize('sm')" style="font-size:0.6rem">A</button>
-          <button class="rich-btn" onclick="execFontSize('md')" style="font-size:0.75rem">A</button>
-          <button class="rich-btn" onclick="execFontSize('lg')" style="font-size:0.9rem">A</button>
-          <button class="rich-btn" onclick="execFontSize('xl')" style="font-size:1.05rem">A</button>
+          <button class="rich-btn" data-font="sm" onclick="execFontSize('sm')" style="font-size:0.6rem">A</button>
+          <button class="rich-btn" data-font="md" onclick="execFontSize('md')" style="font-size:0.75rem">A</button>
+          <button class="rich-btn" data-font="lg" onclick="execFontSize('lg')" style="font-size:0.9rem">A</button>
+          <button class="rich-btn" data-font="xl" onclick="execFontSize('xl')" style="font-size:1.05rem">A</button>
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
-          <div class="rich-color" style="background:#e8e4f0" title="Beyaz" onclick="execColor('#e8e4f0')"></div>
-          <div class="rich-color" style="background:#e8c97a" title="Altın" onclick="execColor('#e8c97a')"></div>
-          <div class="rich-color" style="background:#5c9ee0" title="Mavi" onclick="execColor('#5c9ee0')"></div>
-          <div class="rich-color" style="background:#5ce0a8" title="Yeşil" onclick="execColor('#5ce0a8')"></div>
-          <div class="rich-color" style="background:#e05c7a" title="Kırmızı" onclick="execColor('#e05c7a')"></div>
-          <div class="rich-color" style="background:#a05ce0" title="Mor" onclick="execColor('#a05ce0')"></div>
+          <div class="rich-color" data-color="#e8e4f0" style="background:#e8e4f0" title="Beyaz" onclick="execColor('#e8e4f0')"></div>
+          <div class="rich-color" data-color="#e8c97a" style="background:#e8c97a" title="Altın" onclick="execColor('#e8c97a')"></div>
+          <div class="rich-color" data-color="#5c9ee0" style="background:#5c9ee0" title="Mavi" onclick="execColor('#5c9ee0')"></div>
+          <div class="rich-color" data-color="#5ce0a8" style="background:#5ce0a8" title="Yeşil" onclick="execColor('#5ce0a8')"></div>
+          <div class="rich-color" data-color="#e05c7a" style="background:#e05c7a" title="Kırmızı" onclick="execColor('#e05c7a')"></div>
+          <div class="rich-color" data-color="#a05ce0" style="background:#a05ce0" title="Mor" onclick="execColor('#a05ce0')"></div>
         </div>
         <div class="note-editor" id="note-editor" contenteditable="true" spellcheck="false"></div>
       </div>
@@ -940,6 +962,7 @@ function renderPool() {
   empty.style.display=poolTasks.length?'none':'block';
   container.querySelectorAll('.task-card').forEach(el=>el.remove());
   poolTasks.forEach(t=>container.appendChild(createTaskCard(t)));
+  if(typeof initPoolDangerControls==='function') initPoolDangerControls();
 }
 
 // ══════════════════════════════════════════
@@ -1009,12 +1032,13 @@ function createDayCol(date) {
 // ══════════════════════════════════════════
 function createTaskCard(task) {
   const card=document.createElement('div');
-  card.className=`task-card ${task.completed?'completed':''}`;
+  const isBulkSelectable=_bulkDeleteMode && !task._archiveView && !task.dayKey;
+  card.className=`task-card ${task.completed?'completed':''} ${task.priority?'priority':''} ${isBulkSelectable?'bulk-mode':''}`;
   card.dataset.id=task.id;
   card.dataset.order=task.order||task.createdAt||0;
   card.dataset.lesson=(task.lesson||'').toLowerCase();
-  card.draggable=!_isGuest && !task._archiveView;
-  if (!_isGuest && !task._archiveView) {
+  card.draggable=!_isGuest && !task._archiveView && !isBulkSelectable;
+  if (!_isGuest && !task._archiveView && !isBulkSelectable) {
     card.addEventListener('dragstart',e=>{
       _dragTaskId=task.id;
       e.dataTransfer.effectAllowed='move';
@@ -1035,6 +1059,7 @@ function createTaskCard(task) {
   const rep=(task.recurring===true||task.recurring==='true')?`<span class="repeat-badge">↻</span>`:'';
   const dur=task.duration?`<span class="task-duration">${task.duration}dk</span>`:'';
   const noteChip=task.note?`<div class="task-note-chip-wrap"><span class="task-note-chip" title="${escHtml(task.note)}">${escHtml(task.note.substring(0,40))}${task.note.length>40?'…':''}</span>${task.isPastClone?'<span class="task-origin-chip">Geçmiş görev</span>':''}</div>`:(task.isPastClone?`<div class="task-note-chip-wrap"><span class="task-origin-chip">Geçmiş görev</span></div>`:'');
+  const bulkCheck=isBulkSelectable?`<div class="bulk-check-wrap"><input type="checkbox" class="bulk-check" ${_bulkDeleteSelected.has(task.id)?'checked':''} onchange="toggleBulkTaskSelection('${task.id}', this.checked)"></div>`:'';
   const actions = task._archiveView
     ? `<div class="task-actions">
         <button class="complete-btn" onclick="_snd('complete');toggleArchiveComplete('${task._archiveWeekId}','${task.id}')">${task.completed?'✓ tamamlandı':'tamamlandı'}</button>
@@ -1053,7 +1078,7 @@ function createTaskCard(task) {
     <div class="task-name">${escHtml(task.lesson||'')}${task.topic?' · '+escHtml(task.topic):''}</div>
     ${noteChip}
     <div class="task-meta">${exam}${rep}${dur}</div>
-    ${actions}`;
+    ${isBulkSelectable ? bulkCheck : actions}`;
   return card;
 }
 
@@ -1364,10 +1389,11 @@ function openArchiveDetail(weekId, taskId) {
   const week=_archivedWeeks.find(w=>w.id===weekId); if(!week) return;
   const task=(week.tasks||[]).find(t=>t.id===taskId); if(!task) return;
   document.getElementById('detail-title').textContent=task.lesson||'Görev';
-  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
+  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Öncelik',task.priority?'Verildi':'—'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
   document.getElementById('detail-body').innerHTML=rows.map(([k,v])=>`<div class="detail-row"><div class="detail-key">${k}</div><div class="detail-val ${k==='Durum'&&task.completed?'detail-completed':''}">${escHtml(String(v))}</div></div>`).join('');
   document.getElementById('detail-edit-btn').style.display='none';
   document.getElementById('detail-copy-btn').style.display='none';
+  document.getElementById('detail-priority-btn').style.display='none';
   document.getElementById('detail-modal').classList.add('open');
 }
 
@@ -1447,13 +1473,22 @@ async function deleteTask(id) {
 function openDetail(id) {
   const task=_tasks.find(t=>t.id===id);if(!task)return;
   document.getElementById('detail-title').textContent=task.lesson||'Görev';
-  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
+  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Öncelik',task.priority?'Verildi':'—'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
   document.getElementById('detail-body').innerHTML=rows.map(([k,v])=>`<div class="detail-row"><div class="detail-key">${k}</div><div class="detail-val ${k==='Durum'&&task.completed?'detail-completed':''}">${escHtml(String(v))}</div></div>`).join('');
   document.getElementById('detail-edit-btn').style.display='';
   document.getElementById('detail-copy-btn').style.display='';
+  document.getElementById('detail-priority-btn').style.display='';
+  document.getElementById('detail-priority-btn').classList.toggle('active', !!task.priority);
   document.getElementById('detail-edit-btn').onclick=()=>{closeModal('detail-modal');openEdit(id);};
   document.getElementById('detail-copy-btn').onclick=()=>{closeModal('detail-modal');openDuplicateTask(id);};
+  document.getElementById('detail-priority-btn').onclick=()=>{_snd('click');toggleTaskPriority(id);};
   document.getElementById('detail-modal').classList.add('open');
+}
+
+async function toggleTaskPriority(id) {
+  const task=_tasks.find(t=>t.id===id); if(!task) return;
+  const {doc,updateDoc}= _firestore;
+  await updateDoc(doc(_db,`users/${_uid}/tasks`,id),{priority:!task.priority});
 }
 
 function openEdit(id) {
@@ -1857,7 +1892,7 @@ document.getElementById('new-note-btn').onclick=()=>{
   _snd('click');
   _editingNoteId=null;
   document.getElementById('note-modal-title').textContent='Yeni Not';
-  document.getElementById('note-editor').innerHTML='';
+  resetRichState(true);
   document.getElementById('note-category').value=_activeNoteTab;
   resetRichState(true);
   document.getElementById('note-modal').classList.add('open');
@@ -1882,6 +1917,7 @@ function editNote(id) {
   const note=_notes.find(n=>n.id===id);if(!note)return;
   _editingNoteId=id;
   document.getElementById('note-modal-title').textContent='Notu Düzenle';
+  resetRichState(false);
   document.getElementById('note-editor').innerHTML=note.html||'';
   document.getElementById('note-category').value=note.category||'Genel';
   resetRichState(false);
@@ -1899,124 +1935,99 @@ async function deleteNote(id) {
 // ══════════════════════════════════════════
 let _savedNoteRange = null;
 
+function _ed() { return document.getElementById('note-editor'); }
+function _mapFontSize(key){ return ({sm:'0.68rem',md:'0.85rem',lg:'1.05rem',xl:'1.3rem'})[key]||'0.85rem'; }
+
 function _saveNoteSelection() {
   const editor = _ed();
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!editor || !sel || sel.rangeCount === 0) return;
   const range = sel.getRangeAt(0);
   if (!editor.contains(range.commonAncestorContainer)) return;
   _savedNoteRange = range.cloneRange();
 }
 
 function _restoreNoteSelection() {
-  if (!_savedNoteRange) return false;
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(_savedNoteRange);
-  return true;
-}
-
-function _placeCaretAfter(node) {
-  const sel = window.getSelection();
-  const range = document.createRange();
-  range.setStartAfter(node);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
-  _saveNoteSelection();
-}
-
-function _insertStyledCaretSpan(styles) {
-  const sel = window.getSelection();
-  let range;
-  if (sel && sel.rangeCount) range = sel.getRangeAt(0);
-  if (!range) return null;
-  const span = document.createElement('span');
-  Object.assign(span.style, styles);
-  const textNode = document.createTextNode('\u200B');
-  span.appendChild(textNode);
-  range.insertNode(span);
-  const newRange = document.createRange();
-  newRange.setStart(textNode, 1);
-  newRange.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(newRange);
-  _savedNoteRange = newRange.cloneRange();
-  return span;
-}
-
-function _ed() { return document.getElementById('note-editor'); }
-
-function _currentRichStyles(){
-  const styles={ color:_richState.color||'#e8e4f0', fontSize:({sm:'0.68rem',md:'0.85rem',lg:'1.05rem',xl:'1.3rem'})[_richState.fontSize]||'0.85rem' };
-  if(_richState.bold) styles.fontWeight='700';
-  if(_richState.italic) styles.fontStyle='italic';
-  if(_richState.underline) styles.textDecoration='underline';
-  return styles;
-}
-
-function _applySpan(styles) {
-  const editor = _ed();
-  if(!editor) return;
-  editor.focus();
-  _restoreNoteSelection();
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-
-  if (sel.isCollapsed) {
-    _insertStyledCaretSpan(styles);
-    return;
-  }
-
-  try {
-    const frag = range.extractContents();
-    const span = document.createElement('span');
-    Object.assign(span.style, styles);
-    span.appendChild(frag);
-    range.insertNode(span);
-    _placeCaretAfter(span);
-  } catch(e) {}
-}
-
-function _applyTypingState(){
   const editor=_ed();
-  if(!editor) return;
+  if(!_savedNoteRange || !editor) return false;
+  try {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_savedNoteRange);
+    return true;
+  } catch(e){ return false; }
+}
+
+function _currentStyleString(){
+  const styles=[];
+  styles.push(`color:${_richState.color}`);
+  styles.push(`font-size:${_mapFontSize(_richState.fontSize)}`);
+  styles.push(`font-weight:${_richState.bold?'700':'400'}`);
+  styles.push(`font-style:${_richState.italic?'italic':'normal'}`);
+  styles.push(`text-decoration:${_richState.underline?'underline':'none'}`);
+  return styles.join(';');
+}
+
+function _insertMarkerSpan(){
+  const editor=_ed(); if(!editor) return;
   editor.focus();
   _restoreNoteSelection();
-  _insertStyledCaretSpan(_currentRichStyles());
+  const sel=window.getSelection();
+  if(!sel||sel.rangeCount===0) return;
+  const range=sel.getRangeAt(0);
+  const span=document.createElement('span');
+  span.setAttribute('data-rich-marker','1');
+  span.setAttribute('style', _currentStyleString());
+  span.textContent='​';
+  range.insertNode(span);
+  const nr=document.createRange();
+  nr.setStart(span.firstChild,1);
+  nr.collapse(true);
+  sel.removeAllRanges(); sel.addRange(nr);
+  _savedNoteRange=nr.cloneRange();
+}
+
+function updateRichToolbarUI(){
+  const byId=(id)=>document.getElementById(id);
+  byId('rich-bold-btn')?.classList.toggle('active', !!_richState.bold);
+  byId('rich-italic-btn')?.classList.toggle('active', !!_richState.italic);
+  byId('rich-underline-btn')?.classList.toggle('active', !!_richState.underline);
+  document.querySelectorAll('#rich-toolbar [data-font]').forEach(btn=>btn.classList.toggle('active', btn.dataset.font===_richState.fontSize));
+  document.querySelectorAll('#rich-toolbar .rich-color').forEach(el=>el.classList.toggle('active', el.dataset.color===_richState.color));
 }
 
 function execRich(cmd) {
-  if(cmd==='bold' || cmd==='italic' || cmd==='underline'){
-    _richState[cmd]=!_richState[cmd];
-    updateRichToolbarUI();
-    _applyTypingState();
-  }
+  if(!(cmd in _richState)) return;
+  _richState[cmd]=!_richState[cmd];
+  updateRichToolbarUI();
+  _insertMarkerSpan();
 }
 
 function execColor(color) {
   _richState.color=color;
   updateRichToolbarUI();
-  _applySpan({ color });
+  _insertMarkerSpan();
 }
 
 function execFontSize(size) {
   _richState.fontSize=size;
   updateRichToolbarUI();
-  const map = { sm: '0.68rem', md: '0.85rem', lg: '1.05rem', xl: '1.3rem' };
-  _applySpan({ fontSize: map[size] || size });
+  _insertMarkerSpan();
 }
 
-// Note editor selection koruma
+function resetRichState(applyToEditor=true){
+  _richState={ bold:false, italic:false, underline:false, color:'#e8e4f0', fontSize:'md' };
+  const ed=_ed();
+  if(ed && applyToEditor){ ed.innerHTML=''; ed.style.color='#e8e4f0'; ed.style.fontSize='0.85rem'; }
+  _savedNoteRange=null;
+  updateRichToolbarUI();
+}
+
 ['mouseup','keyup','input','touchend'].forEach(evt=>{
   document.getElementById('note-editor')?.addEventListener(evt, _saveNoteSelection);
 });
 document.querySelectorAll('.rich-btn, .rich-color').forEach(el=>{
-  el.addEventListener('mousedown', e => {
-    e.preventDefault();
-    _restoreNoteSelection();
-  });
+  el.addEventListener('mousedown', e => { e.preventDefault(); _restoreNoteSelection(); });
 });
 // ══════════════════════════════════════════
 // UTILS
@@ -2045,14 +2056,22 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
     const recentBtn=document.getElementById('recent-deleted-btn');
     const clearBtn=document.getElementById('clear-pool-btn');
     const cancelBtn=document.getElementById('bulk-cancel-btn');
-    if(!bulkBtn||!recentBtn||!clearBtn||!cancelBtn) return;
+    const cancelRow=document.getElementById('bulk-cancel-row');
+    if(!bulkBtn||!recentBtn||!clearBtn||!cancelBtn||!cancelRow) return;
+
+    bulkBtn.classList.remove('confirm-mode','cancel-mode');
+    recentBtn.classList.remove('confirm-mode','cancel-mode');
+    clearBtn.classList.remove('confirm-mode','cancel-mode');
+    cancelBtn.classList.remove('confirm-mode','cancel-mode');
 
     if(_bulkDeleteMode){
       bulkBtn.textContent='Hepsini seç';
       recentBtn.textContent='Tüm seçimleri iptal et';
       clearBtn.textContent='Onayla';
       cancelBtn.textContent='Vazgeç';
-      cancelBtn.style.display='block';
+      cancelRow.style.display='grid';
+      clearBtn.classList.add('confirm-mode');
+      cancelBtn.classList.add('cancel-mode');
       bulkBtn.onclick=()=>{ _snd('click'); selectAllBulkTasks(); };
       recentBtn.onclick=()=>{ _snd('click'); clearBulkSelections(); };
       clearBtn.onclick=()=>{ _snd('click'); confirmBulkDelete(); };
@@ -2061,7 +2080,7 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
       bulkBtn.textContent='Toplu silme';
       recentBtn.textContent='Son silinenler';
       clearBtn.textContent='Görev havuzunu temizle';
-      cancelBtn.style.display='none';
+      cancelRow.style.display='none';
       bulkBtn.onclick=()=>{ _snd('click'); startBulkDeleteMode(); };
       recentBtn.onclick=()=>{ _snd('click'); openRecentDeletedModal(); };
       clearBtn.onclick=async()=>{ _snd('click'); if(confirm('Görev havuzunu temizlemek istiyor musun?')) await clearPoolTasks(); };
@@ -2201,8 +2220,7 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
   window.confirmBulkDelete=async function(){
     const ids=[..._bulkDeleteSelected];
     if(!ids.length){ showToast('Seçili görev yok'); return; }
-    if(!confirm('Seçili görevleri silmek istiyor musun?')) return;
-    const {doc,deleteDoc}= _firestore;
+        const {doc,deleteDoc}= _firestore;
     for(const id of ids){
       const task=_tasks.find(t=>t.id===id && !t.dayKey);
       if(!task) continue;
@@ -2217,26 +2235,7 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
     _snd('delete');
   };
 
-  const _origCreateTaskCard = window.createTaskCard;
-  window.createTaskCard=function(task){
-    const card=_origCreateTaskCard(task);
-    if(_bulkDeleteMode && !task._archiveView && !task.dayKey){
-      card.classList.add('bulk-mode');
-      const checkWrap=document.createElement('div');
-      checkWrap.className='bulk-check-wrap';
-      checkWrap.innerHTML=`<input type="checkbox" class="bulk-check" ${_bulkDeleteSelected.has(task.id)?'checked':''}>`;
-      const input=checkWrap.querySelector('input');
-      input.addEventListener('change', e=>toggleBulkTaskSelection(task.id, e.target.checked));
-      card.appendChild(checkWrap);
-    }
-    return card;
-  };
-
-  const _origRenderPool = window.renderPool;
-  window.renderPool=function(){
-    _origRenderPool();
-    initPoolDangerControls();
-  };
+  // bulk mode doğrudan createTaskCard ve renderPool içinde yönetiliyor
 
   window.deleteTask=async function(id){
     const task=_tasks.find(t=>t.id===id);
