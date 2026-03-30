@@ -316,6 +316,30 @@ body::before {
 .dot-pulse::after { content:'...';animation:dots 1.5s infinite; }
 @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
 
+
+.rich-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); box-shadow:0 0 0 1px rgba(196,163,90,0.22) inset; }
+.rich-color.active { outline:2px solid var(--text); outline-offset:2px; box-shadow:0 0 0 2px rgba(0,0,0,0.35) inset; }
+
+.pool-danger-actions { margin-top:0.8rem; display:flex; flex-direction:column; gap:0.45rem; }
+.pool-danger-row { display:grid; grid-template-columns:1fr 1fr; gap:0.45rem; }
+.pool-danger-btn { width:100%; padding:0.7rem 0.75rem; border-radius:6px; border:1px solid rgba(224,92,122,0.35); background:rgba(224,92,122,0.10); color:#ff9db1; font-family:var(--ff-body); font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.18s; }
+.pool-danger-btn:hover { background:rgba(224,92,122,0.16); border-color:#e05c7a; color:#ffd0da; }
+.pool-danger-btn.full { width:100%; }
+
+.bulk-check-wrap { display:flex; align-items:center; justify-content:flex-end; margin-top:0.35rem; }
+.bulk-check { width:16px; height:16px; accent-color:#e05c7a; cursor:pointer; }
+.task-card.bulk-mode { border-color:rgba(224,92,122,0.35); }
+.task-card.bulk-mode .task-actions { display:none; }
+
+.recent-deleted-list { display:flex; flex-direction:column; gap:0.55rem; }
+.recent-deleted-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:0.7rem 0.8rem; }
+.recent-meta { font-size:0.62rem; color:var(--text-dim); margin-bottom:0.3rem; font-family:var(--ff-mono); }
+.restore-btn { font-size:0.65rem; padding:0.22rem 0.55rem; border-radius:4px; border:1px solid rgba(232,201,122,0.35); background:rgba(232,201,122,0.12); color:var(--accent2); cursor:pointer; font-family:var(--ff-body); font-weight:600; }
+.restore-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
+
+.nav-btn.flash { animation:navFlash 0.75s ease 0s 3; }
+@keyframes navFlash { 0%,100%{border-color:var(--border);color:var(--text-muted);background:transparent} 50%{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)} }
+
 /* ════════════════════════════════════
    DENEME ANALİZİ
 ════════════════════════════════════ */
@@ -484,6 +508,13 @@ body::before {
         </div>
         <div style="padding:0 0.8rem 0.8rem">
           <button class="add-task-btn" id="add-task-btn">+ yeni görev ekle</button>
+          <div class="pool-danger-actions">
+            <div class="pool-danger-row">
+              <button class="pool-danger-btn" id="bulk-delete-btn">Toplu silme</button>
+              <button class="pool-danger-btn" id="recent-deleted-btn">Son silinenler</button>
+            </div>
+            <button class="pool-danger-btn full" id="clear-pool-btn">Görev havuzunu temizle</button>
+          </div>
         </div>
       </div>
       <div class="weeks-container" id="weeks-container"></div>
@@ -655,7 +686,7 @@ body::before {
           <button class="rich-btn b" onclick="execRich('bold')">K</button>
           <button class="rich-btn i" onclick="execRich('italic')">İ</button>
           <button class="rich-btn" onclick="execRich('underline')" style="text-decoration:underline">A</button>
-          <button class="rich-btn" onclick="execRich('clear')" title="Formatı Temizle" style="color:var(--color-turkce)">✕</button>
+          
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
           <button class="rich-btn" onclick="execFontSize('sm')" style="font-size:0.6rem">A</button>
           <button class="rich-btn" onclick="execFontSize('md')" style="font-size:0.75rem">A</button>
@@ -755,6 +786,10 @@ let _examSineType='TYT';
 let _wrongCounts={};
 let _analysisN=0;
 let _activeNoteTab='Genel';
+let _recentDeleted=[];
+let _bulkDeleteMode=false;
+let _bulkDeleteSelected=new Set();
+let _richState={ bold:false, italic:false, underline:false, color:'#e8e4f0', fontSize:'md' };
 
 const DAYS_TR=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
 const DAYS_SHORT=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
@@ -2003,5 +2038,350 @@ document.querySelectorAll('.rich-btn, .rich-color').forEach(el=>{
 // ══════════════════════════════════════════
 function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 </script>
+
+<!-- Recent Deleted Modal -->
+<div class="modal-overlay" id="recent-deleted-modal">
+  <div class="modal wide">
+    <div class="modal-header">
+      <div class="modal-title">Son silinenler</div>
+      <button class="modal-close" onclick="closeModal('recent-deleted-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:0.78rem;color:var(--text-dim);margin-bottom:0.6rem">12 saat içinde geri alınmayan görevler tamamen silinir.</div>
+      <div id="recent-deleted-list" class="recent-deleted-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk Delete Modal -->
+<div class="modal-overlay" id="bulk-delete-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">Toplu silme</div>
+      <button class="modal-close" onclick="cancelBulkDelete()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.5" id="bulk-delete-text">Görev havuzundaki silmek istediğin görevleri işaretle.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="cancelBulkDelete()">İptal</button>
+      <button class="btn-primary" id="confirm-bulk-delete-btn" style="background:#e05c7a;color:white">Onayla</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  function initPoolDangerControls(){
+    const bulkBtn=document.getElementById('bulk-delete-btn');
+    const recentBtn=document.getElementById('recent-deleted-btn');
+    const clearBtn=document.getElementById('clear-pool-btn');
+    const confirmBulk=document.getElementById('confirm-bulk-delete-btn');
+    if(bulkBtn && !bulkBtn.dataset.bound){
+      bulkBtn.dataset.bound='1';
+      bulkBtn.onclick=()=>{ _snd('click'); startBulkDeleteMode(); };
+    }
+    if(recentBtn && !recentBtn.dataset.bound){
+      recentBtn.dataset.bound='1';
+      recentBtn.onclick=()=>{ _snd('click'); openRecentDeletedModal(); };
+    }
+    if(clearBtn && !clearBtn.dataset.bound){
+      clearBtn.dataset.bound='1';
+      clearBtn.onclick=async()=>{ _snd('click'); if(confirm('Görev havuzunu temizlemek istiyor musun?')) await clearPoolTasks(); };
+    }
+    if(confirmBulk && !confirmBulk.dataset.bound){
+      confirmBulk.dataset.bound='1';
+      confirmBulk.onclick=()=>confirmBulkDelete();
+    }
+  }
+
+  function flashProgramNav(){
+    const btn=document.getElementById('nav-planner');
+    if(!btn) return;
+    btn.classList.remove('flash');
+    void btn.offsetWidth;
+    btn.classList.add('flash');
+    setTimeout(()=>btn.classList.remove('flash'),2500);
+  }
+
+  function cleanupRecentDeleted(){
+    const now=Date.now();
+    _recentDeleted=_recentDeleted.filter(item=>item.expiresAt>now);
+  }
+
+  async function addRecentDeletedEntry(entry){
+    cleanupRecentDeleted();
+    _recentDeleted.unshift(entry);
+    _recentDeleted=_recentDeleted.slice(0,100);
+    renderRecentDeletedList();
+  }
+
+  function makeDeletedEntry(task, source){
+    return {
+      key: 'del_'+Date.now()+'_'+Math.random().toString(36).slice(2,8),
+      task: JSON.parse(JSON.stringify(task)),
+      source,
+      deletedAt: Date.now(),
+      expiresAt: Date.now() + 12*60*60*1000
+    };
+  }
+
+  function recentDeletedCard(entry){
+    const t=entry.task||{};
+    const meta=entry.source?.type==='archive' ? 'Arşivden silindi' : (t.dayKey ? ('Gün: '+t.dayKey) : 'Görev havuzundan silindi');
+    return `<div class="recent-deleted-item">
+      <div class="recent-meta">${meta} · ${new Date(entry.deletedAt).toLocaleString('tr-TR')}</div>
+      <div class="task-name">${escHtml(t.lesson||'')}${t.topic?' · '+escHtml(t.topic):''}</div>
+      ${(t.note||t.isPastClone)?`<div class="task-note-chip-wrap">${t.note?`<span class="task-note-chip">${escHtml((t.note||'').substring(0,50))}${(t.note||'').length>50?'…':''}</span>`:''}${t.isPastClone?'<span class="task-origin-chip">Geçmiş görev</span>':''}</div>`:''}
+      <div class="task-meta">${t.examType?`<span class="task-badge badge-${String(t.examType).toLowerCase()}">${t.examType}</span>`:''}${t.duration?`<span class="task-duration">${t.duration}dk</span>`:''}</div>
+      <div class="task-actions"><button class="restore-btn" onclick="restoreDeletedTask('${entry.key}')">geri al</button></div>
+    </div>`;
+  }
+
+  window.renderRecentDeletedList=function(){
+    cleanupRecentDeleted();
+    const list=document.getElementById('recent-deleted-list');
+    if(!list) return;
+    if(!_recentDeleted.length){
+      list.innerHTML='<div style="color:var(--text-dim);font-size:0.78rem;padding:1.2rem 0;text-align:center">son 12 saatte silinen görev yok</div>';
+      return;
+    }
+    list.innerHTML=_recentDeleted.map(recentDeletedCard).join('');
+  };
+
+  window.openRecentDeletedModal=function(){
+    cleanupRecentDeleted();
+    renderRecentDeletedList();
+    document.getElementById('recent-deleted-modal').classList.add('open');
+  };
+
+  window.restoreDeletedTask=async function(key){
+    cleanupRecentDeleted();
+    const entry=_recentDeleted.find(x=>x.key===key);
+    if(!entry) return;
+    const t=entry.task||{};
+    const {collection,addDoc,doc,setDoc}= _firestore;
+    if(entry.source?.type==='archive'){
+      const week=_archivedWeeks.find(w=>w.id===entry.source.weekId);
+      if(week){
+        const updated=[...(week.tasks||[]), t];
+        await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,entry.source.weekId), {...week,tasks:updated});
+      }
+    } else {
+      const clone={...t};
+      delete clone.id;
+      await addDoc(collection(_db,`users/${_uid}/tasks`), clone);
+    }
+    _recentDeleted=_recentDeleted.filter(x=>x.key!==key);
+    renderRecentDeletedList();
+    showToast('Görev geri alındı');
+    _snd('save');
+  };
+
+  async function softDeleteTaskCommon(task, source, doDelete){
+    await addRecentDeletedEntry(makeDeletedEntry(task, source));
+    await doDelete();
+    showToast('Görev silindi');
+    _snd('delete');
+  }
+
+  window.clearPoolTasks=async function(){
+    const poolTasks=_tasks.filter(t=>!t.dayKey);
+    if(!poolTasks.length){ showToast('Görev havuzu zaten boş'); return; }
+    const {doc,deleteDoc}= _firestore;
+    for(const task of poolTasks){
+      await addRecentDeletedEntry(makeDeletedEntry(task,{type:'active'}));
+      await deleteDoc(doc(_db,`users/${_uid}/tasks`,task.id));
+    }
+    showToast('Görev havuzu temizlendi');
+    _snd('delete');
+  };
+
+  window.startBulkDeleteMode=function(){
+    _bulkDeleteMode=true;
+    _bulkDeleteSelected=new Set();
+    const text=document.getElementById('bulk-delete-text');
+    if(text) text.textContent='Görev havuzundaki silmek istediğin görevleri işaretle. Onayla deyince silinir.';
+    document.getElementById('bulk-delete-modal').classList.add('open');
+    renderPool();
+  };
+  window.cancelBulkDelete=function(){
+    _bulkDeleteMode=false;
+    _bulkDeleteSelected=new Set();
+    closeModal('bulk-delete-modal');
+    renderPool();
+  };
+  window.toggleBulkTaskSelection=function(id, checked){
+    if(checked) _bulkDeleteSelected.add(id); else _bulkDeleteSelected.delete(id);
+  };
+  window.confirmBulkDelete=async function(){
+    const ids=[..._bulkDeleteSelected];
+    if(!ids.length){ showToast('Seçili görev yok'); return; }
+    if(!confirm('Seçili görevleri silmek istiyor musun?')) return;
+    const {doc,deleteDoc}= _firestore;
+    for(const id of ids){
+      const task=_tasks.find(t=>t.id===id && !t.dayKey);
+      if(!task) continue;
+      await addRecentDeletedEntry(makeDeletedEntry(task,{type:'active'}));
+      await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));
+    }
+    cancelBulkDelete();
+    showToast('Seçili görevler silindi');
+    _snd('delete');
+  };
+
+  const _origCreateTaskCard = window.createTaskCard;
+  window.createTaskCard=function(task){
+    const card=_origCreateTaskCard(task);
+    if(_bulkDeleteMode && !task._archiveView && !task.dayKey){
+      card.classList.add('bulk-mode');
+      const checkWrap=document.createElement('div');
+      checkWrap.className='bulk-check-wrap';
+      checkWrap.innerHTML=`<input type="checkbox" class="bulk-check" ${_bulkDeleteSelected.has(task.id)?'checked':''}>`;
+      const input=checkWrap.querySelector('input');
+      input.addEventListener('change', e=>toggleBulkTaskSelection(task.id, e.target.checked));
+      card.appendChild(checkWrap);
+    }
+    return card;
+  };
+
+  const _origRenderPool = window.renderPool;
+  window.renderPool=function(){
+    _origRenderPool();
+    initPoolDangerControls();
+  };
+
+  window.deleteTask=async function(id){
+    const task=_tasks.find(t=>t.id===id);
+    if(!task) return;
+    const {doc,deleteDoc,getDoc,setDoc}= _firestore;
+    if(task.isPastClone){
+      const archiveRef=doc(_db,`users/${_uid}/archivedWeeks`,task.originalArchiveWeekId);
+      const snap=await getDoc(archiveRef);
+      if(snap.exists()){
+        const data=snap.data();
+        const tasks=(data.tasks||[]).map(t=> t.id===task.originalArchivedTaskId ? {...t, completed:false} : t);
+        await setDoc(archiveRef,{...data,tasks});
+      }
+    }
+    await softDeleteTaskCommon(task,{type:'active'}, async()=>{ await deleteDoc(doc(_db,`users/${_uid}/tasks`,id)); });
+  };
+
+  window.deleteArchiveTask=async function(weekId, taskId){
+    const week=_archivedWeeks.find(w=>w.id===weekId); if(!week) return;
+    const task=(week.tasks||[]).find(t=>t.id===taskId); if(!task) return;
+    const {doc,setDoc}= _firestore;
+    await softDeleteTaskCommon(task,{type:'archive',weekId}, async()=>{
+      const updated=(week.tasks||[]).filter(t=>t.id!==taskId);
+      await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,weekId),{...week,tasks:updated});
+    });
+  };
+
+  window.restoreUnfinishedFromArchive=async function(weekId){
+    if(_isGuest||!_uid)return;
+    const week=_archivedWeeks.find(w=>w.id===weekId);
+    if(!week)return;
+    const unfinished=(week.tasks||[]).filter(t=>!t.completed);
+    if(!unfinished.length){ showToast('Aktarılacak tamamlanmayan görev yok'); return; }
+
+    const existingKeys=new Set(
+      _tasks
+        .filter(t=>t.isPastClone)
+        .map(t=>`${t.originalArchiveWeekId}__${t.originalArchivedTaskId}`)
+    );
+
+    const toAdd=unfinished.filter(t=>!existingKeys.has(`${weekId}__${t.id}`));
+    if(!toAdd.length){
+      showToast('Eklenmemiş tamamlanmayan görev yok');
+      _snd('click');
+      flashProgramNav();
+      return;
+    }
+
+    const {collection,addDoc}= _firestore;
+    const existingOrders=_tasks.filter(t=>!t.dayKey).map(t=>t.order||t.createdAt||0);
+    let maxOrder=existingOrders.length?Math.max(...existingOrders):0;
+
+    for(const task of toAdd){
+      maxOrder+=10;
+      const clone={...task};
+      delete clone.id;
+      clone.dayKey=null;
+      clone.order=maxOrder;
+      clone.completed=false;
+      clone.isPastClone=true;
+      clone.originalArchiveWeekId=weekId;
+      clone.originalArchivedTaskId=task.id;
+      await addDoc(collection(_db,`users/${_uid}/tasks`),clone);
+    }
+    _snd('save');
+    flashProgramNav();
+    showToast(`${toAdd.length} geçmiş görev havuza eklendi`);
+  };
+
+  // Rich editor active UI
+  window.updateRichToolbarUI=function(){
+    document.querySelectorAll('.rich-btn[data-rich-toggle]').forEach(btn=>{
+      const key=btn.dataset.richToggle;
+      btn.classList.toggle('active', !!_richState[key]);
+    });
+    document.querySelectorAll('.rich-color').forEach(el=>{
+      const color=(el.dataset.color||'').toLowerCase();
+      el.classList.toggle('active', color===String(_richState.color||'').toLowerCase());
+    });
+    document.querySelectorAll('.rich-btn[data-font-size]').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.fontSize===_richState.fontSize);
+    });
+  };
+
+  const toolbarHtmlReady=()=>{
+    document.querySelectorAll('.rich-color').forEach(el=>{ if(!el.dataset.color) el.dataset.color=el.getAttribute('onclick')?.match(/'([^']+)'/)?.[1]||''; });
+    document.querySelectorAll('.rich-btn.b').forEach(el=>{ el.dataset.richToggle='bold'; });
+    document.querySelectorAll('.rich-btn.i').forEach(el=>{ el.dataset.richToggle='italic'; });
+    const ubtn=[...document.querySelectorAll('.rich-btn')].find(el=>el.textContent.trim()==='A' && el.style.textDecoration==='underline');
+    if(ubtn) ubtn.dataset.richToggle='underline';
+    const fontBtns=[...document.querySelectorAll('.rich-btn')].filter(el=>['0.6rem','0.75rem','0.9rem','1.05rem'].includes(el.style.fontSize));
+    if(fontBtns[0]) fontBtns[0].dataset.fontSize='sm';
+    if(fontBtns[1]) fontBtns[1].dataset.fontSize='md';
+    if(fontBtns[2]) fontBtns[2].dataset.fontSize='lg';
+    if(fontBtns[3]) fontBtns[3].dataset.fontSize='xl';
+    updateRichToolbarUI();
+  };
+
+  const _origExecRich=window.execRich;
+  window.execRich=function(cmd){
+    if(cmd==='bold' || cmd==='italic' || cmd==='underline'){
+      _richState[cmd]=!_richState[cmd];
+      updateRichToolbarUI();
+    }
+    _origExecRich(cmd);
+  };
+  const _origExecColor=window.execColor;
+  window.execColor=function(color){ _richState.color=color; updateRichToolbarUI(); _origExecColor(color); };
+  const _origExecFontSize=window.execFontSize;
+  window.execFontSize=function(size){ _richState.fontSize=size; updateRichToolbarUI(); _origExecFontSize(size); };
+
+  // remove clear button behavior if any hidden remnants
+  document.addEventListener('DOMContentLoaded', ()=>{
+    initPoolDangerControls();
+    toolbarHtmlReady();
+    cleanupRecentDeleted();
+    renderRecentDeletedList();
+  });
+
+  window.addEventListener('load', ()=>{
+    initPoolDangerControls();
+    toolbarHtmlReady();
+    const recentBtn=document.getElementById('recent-deleted-btn');
+    if(recentBtn) recentBtn.onclick=()=>{ _snd('click'); openRecentDeletedModal(); };
+    const observer=new MutationObserver(()=>{ updateRichToolbarUI(); initPoolDangerControls(); });
+    const toolbar=document.getElementById('rich-toolbar');
+    if(toolbar) observer.observe(toolbar,{childList:true,subtree:true});
+  });
+})();
+</script>
+
+
 </body>
 </html>
