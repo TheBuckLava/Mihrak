@@ -508,12 +508,15 @@ body::before {
         </div>
         <div style="padding:0 0.8rem 0.8rem">
           <button class="add-task-btn" id="add-task-btn">+ yeni görev ekle</button>
-          <div class="pool-danger-actions">
+          <div class="pool-danger-actions" id="pool-danger-actions">
             <div class="pool-danger-row">
               <button class="pool-danger-btn" id="bulk-delete-btn">Toplu silme</button>
               <button class="pool-danger-btn" id="recent-deleted-btn">Son silinenler</button>
             </div>
-            <button class="pool-danger-btn full" id="clear-pool-btn">Görev havuzunu temizle</button>
+            <div class="pool-danger-row">
+              <button class="pool-danger-btn" id="clear-pool-btn">Görev havuzunu temizle</button>
+              <button class="pool-danger-btn" id="bulk-cancel-btn" style="display:none">Vazgeç</button>
+            </div>
           </div>
         </div>
       </div>
@@ -790,6 +793,12 @@ let _recentDeleted=[];
 let _bulkDeleteMode=false;
 let _bulkDeleteSelected=new Set();
 let _richState={ bold:false, italic:false, underline:false, color:'#e8e4f0', fontSize:'md' };
+function resetRichState(applyToEditor=true){
+  _richState={ bold:false, italic:false, underline:false, color:'#e8e4f0', fontSize:'md' };
+  const ed=document.getElementById('note-editor');
+  if(ed && applyToEditor){ ed.style.color='#e8e4f0'; ed.style.fontSize='0.85rem'; }
+  if(typeof updateRichToolbarUI==='function') updateRichToolbarUI();
+}
 
 const DAYS_TR=['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
 const DAYS_SHORT=['Paz','Pzt','Sal','Çar','Per','Cum','Cmt'];
@@ -1850,6 +1859,7 @@ document.getElementById('new-note-btn').onclick=()=>{
   document.getElementById('note-modal-title').textContent='Yeni Not';
   document.getElementById('note-editor').innerHTML='';
   document.getElementById('note-category').value=_activeNoteTab;
+  resetRichState(true);
   document.getElementById('note-modal').classList.add('open');
   setTimeout(()=>document.getElementById('note-editor').focus(),100);
 };
@@ -1874,6 +1884,7 @@ function editNote(id) {
   document.getElementById('note-modal-title').textContent='Notu Düzenle';
   document.getElementById('note-editor').innerHTML=note.html||'';
   document.getElementById('note-category').value=note.category||'Genel';
+  resetRichState(false);
   document.getElementById('note-modal').classList.add('open');
 }
 
@@ -1936,8 +1947,17 @@ function _insertStyledCaretSpan(styles) {
 
 function _ed() { return document.getElementById('note-editor'); }
 
+function _currentRichStyles(){
+  const styles={ color:_richState.color||'#e8e4f0', fontSize:({sm:'0.68rem',md:'0.85rem',lg:'1.05rem',xl:'1.3rem'})[_richState.fontSize]||'0.85rem' };
+  if(_richState.bold) styles.fontWeight='700';
+  if(_richState.italic) styles.fontStyle='italic';
+  if(_richState.underline) styles.textDecoration='underline';
+  return styles;
+}
+
 function _applySpan(styles) {
   const editor = _ed();
+  if(!editor) return;
   editor.focus();
   _restoreNoteSelection();
   const sel = window.getSelection();
@@ -1959,69 +1979,34 @@ function _applySpan(styles) {
   } catch(e) {}
 }
 
-function _toggleSpan(prop, onVal, offVal) {
-  const editor = _ed();
+function _applyTypingState(){
+  const editor=_ed();
+  if(!editor) return;
   editor.focus();
   _restoreNoteSelection();
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-
-  if (sel.isCollapsed) {
-    _insertStyledCaretSpan({ [prop]: onVal });
-    return;
-  }
-
-  const container = range.commonAncestorContainer;
-  const el = container.nodeType === 3 ? container.parentElement : container;
-  const cur = window.getComputedStyle(el)[prop];
-  _applySpan({ [prop]: (cur === onVal) ? offVal : onVal });
+  _insertStyledCaretSpan(_currentRichStyles());
 }
 
 function execRich(cmd) {
-  if (cmd === 'bold') _toggleSpan('fontWeight', '700', '400');
-  else if (cmd === 'italic') _toggleSpan('fontStyle', 'italic', 'normal');
-  else if (cmd === 'underline') _toggleSpan('textDecoration', 'underline', 'none');
-  else if (cmd === 'clear') {
-    const editor = _ed(); editor.focus();
-    _restoreNoteSelection();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
-    const range = sel.getRangeAt(0);
-    if (sel.isCollapsed) {
-      _insertStyledCaretSpan({ fontWeight:'400', fontStyle:'normal', textDecoration:'none', color:'inherit', fontSize:'inherit' });
-      return;
-    }
-    try {
-      const frag = range.extractContents();
-      const holder = document.createElement('div');
-      holder.appendChild(frag);
-      const elems = [];
-      const walker = document.createTreeWalker(holder, NodeFilter.SHOW_ELEMENT);
-      while (walker.nextNode()) elems.push(walker.currentNode);
-      elems.reverse().forEach(el => {
-        if (el.tagName === 'BR') return;
-        el.removeAttribute('style');
-        while (el.firstChild) el.parentNode.insertBefore(el.firstChild, el);
-        el.parentNode.removeChild(el);
-      });
-      const cleanFrag = document.createDocumentFragment();
-      while (holder.firstChild) cleanFrag.appendChild(holder.firstChild);
-      const lastNode = cleanFrag.lastChild;
-      range.insertNode(cleanFrag);
-      if (lastNode) _placeCaretAfter(lastNode);
-    } catch(e) {}
+  if(cmd==='bold' || cmd==='italic' || cmd==='underline'){
+    _richState[cmd]=!_richState[cmd];
+    updateRichToolbarUI();
+    _applyTypingState();
   }
 }
 
-function execColor(color) { _applySpan({ color }); }
+function execColor(color) {
+  _richState.color=color;
+  updateRichToolbarUI();
+  _applySpan({ color });
+}
 
 function execFontSize(size) {
+  _richState.fontSize=size;
+  updateRichToolbarUI();
   const map = { sm: '0.68rem', md: '0.85rem', lg: '1.05rem', xl: '1.3rem' };
   _applySpan({ fontSize: map[size] || size });
 }
-
-
 
 // Note editor selection koruma
 ['mouseup','keyup','input','touchend'].forEach(evt=>{
@@ -2053,46 +2038,34 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
   </div>
 </div>
 
-<!-- Bulk Delete Modal -->
-<div class="modal-overlay" id="bulk-delete-modal">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-header">
-      <div class="modal-title">Toplu silme</div>
-      <button class="modal-close" onclick="cancelBulkDelete()">×</button>
-    </div>
-    <div class="modal-body">
-      <div style="font-size:0.82rem;color:var(--text-muted);line-height:1.5" id="bulk-delete-text">Görev havuzundaki silmek istediğin görevleri işaretle.</div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="cancelBulkDelete()">İptal</button>
-      <button class="btn-primary" id="confirm-bulk-delete-btn" style="background:#e05c7a;color:white">Onayla</button>
-    </div>
-  </div>
-</div>
-
-
 <script>
 (function(){
   function initPoolDangerControls(){
     const bulkBtn=document.getElementById('bulk-delete-btn');
     const recentBtn=document.getElementById('recent-deleted-btn');
     const clearBtn=document.getElementById('clear-pool-btn');
-    const confirmBulk=document.getElementById('confirm-bulk-delete-btn');
-    if(bulkBtn && !bulkBtn.dataset.bound){
-      bulkBtn.dataset.bound='1';
+    const cancelBtn=document.getElementById('bulk-cancel-btn');
+    if(!bulkBtn||!recentBtn||!clearBtn||!cancelBtn) return;
+
+    if(_bulkDeleteMode){
+      bulkBtn.textContent='Hepsini seç';
+      recentBtn.textContent='Tüm seçimleri iptal et';
+      clearBtn.textContent='Onayla';
+      cancelBtn.textContent='Vazgeç';
+      cancelBtn.style.display='block';
+      bulkBtn.onclick=()=>{ _snd('click'); selectAllBulkTasks(); };
+      recentBtn.onclick=()=>{ _snd('click'); clearBulkSelections(); };
+      clearBtn.onclick=()=>{ _snd('click'); confirmBulkDelete(); };
+      cancelBtn.onclick=()=>{ _snd('click'); cancelBulkDelete(); };
+    } else {
+      bulkBtn.textContent='Toplu silme';
+      recentBtn.textContent='Son silinenler';
+      clearBtn.textContent='Görev havuzunu temizle';
+      cancelBtn.style.display='none';
       bulkBtn.onclick=()=>{ _snd('click'); startBulkDeleteMode(); };
-    }
-    if(recentBtn && !recentBtn.dataset.bound){
-      recentBtn.dataset.bound='1';
       recentBtn.onclick=()=>{ _snd('click'); openRecentDeletedModal(); };
-    }
-    if(clearBtn && !clearBtn.dataset.bound){
-      clearBtn.dataset.bound='1';
       clearBtn.onclick=async()=>{ _snd('click'); if(confirm('Görev havuzunu temizlemek istiyor musun?')) await clearPoolTasks(); };
-    }
-    if(confirmBulk && !confirmBulk.dataset.bound){
-      confirmBulk.dataset.bound='1';
-      confirmBulk.onclick=()=>confirmBulkDelete();
+      cancelBtn.onclick=null;
     }
   }
 
@@ -2201,16 +2174,26 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
   window.startBulkDeleteMode=function(){
     _bulkDeleteMode=true;
     _bulkDeleteSelected=new Set();
-    const text=document.getElementById('bulk-delete-text');
-    if(text) text.textContent='Görev havuzundaki silmek istediğin görevleri işaretle. Onayla deyince silinir.';
-    document.getElementById('bulk-delete-modal').classList.add('open');
+    initPoolDangerControls();
     renderPool();
+    showToast('Silmek istediğin görevleri kutucuklardan seç');
   };
   window.cancelBulkDelete=function(){
     _bulkDeleteMode=false;
     _bulkDeleteSelected=new Set();
-    closeModal('bulk-delete-modal');
+    initPoolDangerControls();
     renderPool();
+    showToast('Toplu silme iptal edildi');
+  };
+  window.selectAllBulkTasks=function(){
+    _bulkDeleteSelected=new Set(_tasks.filter(t=>!t.dayKey).map(t=>t.id));
+    renderPool();
+    showToast('Tüm görevler seçildi');
+  };
+  window.clearBulkSelections=function(){
+    _bulkDeleteSelected=new Set();
+    renderPool();
+    showToast('Tüm seçimler kaldırıldı');
   };
   window.toggleBulkTaskSelection=function(id, checked){
     if(checked) _bulkDeleteSelected.add(id); else _bulkDeleteSelected.delete(id);
@@ -2226,7 +2209,10 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
       await addRecentDeletedEntry(makeDeletedEntry(task,{type:'active'}));
       await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));
     }
-    cancelBulkDelete();
+    _bulkDeleteMode=false;
+    _bulkDeleteSelected=new Set();
+    initPoolDangerControls();
+    renderPool();
     showToast('Seçili görevler silindi');
     _snd('delete');
   };
@@ -2349,25 +2335,13 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
     updateRichToolbarUI();
   };
 
-  const _origExecRich=window.execRich;
-  window.execRich=function(cmd){
-    if(cmd==='bold' || cmd==='italic' || cmd==='underline'){
-      _richState[cmd]=!_richState[cmd];
-      updateRichToolbarUI();
-    }
-    _origExecRich(cmd);
-  };
-  const _origExecColor=window.execColor;
-  window.execColor=function(color){ _richState.color=color; updateRichToolbarUI(); _origExecColor(color); };
-  const _origExecFontSize=window.execFontSize;
-  window.execFontSize=function(size){ _richState.fontSize=size; updateRichToolbarUI(); _origExecFontSize(size); };
-
   // remove clear button behavior if any hidden remnants
   document.addEventListener('DOMContentLoaded', ()=>{
     initPoolDangerControls();
     toolbarHtmlReady();
     cleanupRecentDeleted();
     renderRecentDeletedList();
+    resetRichState(true);
   });
 
   window.addEventListener('load', ()=>{
