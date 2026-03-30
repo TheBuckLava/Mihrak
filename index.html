@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mihrak</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 40'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='80%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23e8c97a'/%3E%3Cstop offset='100%25' stop-color='%23c4a35a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cpath d='M16 2 C16 2 26 12 26 22 C26 28.6 21.5 34 16 36 C10.5 34 6 28.6 6 22 C6 12 16 2 16 2Z' fill='url(%23g)' opacity='0.95'/%3E%3Ccircle cx='16' cy='23' r='5' fill='%230f0f1a' opacity='0.55'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <script type="module">
@@ -18,7 +19,7 @@
     projectId: "mihrak-ff2a9",
     storageBucket: "mihrak-ff2a9.firebasestorage.app",
     messagingSenderId: "816000351968",
-    appId: "1:816000351968:web:686f7418114c1b2b411a85"
+    appId: "1:816000351968:web:686f7418114c1b2b411a85",
   };
 
   const app = initializeApp(firebaseConfig);
@@ -228,20 +229,19 @@ body::before {
 .task-card[data-lesson*="elsefe"]::before { background:var(--color-felsefe); }
 .task-card[data-lesson*="ngiliz"]::before,.task-card[data-lesson*="il "]::before { background:var(--color-dil); }
 
+.task-note-chip-wrap { display:flex; gap:0.3rem; flex-wrap:wrap; margin:0.18rem 0 0.22rem; }
 .task-note-chip {
-  display:inline-flex;
-  align-items:center;
-  max-width:100%;
-  font-size:0.55rem;
-  padding:0.12rem 0.42rem;
-  border-radius:999px;
-  background:rgba(160,92,224,0.14);
-  color:#cfb4ff;
-  border:1px solid rgba(160,92,224,0.35);
-  font-family:var(--ff-mono);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  display:inline-flex; align-items:center; max-width:100%;
+  padding:0.14rem 0.45rem; border-radius:999px;
+  background:rgba(232,201,122,0.12); border:1px solid rgba(232,201,122,0.28);
+  color:var(--accent2); font-size:0.58rem; font-family:var(--ff-mono);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.task-origin-chip {
+  display:inline-flex; align-items:center;
+  padding:0.14rem 0.45rem; border-radius:999px;
+  background:rgba(224,92,122,0.12); border:1px solid rgba(224,92,122,0.28);
+  color:#ff9db1; font-size:0.58rem; font-family:var(--ff-mono);
 }
 .task-card.drag-target { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow); }
 .empty-drop { font-size:0.6rem;color:var(--text-dim);text-align:center;padding:0.8rem 0.5rem;pointer-events:none; }
@@ -294,8 +294,10 @@ body::before {
 .archive-stats { display:flex;gap:1.2rem; }
 .archive-stat { font-size:0.65rem;color:var(--text-dim); }
 .archive-stat span { color:var(--accent); }
-.archive-week-body { display:none;padding:1rem; }
+.archive-week-body { display:block;padding:0; }
 .archive-week-body.open { display:block; }
+.archive-restore-btn { padding:0.35rem 0.7rem;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--accent2);font-family:var(--ff-body);font-size:0.72rem;cursor:pointer;transition:all 0.2s; }
+.archive-restore-btn:hover { border-color:var(--accent);color:var(--accent);background:var(--accent-glow); }
 .archive-tasks { display:flex;flex-wrap:wrap;gap:0.5rem; }
 
 /* ── GÜN NOTU ── */
@@ -724,7 +726,6 @@ let _examTypeVal='',_recurringVal='false';
 let _unsubTasks=null,_unsubNotes=null,_unsubArchive=null,_unsubExams=null,_unsubNotesDb=null;
 let _editingExamId=null,_editingNoteId=null;
 let _examSineType='TYT';
-let _archiveInProgress=false;
 let _wrongCounts={};
 let _analysisN=0;
 let _activeNoteTab='Genel';
@@ -816,10 +817,8 @@ function startApp() {
 // ══════════════════════════════════════════
 function subscribeData() {
   const {collection,onSnapshot}=_firestore;
-  _unsubTasks = onSnapshot(collection(_db,`users/${_uid}/tasks`), async s => {
-    _tasks=s.docs.map(d=>({id:d.id,...d.data()}));
-    renderAll();
-    await checkWeekArchive();
+  _unsubTasks = onSnapshot(collection(_db,`users/${_uid}/tasks`), s => {
+    _tasks=s.docs.map(d=>({id:d.id,...d.data()})); renderAll(); checkWeekArchive();
   });
   _unsubNotes = onSnapshot(collection(_db,`users/${_uid}/dayNotes`), s => {
     _dayNotes={}; s.docs.forEach(d=>{_dayNotes[d.id]=d.data().text;}); renderAll();
@@ -944,8 +943,8 @@ function createTaskCard(task) {
   card.dataset.id=task.id;
   card.dataset.order=task.order||task.createdAt||0;
   card.dataset.lesson=(task.lesson||'').toLowerCase();
-  card.draggable=!_isGuest;
-  if (!_isGuest) {
+  card.draggable=!_isGuest && !task._archiveView;
+  if (!_isGuest && !task._archiveView) {
     card.addEventListener('dragstart',e=>{
       _dragTaskId=task.id;
       e.dataTransfer.effectAllowed='move';
@@ -963,18 +962,23 @@ function createTaskCard(task) {
     _setupTouch(card,task.id);
   }
   const exam=task.examType?`<span class="task-badge badge-${task.examType.toLowerCase()}">${task.examType}</span>`:'';
-  const rep=task.recurring==='true'?`<span class="repeat-badge">↻</span>`:'';
+  const rep=(task.recurring===true||task.recurring==='true')?`<span class="repeat-badge">↻</span>`:'';
   const dur=task.duration?`<span class="task-duration">${task.duration}dk</span>`:'';
-  const notePreview=task.note?`<div class="task-note-preview">${escHtml(task.note.substring(0,60))}${task.note.length>60?'…':''}</div>`:'';
+  const noteChip=task.note?`<div class="task-note-chip-wrap"><span class="task-note-chip" title="${escHtml(task.note)}">${escHtml(task.note.substring(0,40))}${task.note.length>40?'…':''}</span>${task.isPastClone?'<span class="task-origin-chip">Geçmiş görev</span>':''}</div>`:(task.isPastClone?`<div class="task-note-chip-wrap"><span class="task-origin-chip">Geçmiş görev</span></div>`:'');
+  const actions = task._archiveView ? '' : (
+    !_isGuest
+      ? `<div class="task-actions">
+          <button class="complete-btn" onclick="_snd('complete');toggleComplete('${task.id}')">${task.completed?'✓ tamamlandı':'tamamlandı'}</button>
+          <button class="view-btn" onclick="_snd('click');openDetail('${task.id}')">detay</button>
+          <button class="delete-btn" onclick="_snd('delete');deleteTask('${task.id}')">sil</button>
+        </div>`
+      : `<div class="task-actions"><button class="view-btn" onclick="openDetail('${task.id}')">detay</button></div>`
+  );
   card.innerHTML=`
     <div class="task-name">${escHtml(task.lesson||'')}${task.topic?' · '+escHtml(task.topic):''}</div>
-    ${notePreview}
+    ${noteChip}
     <div class="task-meta">${exam}${rep}${dur}</div>
-    ${!_isGuest?`<div class="task-actions">
-      <button class="complete-btn" onclick="_snd('complete');toggleComplete('${task.id}')">${task.completed?'✓ tamamlandı':'tamamlandı'}</button>
-      <button class="view-btn" onclick="_snd('click');openDetail('${task.id}')">detay</button>
-      <button class="delete-btn" onclick="_snd('delete');deleteTask('${task.id}')">sil</button>
-    </div>`:`<div class="task-actions"><button class="view-btn" onclick="openDetail('${task.id}')">detay</button></div>`}`;
+    ${actions}`;
   return card;
 }
 
@@ -1102,69 +1106,137 @@ function renderArchive() {
   const c=document.getElementById('archive-list');c.innerHTML='';
   if(!_archivedWeeks.length){c.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.75rem;padding:3rem">henüz arşivlenmiş hafta yok</div>';return;}
   [..._archivedWeeks].sort((a,b)=>b.weekStart-a.weekStart).forEach(week=>{
-    const tasks=week.tasks||[];
-    const done=tasks.filter(t=>t.completed).length;
-    const min=tasks.reduce((s,t)=>s+(parseInt(t.duration)||0),0);
-    const h=Math.floor(min/60),m=min%60;
-    const el=document.createElement('div');el.className='archive-week';
-    el.innerHTML=`
-      <div class="archive-week-header" onclick="this.nextElementSibling.classList.toggle('open')">
-        <div class="archive-week-label">${week.label||'Hafta'}</div>
-        <div class="archive-stats">
-          <div class="archive-stat"><span>${done}/${tasks.length}</span> tamamlandı</div>
-          <div class="archive-stat"><span>${h>0?h+'s ':''} ${m}dk</span></div>
-        </div>
-      </div>
-      <div class="archive-week-body">
-        <div class="archive-tasks">
-          ${tasks.map(t=>`<div style="font-size:0.7rem;padding:0.3rem 0.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:${t.completed?'var(--text-dim)':'var(--text-muted)'}">${t.completed?'✓ ':''}<span style="${t.completed?'text-decoration:line-through':''}">${escHtml(t.lesson||'')}${t.topic?' · '+escHtml(t.topic):''}</span>${t.duration?`<span style="color:var(--text-dim);margin-left:0.4rem">${t.duration}dk</span>`:''}</div>`).join('')}
-        </div>
-      </div>`;
-    c.appendChild(el);
+    c.appendChild(createArchiveWeekBlock(week));
   });
 }
 
+function createArchiveWeekBlock(week) {
+  const block=document.createElement('div');
+  block.className='week-block archive-week';
+  const days=getDaysOfWeek(new Date(week.weekStart));
+  const tasks=(week.tasks||[]);
+  const dayNotes=week.dayNotes||{};
+  const completed=tasks.filter(t=>t.completed).length;
+  const totalMin=tasks.reduce((s,t)=>s+(parseInt(t.duration)||0),0);
+  const hrs=Math.floor(totalMin/60), mins=totalMin%60;
+  block.innerHTML=`
+    <div class="week-header">
+      <div class="week-label">Arşiv · ${week.label||formatWeekRange(days)}</div>
+      <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap">
+        <div class="week-summary">
+          <div class="week-stat"><span>${completed}/${tasks.length}</span> tamamlandı</div>
+          <div class="week-stat"><span>${hrs>0?hrs+'s ':''}${mins}dk</span> toplam</div>
+        </div>
+        <button class="archive-restore-btn" onclick="restoreUnfinishedFromArchive('${week.id}')">tamamlanmayan görevleri aktar</button>
+      </div>
+    </div>
+    <div class="days-grid"></div>`;
+  const grid=block.querySelector('.days-grid');
+  days.forEach(day=>{
+    grid.appendChild(createArchiveDayCol(day, tasks.filter(t=>t.dayKey===dateKey(day)), dayNotes[dateKey(day)]));
+  });
+  return block;
+}
+
+function createArchiveDayCol(date, dayTasks, note) {
+  const key=dateKey(date);
+  const completed=dayTasks.filter(t=>t.completed).length;
+  const pct=dayTasks.length?Math.round(completed/dayTasks.length*100):0;
+  const di=date.getDay();
+  const col=document.createElement('div');
+  col.className='day-col';
+  col.innerHTML=`
+    <div class="day-header">
+      <div class="day-name">${DAYS_SHORT[di]}</div>
+      <div class="day-date">${date.getDate()}</div>
+      <div class="day-progress">${pct}%</div>
+      <div class="day-progress-bar"><div class="day-progress-fill" style="width:${pct}%"></div></div>
+      <button class="day-note-btn ${note?'has-note':''}" disabled>${note?'✦ not':'+ not'}</button>
+    </div>
+    ${note?`<div class="day-note-display">${escHtml(note)}</div>`:''}
+    <div class="day-tasks">${dayTasks.length===0?'<div class="empty-drop">—</div>':''}</div>`;
+  const td=col.querySelector('.day-tasks');
+  [...dayTasks].sort((a,b)=>(a.order??a.createdAt??0)-(b.order??b.createdAt??0)).forEach(t=>{
+    td.appendChild(createTaskCard({...t,_archiveView:true}));
+  });
+  return col;
+}
+
+function getWeekStartFromDayKey(dayKey) {
+  const [y,m,d]=dayKey.split('-').map(Number);
+  const date=new Date(y,m-1,d);
+  const day=date.getDay();
+  date.setDate(date.getDate()-day+1);
+  date.setHours(0,0,0,0);
+  return date;
+}
+
+async function restoreUnfinishedFromArchive(weekId) {
+  if(_isGuest||!_uid)return;
+  const week=_archivedWeeks.find(w=>w.id===weekId);
+  if(!week)return;
+  const unfinished=(week.tasks||[]).filter(t=>!t.completed);
+  if(!unfinished.length){showToast('Aktarılacak tamamlanmayan görev yok');return;}
+  const {collection,addDoc}= _firestore;
+  const poolTasks=_tasks.filter(t=>!t.dayKey);
+  let maxOrder=poolTasks.length?Math.max(...poolTasks.map(t=>t.order||t.createdAt||0)):0;
+  for(const task of unfinished){
+    maxOrder+=10;
+    const clone={...task};
+    delete clone.id;
+    clone.dayKey=null;
+    clone.order=maxOrder;
+    clone.completed=false;
+    clone.isPastClone=true;
+    clone.originalArchiveWeekId=weekId;
+    clone.originalArchivedTaskId=task.id;
+    await addDoc(collection(_db,`users/${_uid}/tasks`),clone);
+  }
+  showToast('Tamamlanmayan görevler havuza aktarıldı');
+}
+
 // ══════════════════════════════════════════
-// WEEK ARCHIVE CHECK — Pazar gece 00:00
+// WEEK ARCHIVE CHECK — geçmiş haftaları otomatik arşivle
 // ══════════════════════════════════════════
 async function checkWeekArchive() {
-  if (_isGuest || !_uid || _archiveInProgress || !_tasks.length) return;
-  _archiveInProgress = true;
-  try {
-    const prevWeekStart = getWeekStart(-1);
-    const prevDays = getDaysOfWeek(prevWeekStart);
-    const prevKeys = prevDays.map(dateKey);
-    const archiveKey = dateKey(prevWeekStart);
+  if(_isGuest||!_uid||!_tasks.length)return;
+  const currentWeekStart=getWeekStart(0).getTime();
+  const pastAssigned=_tasks.filter(t=>t.dayKey && getWeekStartFromDayKey(t.dayKey).getTime() < currentWeekStart && !t.isPastClone);
+  if(!pastAssigned.length)return;
 
-    const exists = _archivedWeeks.find(w => w.id === archiveKey);
-    if (exists) return;
+  const groups={};
+  for(const task of pastAssigned){
+    const ws=getWeekStartFromDayKey(task.dayKey);
+    const key=dateKey(ws);
+    if(!groups[key]) groups[key]={ weekStart:ws, tasks:[] };
+    groups[key].tasks.push(task);
+  }
 
-    const weekTasks = _tasks.filter(t => t.dayKey && prevKeys.includes(t.dayKey));
-    if (weekTasks.length === 0) return;
+  const {doc,setDoc,deleteDoc,updateDoc}= _firestore;
 
-    const { doc, setDoc, deleteDoc, updateDoc } = _firestore;
-
-    await setDoc(doc(_db, `users/${_uid}/archivedWeeks`, archiveKey), {
-      weekStart: prevWeekStart.getTime(),
-      label: `${formatWeekRange(prevDays)}`,
-      tasks: weekTasks.map(t => ({ ...t })),
-      archivedAt: Date.now()
-    });
-
-    for (const t of weekTasks) {
-      if (t.recurring === 'true') {
-        await updateDoc(doc(_db, `users/${_uid}/tasks`, t.id), {
-          dayKey: null,
-          completed: false
-        });
-      } else {
-        await deleteDoc(doc(_db, `users/${_uid}/tasks`, t.id));
-      }
+  for(const [archiveKey,group] of Object.entries(groups)){
+    const exists=_archivedWeeks.find(w=>w.id===archiveKey);
+    if(!exists){
+      const days=getDaysOfWeek(group.weekStart);
+      const keys=days.map(dateKey);
+      const dayNotesSnapshot={};
+      keys.forEach(k=>{ if(_dayNotes[k]) dayNotesSnapshot[k]=_dayNotes[k]; });
+      await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,archiveKey),{
+        weekStart:group.weekStart.getTime(),
+        label:formatWeekRange(days),
+        tasks:group.tasks.map(t=>({...t})),
+        dayNotes:dayNotesSnapshot,
+        archivedAt:Date.now()
+      });
     }
 
-    showToast('Geçen hafta arşivlendi');
-  } finally {
-    _archiveInProgress = false;
+    for(const t of group.tasks){
+      if(t.recurring===true||t.recurring==='true'){
+        await updateDoc(doc(_db,`users/${_uid}/tasks`,t.id),{dayKey:null,completed:false,order:Date.now()+Math.floor(Math.random()*1000)});
+      } else {
+        await deleteDoc(doc(_db,`users/${_uid}/tasks`,t.id));
+      }
+    }
   }
 }
 
@@ -1196,8 +1268,23 @@ document.getElementById('save-task-btn').onclick=async()=>{
 };
 
 async function toggleComplete(id) {
-  const task=_tasks.find(t=>t.id===id);if(!task)return;
-  const{doc,updateDoc}=_firestore;
+  const task=_tasks.find(t=>t.id===id); if(!task) return;
+  const {doc,updateDoc,deleteDoc,getDoc,setDoc}= _firestore;
+
+  if(task.isPastClone && !task.completed){
+    // Arşivdeki orijinal görevi tamamlandı yap, klonu sil
+    const archiveRef=doc(_db,`users/${_uid}/archivedWeeks`,task.originalArchiveWeekId);
+    const snap=await getDoc(archiveRef);
+    if(snap.exists()){
+      const data=snap.data();
+      const tasks=(data.tasks||[]).map(t=> t.id===task.originalArchivedTaskId ? {...t, completed:true} : t);
+      await setDoc(archiveRef,{...data,tasks});
+    }
+    await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));
+    showToast('Geçmiş görev tamamlandı');
+    return;
+  }
+
   await updateDoc(doc(_db,`users/${_uid}/tasks`,id),{completed:!task.completed});
 }
 
@@ -1385,7 +1472,7 @@ document.getElementById('new-exam-btn').onclick=()=>{
   _editingExamId=null;_wrongCounts={};_examSineType='TYT';
   document.getElementById('exam-modal-title').textContent='Yeni Deneme';
   document.getElementById('ef-name').value='';
-  document.getElementById('ef-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('ef-date').value = new Date().toISOString().slice(0,10);
   // Reset type toggle
   document.querySelectorAll('#exam-modal .toggle-group .toggle-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
   buildNetsUI('TYT'); buildWrongsUI('TYT');
@@ -1399,7 +1486,6 @@ document.getElementById('new-exam-btn').onclick=()=>{
 document.getElementById('save-exam-btn').onclick=async()=>{
   _snd('save');
   const name=document.getElementById('ef-name').value.trim();
-  const examDate=document.getElementById('ef-date').value || new Date().toISOString().slice(0,10);
   if(!name){showToast('Deneme adı zorunlu');return;}
   const subjects=_examSineType==='TYT'?TYT_SUBJECTS:AYT_SUBJECTS;
   const counts=_examSineType==='TYT'?TYT_COUNTS:AYT_COUNTS;
@@ -1423,7 +1509,7 @@ document.getElementById('save-exam-btn').onclick=async()=>{
     if(count>0) wrongs[key]=count;
   }
 
-  const data={name,type:_examSineType,nets,totalNet:Math.round(totalNet*100)/100,wrongs,examDate,createdAt:_editingExamId?(_exams.find(e=>e.id===_editingExamId)?.createdAt||Date.now()):Date.now()};
+  const data={name,type:_examSineType,nets,totalNet:Math.round(totalNet*100)/100,wrongs,examDate:document.getElementById('ef-date').value||new Date().toISOString().slice(0,10),createdAt:Date.now()};
 
   try{
     const{collection,doc,addDoc,updateDoc}=_firestore;
@@ -1448,7 +1534,7 @@ function renderExams() {
           <div class="exam-card-title">${escHtml(exam.name)}</div>
           <div class="exam-card-meta" style="margin-top:0.3rem">
             <div class="exam-card-net">Toplam: <span>${exam.totalNet||0}</span> net</div>
-            <div class="exam-card-date">${exam.examDate ? new Date(exam.examDate + 'T00:00:00').toLocaleDateString('tr-TR') : new Date(exam.createdAt).toLocaleDateString('tr-TR')}</div>
+            <div class="exam-card-date">${exam.examDate ? new Date(exam.examDate+'T00:00:00').toLocaleDateString('tr-TR') : new Date(exam.createdAt).toLocaleDateString('tr-TR')}</div>
           </div>
         </div>
         <div class="exam-card-actions" onclick="event.stopPropagation()">
@@ -1490,7 +1576,7 @@ async function editExam(id) {
   _editingExamId=id;_examSineType=exam.type||'TYT';_wrongCounts={...exam.wrongs||{}};
   document.getElementById('exam-modal-title').textContent='Denemeyi Düzenle';
   document.getElementById('ef-name').value=exam.name||'';
-  document.getElementById('ef-date').value=exam.examDate||new Date(exam.createdAt||Date.now()).toISOString().slice(0,10);
+  document.getElementById('ef-date').value=exam.examDate||new Date(exam.createdAt).toISOString().slice(0,10);
   // type toggle
   document.querySelectorAll('#exam-modal .toggle-group .toggle-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===_examSineType));
   buildNetsUI(_examSineType);buildWrongsUI(_examSineType);
@@ -1655,50 +1741,138 @@ async function deleteNote(id) {
 }
 
 // ══════════════════════════════════════════
-// RICH TEXT EDITOR
+// RICH TEXT EDITOR — custom, execCommand yok
 // ══════════════════════════════════════════
+let _savedNoteRange = null;
+
+function _saveNoteSelection() {
+  const editor = _ed();
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+  if (!editor.contains(range.commonAncestorContainer)) return;
+  _savedNoteRange = range.cloneRange();
+}
+
+function _restoreNoteSelection() {
+  if (!_savedNoteRange) return false;
+  const sel = window.getSelection();
+  sel.removeAllRanges();
+  sel.addRange(_savedNoteRange);
+  return true;
+}
+
+function _placeCaretAfter(node) {
+  const sel = window.getSelection();
+  const range = document.createRange();
+  range.setStartAfter(node);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+  _saveNoteSelection();
+}
+
+function _insertStyledCaretSpan(styles) {
+  const sel = window.getSelection();
+  let range;
+  if (sel && sel.rangeCount) range = sel.getRangeAt(0);
+  if (!range) return null;
+  const span = document.createElement('span');
+  Object.assign(span.style, styles);
+  const textNode = document.createTextNode('\u200B');
+  span.appendChild(textNode);
+  range.insertNode(span);
+  const newRange = document.createRange();
+  newRange.setStart(textNode, 1);
+  newRange.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(newRange);
+  _savedNoteRange = newRange.cloneRange();
+  return span;
+}
+
 function _ed() { return document.getElementById('note-editor'); }
 
-function execRich(cmd) {
+function _applySpan(styles) {
   const editor = _ed();
   editor.focus();
-  document.execCommand('styleWithCSS', false, true);
-  if (cmd === 'bold') document.execCommand('bold');
-  else if (cmd === 'italic') document.execCommand('italic');
-  else if (cmd === 'underline') document.execCommand('underline');
-  else if (cmd === 'clear') document.execCommand('removeFormat');
+  _restoreNoteSelection();
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+
+  if (sel.isCollapsed) {
+    _insertStyledCaretSpan(styles);
+    return;
+  }
+
+  try {
+    const frag = range.extractContents();
+    const span = document.createElement('span');
+    Object.assign(span.style, styles);
+    span.appendChild(frag);
+    range.insertNode(span);
+    _placeCaretAfter(span);
+  } catch(e) {}
 }
 
-function execColor(color) {
+function _toggleSpan(prop, onVal, offVal) {
   const editor = _ed();
   editor.focus();
-  document.execCommand('styleWithCSS', false, true);
-  document.execCommand('foreColor', false, color);
+  _restoreNoteSelection();
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return;
+  const range = sel.getRangeAt(0);
+
+  if (sel.isCollapsed) {
+    _insertStyledCaretSpan({ [prop]: onVal });
+    return;
+  }
+
+  const container = range.commonAncestorContainer;
+  const el = container.nodeType === 3 ? container.parentElement : container;
+  const cur = window.getComputedStyle(el)[prop];
+  _applySpan({ [prop]: (cur === onVal) ? offVal : onVal });
 }
+
+function execRich(cmd) {
+  if (cmd === 'bold') _toggleSpan('fontWeight', '700', '400');
+  else if (cmd === 'italic') _toggleSpan('fontStyle', 'italic', 'normal');
+  else if (cmd === 'underline') _toggleSpan('textDecoration', 'underline', 'none');
+  else if (cmd === 'clear') {
+    const editor = _ed(); editor.focus();
+    _restoreNoteSelection();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    try {
+      const text = document.createTextNode(range.toString());
+      range.deleteContents();
+      range.insertNode(text);
+      _placeCaretAfter(text);
+    } catch(e) {}
+  }
+}
+
+function execColor(color) { _applySpan({ color }); }
 
 function execFontSize(size) {
-  const editor = _ed();
-  editor.focus();
-  document.execCommand('styleWithCSS', false, true);
-  const map = { sm: '2', md: '3', lg: '5', xl: '6' };
-  document.execCommand('fontSize', false, map[size] || '3');
-
-  const sizeMap = {
-    '2': '0.68rem',
-    '3': '0.85rem',
-    '5': '1.05rem',
-    '6': '1.3rem'
-  };
-
-  editor.querySelectorAll('font[size]').forEach(el => {
-    const px = sizeMap[el.getAttribute('size')] || '0.85rem';
-    const span = document.createElement('span');
-    span.style.fontSize = px;
-    span.innerHTML = el.innerHTML;
-    el.replaceWith(span);
-  });
+  const map = { sm: '0.68rem', md: '0.85rem', lg: '1.05rem', xl: '1.3rem' };
+  _applySpan({ fontSize: map[size] || size });
 }
 
+
+
+// Note editor selection koruma
+['mouseup','keyup','input','touchend'].forEach(evt=>{
+  document.getElementById('note-editor')?.addEventListener(evt, _saveNoteSelection);
+});
+document.querySelectorAll('.rich-btn, .rich-color').forEach(el=>{
+  el.addEventListener('mousedown', e => {
+    e.preventDefault();
+    _restoreNoteSelection();
+  });
+});
 // ══════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════
