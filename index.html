@@ -18,8 +18,7 @@
     projectId: "mihrak-ff2a9",
     storageBucket: "mihrak-ff2a9.firebasestorage.app",
     messagingSenderId: "816000351968",
-    appId: "1:816000351968:web:686f7418114c1b2b411a85",
-    measurementId: "G-P23J3YNK01"
+    appId: "1:816000351968:web:686f7418114c1b2b411a85"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -229,7 +228,21 @@ body::before {
 .task-card[data-lesson*="elsefe"]::before { background:var(--color-felsefe); }
 .task-card[data-lesson*="ngiliz"]::before,.task-card[data-lesson*="il "]::before { background:var(--color-dil); }
 
-.task-note-preview { font-size:0.65rem;color:var(--text-dim);margin:0.15rem 0 0.2rem;line-height:1.35;font-style:italic; }
+.task-note-chip {
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  font-size:0.55rem;
+  padding:0.12rem 0.42rem;
+  border-radius:999px;
+  background:rgba(160,92,224,0.14);
+  color:#cfb4ff;
+  border:1px solid rgba(160,92,224,0.35);
+  font-family:var(--ff-mono);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 .task-card.drag-target { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow); }
 .empty-drop { font-size:0.6rem;color:var(--text-dim);text-align:center;padding:0.8rem 0.5rem;pointer-events:none; }
 
@@ -578,6 +591,7 @@ body::before {
     </div>
     <div class="modal-body">
       <div class="form-group"><label class="form-label">Deneme Adı *</label><input class="form-input" id="ef-name" placeholder="TYT Deneme 1..."></div>
+      <div class="form-group"><label class="form-label">Deneme Tarihi</label><input class="form-input" id="ef-date" type="date"></div>
       <div class="form-group"><label class="form-label">Sınav Türü</label>
         <div class="toggle-group">
           <button class="toggle-btn active" data-val="TYT" onclick="selectExamType(this)">TYT</button>
@@ -710,6 +724,7 @@ let _examTypeVal='',_recurringVal='false';
 let _unsubTasks=null,_unsubNotes=null,_unsubArchive=null,_unsubExams=null,_unsubNotesDb=null;
 let _editingExamId=null,_editingNoteId=null;
 let _examSineType='TYT';
+let _archiveInProgress=false;
 let _wrongCounts={};
 let _analysisN=0;
 let _activeNoteTab='Genel';
@@ -801,8 +816,10 @@ function startApp() {
 // ══════════════════════════════════════════
 function subscribeData() {
   const {collection,onSnapshot}=_firestore;
-  _unsubTasks = onSnapshot(collection(_db,`users/${_uid}/tasks`), s => {
-    _tasks=s.docs.map(d=>({id:d.id,...d.data()})); renderAll();
+  _unsubTasks = onSnapshot(collection(_db,`users/${_uid}/tasks`), async s => {
+    _tasks=s.docs.map(d=>({id:d.id,...d.data()}));
+    renderAll();
+    await checkWeekArchive();
   });
   _unsubNotes = onSnapshot(collection(_db,`users/${_uid}/dayNotes`), s => {
     _dayNotes={}; s.docs.forEach(d=>{_dayNotes[d.id]=d.data().text;}); renderAll();
@@ -1111,44 +1128,44 @@ function renderArchive() {
 // WEEK ARCHIVE CHECK — Pazar gece 00:00
 // ══════════════════════════════════════════
 async function checkWeekArchive() {
-  if(_isGuest||!_uid)return;
-  const now=new Date();
-  // Bugün Pazartesi mi? (0=Paz, 1=Pzt)
-  // Eğer bugün Pazartesi ise, geçen haftanın (offset=-1) verilerini arşivle
-  if(now.getDay()!==1)return; // Sadece Pazartesi çalıştır
+  if (_isGuest || !_uid || _archiveInProgress || !_tasks.length) return;
+  _archiveInProgress = true;
+  try {
+    const prevWeekStart = getWeekStart(-1);
+    const prevDays = getDaysOfWeek(prevWeekStart);
+    const prevKeys = prevDays.map(dateKey);
+    const archiveKey = dateKey(prevWeekStart);
 
-  const prevWeekStart=getWeekStart(-1); // Geçen Pazartesi
-  const prevDays=getDaysOfWeek(prevWeekStart);
-  const prevKeys=prevDays.map(dateKey);
-  const archiveKey=dateKey(prevWeekStart);
+    const exists = _archivedWeeks.find(w => w.id === archiveKey);
+    if (exists) return;
 
-  // Zaten arşivlenmiş mi?
-  const exists=_archivedWeeks.find(w=>w.id===archiveKey);
-  if(exists)return;
+    const weekTasks = _tasks.filter(t => t.dayKey && prevKeys.includes(t.dayKey));
+    if (weekTasks.length === 0) return;
 
-  // O haftaya ait görevler
-  const weekTasks=_tasks.filter(t=>t.dayKey&&prevKeys.includes(t.dayKey));
-  if(weekTasks.length===0)return;
+    const { doc, setDoc, deleteDoc, updateDoc } = _firestore;
 
-  const {doc,setDoc,deleteDoc}=_firestore;
+    await setDoc(doc(_db, `users/${_uid}/archivedWeeks`, archiveKey), {
+      weekStart: prevWeekStart.getTime(),
+      label: `${formatWeekRange(prevDays)}`,
+      tasks: weekTasks.map(t => ({ ...t })),
+      archivedAt: Date.now()
+    });
 
-  // Arşive kaydet
-  await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,archiveKey),{
-    weekStart:prevWeekStart.getTime(),
-    label:`${formatWeekRange(prevDays)}`,
-    tasks:weekTasks.map(t=>({...t})),
-    archivedAt:Date.now()
-  });
-
-  // O haftanın görevlerini havuza taşı (dayKey null) veya sil — tekrarlayan olmayanları temizle
-  for(const t of weekTasks) {
-    if(t.recurring==='true') {
-      await _firestore.updateDoc(doc(_db,`users/${_uid}/tasks`,t.id),{dayKey:null,completed:false});
-    } else {
-      await deleteDoc(doc(_db,`users/${_uid}/tasks`,t.id));
+    for (const t of weekTasks) {
+      if (t.recurring === 'true') {
+        await updateDoc(doc(_db, `users/${_uid}/tasks`, t.id), {
+          dayKey: null,
+          completed: false
+        });
+      } else {
+        await deleteDoc(doc(_db, `users/${_uid}/tasks`, t.id));
+      }
     }
+
+    showToast('Geçen hafta arşivlendi');
+  } finally {
+    _archiveInProgress = false;
   }
-  showToast('Geçen hafta arşivlendi');
 }
 
 // ══════════════════════════════════════════
@@ -1368,6 +1385,7 @@ document.getElementById('new-exam-btn').onclick=()=>{
   _editingExamId=null;_wrongCounts={};_examSineType='TYT';
   document.getElementById('exam-modal-title').textContent='Yeni Deneme';
   document.getElementById('ef-name').value='';
+  document.getElementById('ef-date').value=new Date().toISOString().slice(0,10);
   // Reset type toggle
   document.querySelectorAll('#exam-modal .toggle-group .toggle-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
   buildNetsUI('TYT'); buildWrongsUI('TYT');
@@ -1381,6 +1399,7 @@ document.getElementById('new-exam-btn').onclick=()=>{
 document.getElementById('save-exam-btn').onclick=async()=>{
   _snd('save');
   const name=document.getElementById('ef-name').value.trim();
+  const examDate=document.getElementById('ef-date').value || new Date().toISOString().slice(0,10);
   if(!name){showToast('Deneme adı zorunlu');return;}
   const subjects=_examSineType==='TYT'?TYT_SUBJECTS:AYT_SUBJECTS;
   const counts=_examSineType==='TYT'?TYT_COUNTS:AYT_COUNTS;
@@ -1404,7 +1423,7 @@ document.getElementById('save-exam-btn').onclick=async()=>{
     if(count>0) wrongs[key]=count;
   }
 
-  const data={name,type:_examSineType,nets,totalNet:Math.round(totalNet*100)/100,wrongs,createdAt:Date.now()};
+  const data={name,type:_examSineType,nets,totalNet:Math.round(totalNet*100)/100,wrongs,examDate,createdAt:_editingExamId?(_exams.find(e=>e.id===_editingExamId)?.createdAt||Date.now()):Date.now()};
 
   try{
     const{collection,doc,addDoc,updateDoc}=_firestore;
@@ -1429,7 +1448,7 @@ function renderExams() {
           <div class="exam-card-title">${escHtml(exam.name)}</div>
           <div class="exam-card-meta" style="margin-top:0.3rem">
             <div class="exam-card-net">Toplam: <span>${exam.totalNet||0}</span> net</div>
-            <div class="exam-card-date">${new Date(exam.createdAt).toLocaleDateString('tr-TR')}</div>
+            <div class="exam-card-date">${exam.examDate ? new Date(exam.examDate + 'T00:00:00').toLocaleDateString('tr-TR') : new Date(exam.createdAt).toLocaleDateString('tr-TR')}</div>
           </div>
         </div>
         <div class="exam-card-actions" onclick="event.stopPropagation()">
@@ -1471,6 +1490,7 @@ async function editExam(id) {
   _editingExamId=id;_examSineType=exam.type||'TYT';_wrongCounts={...exam.wrongs||{}};
   document.getElementById('exam-modal-title').textContent='Denemeyi Düzenle';
   document.getElementById('ef-name').value=exam.name||'';
+  document.getElementById('ef-date').value=exam.examDate||new Date(exam.createdAt||Date.now()).toISOString().slice(0,10);
   // type toggle
   document.querySelectorAll('#exam-modal .toggle-group .toggle-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===_examSineType));
   buildNetsUI(_examSineType);buildWrongsUI(_examSineType);
@@ -1635,61 +1655,49 @@ async function deleteNote(id) {
 }
 
 // ══════════════════════════════════════════
-// RICH TEXT EDITOR — custom, execCommand yok
+// RICH TEXT EDITOR
 // ══════════════════════════════════════════
 function _ed() { return document.getElementById('note-editor'); }
 
-function _applySpan(styles) {
-  const editor = _ed(); editor.focus();
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
-  const range = sel.getRangeAt(0);
-  try {
-    const frag = range.extractContents();
-    const span = document.createElement('span');
-    Object.assign(span.style, styles);
-    span.appendChild(frag);
-    range.insertNode(span);
-    const nr = document.createRange();
-    nr.selectNodeContents(span);
-    sel.removeAllRanges(); sel.addRange(nr);
-  } catch(e) {}
-}
-
-function _toggleSpan(prop, onVal, offVal) {
-  const editor = _ed(); editor.focus();
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
-  const range = sel.getRangeAt(0);
-  const container = range.commonAncestorContainer;
-  const el = container.nodeType === 3 ? container.parentElement : container;
-  const cur = window.getComputedStyle(el)[prop];
-  _applySpan({ [prop]: (cur === onVal) ? offVal : onVal });
-}
-
 function execRich(cmd) {
-  if (cmd === 'bold') _toggleSpan('fontWeight', 'bold', 'normal');
-  else if (cmd === 'italic') _toggleSpan('fontStyle', 'italic', 'normal');
-  else if (cmd === 'underline') _toggleSpan('textDecoration', 'underline', 'none');
-  else if (cmd === 'clear') {
-    const editor = _ed(); editor.focus();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
-    const range = sel.getRangeAt(0);
-    try {
-      const text = document.createTextNode(range.toString());
-      range.deleteContents(); range.insertNode(text);
-    } catch(e) {}
-  }
+  const editor = _ed();
+  editor.focus();
+  document.execCommand('styleWithCSS', false, true);
+  if (cmd === 'bold') document.execCommand('bold');
+  else if (cmd === 'italic') document.execCommand('italic');
+  else if (cmd === 'underline') document.execCommand('underline');
+  else if (cmd === 'clear') document.execCommand('removeFormat');
 }
 
-function execColor(color) { _applySpan({ color }); }
+function execColor(color) {
+  const editor = _ed();
+  editor.focus();
+  document.execCommand('styleWithCSS', false, true);
+  document.execCommand('foreColor', false, color);
+}
 
 function execFontSize(size) {
-  const map = { sm: '0.68rem', md: '0.85rem', lg: '1.05rem', xl: '1.3rem' };
-  _applySpan({ fontSize: map[size] || size });
-}
+  const editor = _ed();
+  editor.focus();
+  document.execCommand('styleWithCSS', false, true);
+  const map = { sm: '2', md: '3', lg: '5', xl: '6' };
+  document.execCommand('fontSize', false, map[size] || '3');
 
+  const sizeMap = {
+    '2': '0.68rem',
+    '3': '0.85rem',
+    '5': '1.05rem',
+    '6': '1.3rem'
+  };
+
+  editor.querySelectorAll('font[size]').forEach(el => {
+    const px = sizeMap[el.getAttribute('size')] || '0.85rem';
+    const span = document.createElement('span');
+    span.style.fontSize = px;
+    span.innerHTML = el.innerHTML;
+    el.replaceWith(span);
+  });
+}
 
 // ══════════════════════════════════════════
 // UTILS
