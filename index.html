@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Mihrak</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='70%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='%23e8c97a'/%3E%3Cstop offset='100%25' stop-color='%23c4a35a'/%3E%3C/radialGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='8' fill='%230f0f1a'/%3E%3Cpath d='M16 4 C16 4 22 10 22 17 C22 21 19.3 24.5 16 26 C12.7 24.5 10 21 10 17 C10 10 16 4 16 4Z' fill='url(%23g)' opacity='0.9'/%3E%3Ccircle cx='16' cy='18' r='3.5' fill='%230f0f1a' opacity='0.6'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
 <script type="module">
@@ -133,13 +132,13 @@ body::before {
 @media (max-width:768px) { .planner-layout { grid-template-columns:1fr; } }
 
 /* ── POOL ── */
-.pool-panel { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden; }
+.pool-panel { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:sticky;top:72px; }
 .pool-header { padding:1rem 1.2rem 0.8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
 .pool-title { font-family:var(--ff-head);font-size:1.05rem;font-weight:600;color:var(--text); }
 .pool-count { font-size:0.7rem;color:var(--text-muted);background:var(--surface3);padding:0.2rem 0.5rem;border-radius:20px;border:1px solid var(--border); }
 .add-task-btn { width:100%;padding:0.75rem;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--accent);font-family:var(--ff-body);font-size:0.8rem;font-weight:500;cursor:pointer;transition:all 0.2s;margin:0.8rem 0 0; }
 .add-task-btn:hover { background:var(--accent-glow);border-color:var(--accent); }
-.pool-tasks { padding:0.8rem;min-height:80px;overflow-y:visible;display:flex;flex-direction:column;gap:0.4rem; }
+.pool-tasks { padding:0.8rem;min-height:80px;max-height:calc(100vh - 220px);overflow-y:auto;display:flex;flex-direction:column;gap:0.4rem; }
 .pool-tasks::-webkit-scrollbar { width:3px; }
 .pool-tasks::-webkit-scrollbar-thumb { background:var(--border2);border-radius:2px; }
 
@@ -230,7 +229,8 @@ body::before {
 .task-card[data-lesson*="elsefe"]::before { background:var(--color-felsefe); }
 .task-card[data-lesson*="ngiliz"]::before,.task-card[data-lesson*="il "]::before { background:var(--color-dil); }
 
-/* ── EMPTY ── */
+.task-note-preview { font-size:0.65rem;color:var(--text-dim);margin:0.15rem 0 0.2rem;line-height:1.35;font-style:italic; }
+.task-card.drag-target { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow); }
 .empty-drop { font-size:0.6rem;color:var(--text-dim);text-align:center;padding:0.8rem 0.5rem;pointer-events:none; }
 
 /* ── MODAL ── */
@@ -393,7 +393,7 @@ body::before {
 .note-card-header { padding:0.6rem 0.8rem;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
 .note-card-date { font-size:0.58rem;color:var(--text-dim);font-family:var(--ff-mono); }
 .note-card-actions { display:flex;gap:0.3rem; }
-.note-card-body { padding:0.8rem;flex:1;font-size:0.82rem;line-height:1.6;color:var(--text-muted);word-break:break-word;overflow-wrap:break-word; }
+.note-card-body { padding:0.8rem;flex:1;font-size:0.8rem;line-height:1.6;color:var(--text-muted);white-space:pre-wrap;word-break:break-word; }
 
 /* Rich text toolbar */
 .rich-toolbar { display:flex;gap:0.3rem;flex-wrap:wrap;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px 6px 0 0;border-bottom:none; }
@@ -403,9 +403,9 @@ body::before {
 .rich-btn.i { font-style:italic; }
 .rich-color { width:18px;height:18px;border-radius:50%;border:2px solid var(--border);cursor:pointer;flex-shrink:0; }
 .rich-color:hover { border-color:var(--text); }
-.note-editor { background:var(--surface2);border:1px solid var(--border);border-radius:0 0 6px 6px;color:var(--text);font-family:var(--ff-body);font-size:0.85rem;padding:0.7rem;min-height:180px;outline:none;word-break:break-word;overflow-wrap:break-word;overflow-y:auto; }
+.note-editor { background:var(--surface2);border:1px solid var(--border);border-radius:0 0 6px 6px;color:var(--text);font-family:var(--ff-body);font-size:0.85rem;padding:0.7rem;min-height:180px;outline:none;white-space:pre-wrap;word-break:break-word;overflow-y:auto; }
 .note-editor:focus { border-color:var(--accent); }
-.note-editor span { display:inline; }
+.note-editor [style] { display:inline; }
 </style>
 </head>
 <body>
@@ -424,7 +424,22 @@ body::before {
 
 <div id="app">
   <header class="header">
-    <div class="header-logo">MİHRAK<span class="header-byline">Made by TheBuckLava · Powered by AI</span></div>
+    <div class="header-logo">
+      <div style="display:flex;align-items:center;gap:0.5rem">
+        <svg width="22" height="28" viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="flameGrad" cx="50%" cy="80%" r="60%">
+              <stop offset="0%" stop-color="#e8c97a"/>
+              <stop offset="100%" stop-color="#c4a35a"/>
+            </radialGradient>
+          </defs>
+          <path d="M16 2 C16 2 26 12 26 22 C26 28.6 21.5 34 16 36 C10.5 34 6 28.6 6 22 C6 12 16 2 16 2Z" fill="url(#flameGrad)" opacity="0.95"/>
+          <circle cx="16" cy="23" r="5" fill="#0f0f1a" opacity="0.55"/>
+        </svg>
+        MİHRAK
+      </div>
+      <span class="header-byline">Made by TheBuckLava · Powered by AI</span>
+    </div>
     <div class="header-actions">
       <button class="nav-btn active" id="nav-planner">Program</button>
       <button class="nav-btn" id="nav-archive">Arşiv</button>
@@ -496,7 +511,6 @@ body::before {
     <div class="modal-body">
       <div class="form-group"><label class="form-label">Ders *</label><input class="form-input" id="f-lesson" placeholder="TYT Türkçe, AYT Matematik..."></div>
       <div class="form-group"><label class="form-label">Konu</label><input class="form-input" id="f-topic" placeholder="Paragraf, Logaritma..."></div>
-      <div class="form-group"><label class="form-label">Not</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
       <div class="form-group"><label class="form-label">TYT / AYT</label>
         <div class="toggle-group">
           <button class="toggle-btn" data-val="TYT" onclick="selectToggle(this,'exam-type')">TYT</button>
@@ -504,8 +518,11 @@ body::before {
           <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type')">Boş</button>
         </div>
       </div>
+      <div class="form-group"><label class="form-label">Görev Türü</label><input class="form-input" id="f-type" placeholder="Test, Konu Anlatımı, Video, Deneme..."></div>
       <div class="form-group"><label class="form-label">Kaynak</label><input class="form-input" id="f-source" placeholder="Hoca / Kitap / Kanal adı..."></div>
+      <div class="form-group"><label class="form-label">Soru Sayısı</label><input class="form-input" id="f-questions" type="number" placeholder="40"></div>
       <div class="form-group"><label class="form-label">Tahmini Süre (dakika)</label><input class="form-input" id="f-duration" type="number" placeholder="45"></div>
+      <div class="form-group"><label class="form-label">Not</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
       <div class="form-group"><label class="form-label">Tekrarlayan Görev</label>
         <div class="toggle-group">
           <button class="toggle-btn active" data-val="false" onclick="selectToggle(this,'recurring')">Hayır</button>
@@ -561,7 +578,6 @@ body::before {
     </div>
     <div class="modal-body">
       <div class="form-group"><label class="form-label">Deneme Adı *</label><input class="form-input" id="ef-name" placeholder="TYT Deneme 1..."></div>
-      <div class="form-group"><label class="form-label">Tarih</label><input class="form-input" id="ef-date" type="date"></div>
       <div class="form-group"><label class="form-label">Sınav Türü</label>
         <div class="toggle-group">
           <button class="toggle-btn active" data-val="TYT" onclick="selectExamType(this)">TYT</button>
@@ -618,9 +634,12 @@ body::before {
           <button class="rich-btn b" onclick="execRich('bold')">K</button>
           <button class="rich-btn i" onclick="execRich('italic')">İ</button>
           <button class="rich-btn" onclick="execRich('underline')" style="text-decoration:underline">A</button>
+          <button class="rich-btn" onclick="execRich('clear')" title="Formatı Temizle" style="color:var(--color-turkce)">✕</button>
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
-          <button class="rich-btn" onclick="execFontSize(1)">A-</button>
-          <button class="rich-btn" onclick="execFontSize(4)">A+</button>
+          <button class="rich-btn" onclick="execFontSize('sm')" style="font-size:0.6rem">A</button>
+          <button class="rich-btn" onclick="execFontSize('md')" style="font-size:0.75rem">A</button>
+          <button class="rich-btn" onclick="execFontSize('lg')" style="font-size:0.9rem">A</button>
+          <button class="rich-btn" onclick="execFontSize('xl')" style="font-size:1.05rem">A</button>
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
           <div class="rich-color" style="background:#e8e4f0" title="Beyaz" onclick="execColor('#e8e4f0')"></div>
           <div class="rich-color" style="background:#e8c97a" title="Altın" onclick="execColor('#e8c97a')"></div>
@@ -830,7 +849,7 @@ function renderPool() {
   const container=document.getElementById('pool-tasks');
   const empty=document.getElementById('pool-empty');
   const count=document.getElementById('pool-count');
-  const poolTasks=_tasks.filter(t=>!t.dayKey);
+  const poolTasks=[..._tasks.filter(t=>!t.dayKey)].sort((a,b)=>(a.order??a.createdAt??0)-(b.order??b.createdAt??0));
   count.textContent=poolTasks.length;
   empty.style.display=poolTasks.length?'none':'block';
   container.querySelectorAll('.task-card').forEach(el=>el.remove());
@@ -872,7 +891,7 @@ function createWeekBlock(days,label) {
 
 function createDayCol(date) {
   const key=dateKey(date);
-  const dayTasks=_tasks.filter(t=>t.dayKey===key);
+  const dayTasks=[..._tasks.filter(t=>t.dayKey===key)].sort((a,b)=>(a.order??a.createdAt??0)-(b.order??b.createdAt??0));
   const done=dayTasks.filter(t=>t.completed).length;
   const pct=dayTasks.length?Math.round(done/dayTasks.length*100):0;
   const note=_dayNotes[key];
@@ -906,19 +925,34 @@ function createTaskCard(task) {
   const card=document.createElement('div');
   card.className=`task-card ${task.completed?'completed':''}`;
   card.dataset.id=task.id;
+  card.dataset.order=task.order||task.createdAt||0;
   card.dataset.lesson=(task.lesson||'').toLowerCase();
   card.draggable=!_isGuest;
   if (!_isGuest) {
-    card.addEventListener('dragstart',e=>{_dragTaskId=task.id;e.dataTransfer.effectAllowed='move';setTimeout(()=>card.style.opacity='0.5',0);});
+    card.addEventListener('dragstart',e=>{
+      _dragTaskId=task.id;
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',task.id);
+      setTimeout(()=>card.style.opacity='0.4',0);
+    });
     card.addEventListener('dragend',()=>{card.style.opacity='';});
+    card.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';card.classList.add('drag-target');});
+    card.addEventListener('dragleave',()=>card.classList.remove('drag-target'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();e.stopPropagation();
+      card.classList.remove('drag-target');
+      handleReorder(_dragTaskId, task.id);
+    });
     _setupTouch(card,task.id);
   }
   const exam=task.examType?`<span class="task-badge badge-${task.examType.toLowerCase()}">${task.examType}</span>`:'';
   const rep=task.recurring==='true'?`<span class="repeat-badge">↻</span>`:'';
   const dur=task.duration?`<span class="task-duration">${task.duration}dk</span>`:'';
+  const notePreview=task.note?`<div class="task-note-preview">${escHtml(task.note.substring(0,60))}${task.note.length>60?'…':''}</div>`:'';
   card.innerHTML=`
     <div class="task-name">${escHtml(task.lesson||'')}${task.topic?' · '+escHtml(task.topic):''}</div>
-    <div class="task-meta">${exam}${task.taskType?`<span class="task-badge" style="background:rgba(196,163,90,0.1);color:var(--accent2)">${escHtml(task.taskType)}</span>`:''}${rep}${dur}</div>
+    ${notePreview}
+    <div class="task-meta">${exam}${rep}${dur}</div>
     ${!_isGuest?`<div class="task-actions">
       <button class="complete-btn" onclick="_snd('complete');toggleComplete('${task.id}')">${task.completed?'✓ tamamlandı':'tamamlandı'}</button>
       <button class="view-btn" onclick="_snd('click');openDetail('${task.id}')">detay</button>
@@ -959,8 +993,11 @@ function _setupTouch(card,taskId) {
     if(_tZone)_tZone.classList.remove('drag-over');
     const t=e.changedTouches[0];
     const el=document.elementFromPoint(t.clientX,t.clientY);
+    const targetCard=el?.closest('.task-card');
     const zone=el?.closest('.day-tasks,#pool-tasks');
-    if(zone){const dk=zone.id.startsWith('day-')?zone.id.replace('day-',''):null;_dropTouch(dk);}
+    if(targetCard&&targetCard.dataset.id&&targetCard.dataset.id!==_tOn) {
+      await _dropTouch(targetCard.closest('.day-tasks')?.id?.replace('day-','')||null, targetCard.dataset.id);
+    } else if(zone){const dk=zone.id.startsWith('day-')?zone.id.replace('day-',''):null;await _dropTouch(dk,null);}
     if(_tEl){_tEl.style.opacity='';_tEl=null;}
     _tOn=false;_dragTaskId=null;_tId=null;_tZone=null;
   });
@@ -985,19 +1022,57 @@ function _moveDrag() {
   _tc.style.left=(_tX-_tc._ox)+'px';_tc.style.top=(_tY-_tc._oy)+'px';
   if(_tY<80)window.scrollBy(0,-10);else if(_tY>window.innerHeight-80)window.scrollBy(0,10);
 }
-async function _dropTouch(dayKey) {
+async function _dropTouch(dayKey, targetCardId) {
   if(!_dragTaskId||_isGuest)return;
-  try{const{doc,updateDoc}=_firestore;await updateDoc(doc(_db,`users/${_uid}/tasks`,_dragTaskId),{dayKey:dayKey||null});showToast(dayKey?'Görev güne atandı':'Görev havuza taşındı');}catch(e){showToast('Hata: '+e.message);}
+  if(targetCardId&&targetCardId!==_dragTaskId) {
+    await handleReorder(_dragTaskId, targetCardId);
+    return;
+  }
+  const dragged=_tasks.find(t=>t.id===_dragTaskId);
+  if(!dragged)return;
+  const zoneTasks=_tasks.filter(t=>t.dayKey===(dayKey||null)&&t.id!==_dragTaskId);
+  const maxOrder=zoneTasks.length?Math.max(...zoneTasks.map(t=>t.order||t.createdAt||0)):0;
+  try{const{doc,updateDoc}=_firestore;await updateDoc(doc(_db,`users/${_uid}/tasks`,_dragTaskId),{dayKey:dayKey||null,order:maxOrder+1});showToast(dayKey?'Görev güne atandı':'Görev havuza taşındı');}catch(e){showToast('Hata: '+e.message);}
 }
 
 // ══════════════════════════════════════════
-// DRAG & DROP (desktop)
+// DRAG & DROP (desktop) + REORDER
 // ══════════════════════════════════════════
 async function handleDrop(e,dayKey) {
   e.preventDefault();e.currentTarget.classList.remove('drag-over');
   if(!_dragTaskId||_isGuest)return;
-  try{const{doc,updateDoc}=_firestore;await updateDoc(doc(_db,`users/${_uid}/tasks`,_dragTaskId),{dayKey:dayKey||null});showToast(dayKey?'Görev güne atandı':'Görev havuza taşındı');}catch(err){showToast('Hata: '+err.message);}
+  // Sadece gün/havuz değişikliği — sıralama card drop ile yapılıyor
+  const dragged=_tasks.find(t=>t.id===_dragTaskId);
+  if(!dragged)return;
+  // Hedef zone'daki görevlerin en sonuna ekle
+  const zoneTasks=_tasks.filter(t=>t.dayKey===(dayKey||null)&&t.id!==_dragTaskId);
+  const maxOrder=zoneTasks.length?Math.max(...zoneTasks.map(t=>t.order||t.createdAt||0)):0;
+  try{
+    const{doc,updateDoc}=_firestore;
+    await updateDoc(doc(_db,`users/${_uid}/tasks`,_dragTaskId),{dayKey:dayKey||null,order:maxOrder+1});
+    showToast(dayKey?'Görev güne atandı':'Görev havuza taşındı');
+  }catch(err){showToast('Hata: '+err.message);}
   _dragTaskId=null;
+}
+
+async function handleReorder(draggedId, targetId) {
+  if(!draggedId||!targetId||draggedId===targetId||_isGuest)return;
+  const dragged=_tasks.find(t=>t.id===draggedId);
+  const target=_tasks.find(t=>t.id===targetId);
+  if(!dragged||!target)return;
+  // Aynı container içinde mi?
+  if(dragged.dayKey!==target.dayKey)return;
+  // Target'ın order'ını al, dragged'a ver, aralarını kaydır
+  const containerTasks=[..._tasks.filter(t=>t.dayKey===target.dayKey)].sort((a,b)=>(a.order||a.createdAt||0)-(b.order||b.createdAt||0));
+  const newOrder=[];
+  const withoutDragged=containerTasks.filter(t=>t.id!==draggedId);
+  const targetIdx=withoutDragged.findIndex(t=>t.id===targetId);
+  withoutDragged.splice(targetIdx,0,dragged);
+  withoutDragged.forEach((t,i)=>newOrder.push({id:t.id,order:i*10}));
+  try{
+    const{doc,updateDoc}=_firestore;
+    await Promise.all(newOrder.map(({id,order})=>updateDoc(doc(_db,`users/${_uid}/tasks`,id),{order})));
+  }catch(e){showToast('Hata: '+e.message);}
 }
 
 // ══════════════════════════════════════════
@@ -1080,7 +1155,7 @@ document.getElementById('add-task-btn').onclick=()=>{
   _snd('click');
   _editingTaskId=null;
   document.getElementById('modal-title').textContent='Yeni Görev';
-  ['f-lesson','f-topic','f-source','f-duration','f-note'].forEach(id=>document.getElementById(id).value='');
+  ['f-lesson','f-topic','f-type','f-source','f-questions','f-duration','f-note'].forEach(id=>document.getElementById(id).value='');
   _examTypeVal='';_recurringVal='false';
   resetToggle('exam-type','');resetToggle('recurring','false');
   document.getElementById('task-modal').classList.add('open');
@@ -1090,7 +1165,7 @@ document.getElementById('save-task-btn').onclick=async()=>{
   _snd('save');
   const lesson=document.getElementById('f-lesson').value.trim();
   if(!lesson){showToast('Ders alanı zorunlu');return;}
-  const data={lesson,topic:document.getElementById('f-topic').value.trim(),examType:_examTypeVal,source:document.getElementById('f-source').value.trim(),duration:document.getElementById('f-duration').value.trim(),note:document.getElementById('f-note').value.trim(),recurring:_recurringVal,completed:false};
+  const data={lesson,topic:document.getElementById('f-topic').value.trim(),examType:_examTypeVal,taskType:document.getElementById('f-type').value.trim(),source:document.getElementById('f-source').value.trim(),questions:document.getElementById('f-questions').value.trim(),duration:document.getElementById('f-duration').value.trim(),note:document.getElementById('f-note').value.trim(),recurring:_recurringVal,completed:false};
   if(!_editingTaskId){data.createdAt=Date.now();data.dayKey=null;}
   try{
     const{collection,doc,addDoc,updateDoc}=_firestore;
@@ -1118,7 +1193,7 @@ async function deleteTask(id) {
 function openDetail(id) {
   const task=_tasks.find(t=>t.id===id);if(!task)return;
   document.getElementById('detail-title').textContent=task.lesson||'Görev';
-  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Kaynak',task.source],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',task.recurring==='true'?'Evet':'Hayır'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
+  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',task.recurring==='true'?'Evet':'Hayır'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
   document.getElementById('detail-body').innerHTML=rows.map(([k,v])=>`<div class="detail-row"><div class="detail-key">${k}</div><div class="detail-val ${k==='Durum'&&task.completed?'detail-completed':''}">${escHtml(String(v))}</div></div>`).join('');
   document.getElementById('detail-edit-btn').onclick=()=>{closeModal('detail-modal');openEdit(id);};
   document.getElementById('detail-modal').classList.add('open');
@@ -1130,9 +1205,11 @@ function openEdit(id) {
   document.getElementById('modal-title').textContent='Görevi Düzenle';
   document.getElementById('f-lesson').value=task.lesson||'';
   document.getElementById('f-topic').value=task.topic||'';
-  document.getElementById('f-note').value=task.note||'';
+  document.getElementById('f-type').value=task.taskType||'';
   document.getElementById('f-source').value=task.source||'';
+  document.getElementById('f-questions').value=task.questions||'';
   document.getElementById('f-duration').value=task.duration||'';
+  document.getElementById('f-note').value=task.note||'';
   _examTypeVal=task.examType||'';_recurringVal=task.recurring||'false';
   resetToggle('exam-type',_examTypeVal);resetToggle('recurring',_recurringVal);
   document.getElementById('task-modal').classList.add('open');
@@ -1288,7 +1365,6 @@ document.getElementById('new-exam-btn').onclick=()=>{
   _editingExamId=null;_wrongCounts={};_examSineType='TYT';
   document.getElementById('exam-modal-title').textContent='Yeni Deneme';
   document.getElementById('ef-name').value='';
-  document.getElementById('ef-date').value=new Date().toISOString().split('T')[0];
   // Reset type toggle
   document.querySelectorAll('#exam-modal .toggle-group .toggle-btn').forEach((b,i)=>b.classList.toggle('active',i===0));
   buildNetsUI('TYT'); buildWrongsUI('TYT');
@@ -1325,7 +1401,7 @@ document.getElementById('save-exam-btn').onclick=async()=>{
     if(count>0) wrongs[key]=count;
   }
 
-  const data={name,date:document.getElementById('ef-date').value||'',type:_examSineType,nets,totalNet:Math.round(totalNet*100)/100,wrongs,createdAt:Date.now()};
+  const data={name,type:_examSineType,nets,totalNet:Math.round(totalNet*100)/100,wrongs,createdAt:Date.now()};
 
   try{
     const{collection,doc,addDoc,updateDoc}=_firestore;
@@ -1350,7 +1426,7 @@ function renderExams() {
           <div class="exam-card-title">${escHtml(exam.name)}</div>
           <div class="exam-card-meta" style="margin-top:0.3rem">
             <div class="exam-card-net">Toplam: <span>${exam.totalNet||0}</span> net</div>
-            <div class="exam-card-date">${exam.date||new Date(exam.createdAt).toLocaleDateString('tr-TR')}</div>
+            <div class="exam-card-date">${new Date(exam.createdAt).toLocaleDateString('tr-TR')}</div>
           </div>
         </div>
         <div class="exam-card-actions" onclick="event.stopPropagation()">
@@ -1392,7 +1468,6 @@ async function editExam(id) {
   _editingExamId=id;_examSineType=exam.type||'TYT';_wrongCounts={...exam.wrongs||{}};
   document.getElementById('exam-modal-title').textContent='Denemeyi Düzenle';
   document.getElementById('ef-name').value=exam.name||'';
-  document.getElementById('ef-date').value=exam.date||'';
   // type toggle
   document.querySelectorAll('#exam-modal .toggle-group .toggle-btn').forEach(b=>b.classList.toggle('active',b.dataset.val===_examSineType));
   buildNetsUI(_examSineType);buildWrongsUI(_examSineType);
@@ -1556,45 +1631,62 @@ async function deleteNote(id) {
   await deleteDoc(doc(_db,`users/${_uid}/notes`,id));showToast('Not silindi');
 }
 
-// Rich text
-function execRich(cmd) {
-  const editor = document.getElementById('note-editor');
-  editor.focus();
+// ══════════════════════════════════════════
+// RICH TEXT EDITOR — custom, execCommand yok
+// ══════════════════════════════════════════
+function _ed() { return document.getElementById('note-editor'); }
+
+function _applySpan(styles) {
+  const editor = _ed(); editor.focus();
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
   const range = sel.getRangeAt(0);
-  if (range.collapsed) { document.execCommand(cmd, false, null); return; }
-  const span = document.createElement('span');
-  if (cmd === 'bold') span.style.fontWeight = 'bold';
-  else if (cmd === 'italic') span.style.fontStyle = 'italic';
-  else if (cmd === 'underline') span.style.textDecoration = 'underline';
-  try { range.surroundContents(span); } catch(e) { document.execCommand(cmd, false, null); }
+  try {
+    const frag = range.extractContents();
+    const span = document.createElement('span');
+    Object.assign(span.style, styles);
+    span.appendChild(frag);
+    range.insertNode(span);
+    const nr = document.createRange();
+    nr.selectNodeContents(span);
+    sel.removeAllRanges(); sel.addRange(nr);
+  } catch(e) {}
 }
 
-function execColor(color) {
-  const editor = document.getElementById('note-editor');
-  editor.focus();
+function _toggleSpan(prop, onVal, offVal) {
+  const editor = _ed(); editor.focus();
   const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
+  if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
   const range = sel.getRangeAt(0);
-  if (range.collapsed) return;
-  const span = document.createElement('span');
-  span.style.color = color;
-  try { range.surroundContents(span); } catch(e) { document.execCommand('foreColor', false, color); }
+  const container = range.commonAncestorContainer;
+  const el = container.nodeType === 3 ? container.parentElement : container;
+  const cur = window.getComputedStyle(el)[prop];
+  _applySpan({ [prop]: (cur === onVal) ? offVal : onVal });
 }
+
+function execRich(cmd) {
+  if (cmd === 'bold') _toggleSpan('fontWeight', 'bold', 'normal');
+  else if (cmd === 'italic') _toggleSpan('fontStyle', 'italic', 'normal');
+  else if (cmd === 'underline') _toggleSpan('textDecoration', 'underline', 'none');
+  else if (cmd === 'clear') {
+    const editor = _ed(); editor.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0 || sel.isCollapsed) return;
+    const range = sel.getRangeAt(0);
+    try {
+      const text = document.createTextNode(range.toString());
+      range.deleteContents(); range.insertNode(text);
+    } catch(e) {}
+  }
+}
+
+function execColor(color) { _applySpan({ color }); }
 
 function execFontSize(size) {
-  const editor = document.getElementById('note-editor');
-  editor.focus();
-  const sel = window.getSelection();
-  if (!sel || sel.rangeCount === 0) return;
-  const range = sel.getRangeAt(0);
-  if (range.collapsed) return;
-  const span = document.createElement('span');
-  const sizes = {1: '0.72rem', 2: '0.85rem', 3: '1rem', 4: '1.2rem', 5: '1.5rem'};
-  span.style.fontSize = sizes[size] || '0.85rem';
-  try { range.surroundContents(span); } catch(e) {}
+  const map = { sm: '0.68rem', md: '0.85rem', lg: '1.05rem', xl: '1.3rem' };
+  _applySpan({ fontSize: map[size] || size });
 }
+
 
 // ══════════════════════════════════════════
 // UTILS
