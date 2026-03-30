@@ -985,21 +985,24 @@ function _setupTouch(card,taskId) {
     _tZone=el?.closest('.day-tasks,#pool-tasks')||null;
     if(_tZone)_tZone.classList.add('drag-over');
   },{passive:false});
-  card.addEventListener('touchend',e=>{
-    clearTimeout(_tTmr);_tTmr=null;
-    if(_tRaf){cancelAnimationFrame(_tRaf);_tRaf=null;}
-    if(!_tOn||!_tc){_tOn=false;return;}
-    _tc.remove();_tc=null;
-    if(_tZone)_tZone.classList.remove('drag-over');
-    const t=e.changedTouches[0];
-    const el=document.elementFromPoint(t.clientX,t.clientY);
-    const targetCard=el?.closest('.task-card');
-    const zone=el?.closest('.day-tasks,#pool-tasks');
-    if(targetCard&&targetCard.dataset.id&&targetCard.dataset.id!==_tOn) {
-      await _dropTouch(targetCard.closest('.day-tasks')?.id?.replace('day-','')||null, targetCard.dataset.id);
-    } else if(zone){const dk=zone.id.startsWith('day-')?zone.id.replace('day-',''):null;await _dropTouch(dk,null);}
-    if(_tEl){_tEl.style.opacity='';_tEl=null;}
-    _tOn=false;_dragTaskId=null;_tId=null;_tZone=null;
+  card.addEventListener('touchend', async e => {
+    clearTimeout(_tTmr); _tTmr = null;
+    if (_tRaf) { cancelAnimationFrame(_tRaf); _tRaf = null; }
+    if (!_tOn || !_tc) { _tOn = false; return; }
+    _tc.remove(); _tc = null;
+    if (_tZone) _tZone.classList.remove('drag-over');
+    const t = e.changedTouches[0];
+    const el = document.elementFromPoint(t.clientX, t.clientY);
+    const targetCard = el?.closest('.task-card');
+    const zone = el?.closest('.day-tasks,#pool-tasks');
+    if (targetCard && targetCard.dataset.id && targetCard.dataset.id !== _tId) {
+      await _dropTouch(targetCard.closest('.day-tasks')?.id?.replace('day-','') || null, targetCard.dataset.id);
+    } else if (zone) {
+      const dk = zone.id.startsWith('day-') ? zone.id.replace('day-','') : null;
+      await _dropTouch(dk, null);
+    }
+    if (_tEl) { _tEl.style.opacity = ''; _tEl = null; }
+    _tOn = false; _dragTaskId = null; _tId = null; _tZone = null;
   });
   card.addEventListener('touchcancel',()=>{
     clearTimeout(_tTmr);
