@@ -884,7 +884,7 @@ window.addEventListener('load', () => {
     m.onAuthStateChanged(_auth, user => {
       document.getElementById('loading').style.display='none';
       if (user) {
-        if (user.email !== 'musaorunn@gmail.com') {
+        if (!['musaorunn@gmail.com', 'mhmetor@gmail.com'].includes(user.email)) {
           alert('Bu hesapla giriş izni yok.');
           m.signOut(_auth);
           document.getElementById('login-screen').style.display='flex';
