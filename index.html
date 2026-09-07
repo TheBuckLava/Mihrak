@@ -287,6 +287,62 @@ body::before {
 .btn-primary:hover { background:var(--accent2);box-shadow:0 0 18px rgba(196,163,90,0.35); }
 .btn-secondary { padding:0.6rem 1.2rem;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--text-muted);font-family:var(--ff-body);font-size:0.82rem;cursor:pointer;transition:all 0.2s; }
 .btn-secondary:hover { border-color:var(--text-muted);color:var(--text); }
+
+/* ══════════════════════════════════════════
+   KAYNAKLAR
+══════════════════════════════════════════ */
+.resources-subject-tabs{display:flex;gap:0.4rem;flex-wrap:wrap;padding:1rem 1.4rem 0;}
+.resource-subject-btn{padding:0.4rem 0.9rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-muted);font-family:var(--ff-body);font-size:0.75rem;cursor:pointer;transition:all 0.2s;}
+.resource-subject-btn:hover,.resource-subject-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+.resources-subtabs{display:flex;gap:0.4rem;padding:0.8rem 1.4rem 0;flex-wrap:wrap;}
+.resource-sub-btn{padding:0.3rem 0.7rem;border:1px solid var(--border);border-radius:16px;background:transparent;color:var(--text-dim);font-family:var(--ff-mono);font-size:0.68rem;cursor:pointer;transition:all 0.2s;}
+.resource-sub-btn:hover,.resource-sub-btn.active{border-color:var(--accent2);color:var(--accent2);}
+.resources-toolbar{padding:1rem 1.4rem 0;display:flex;justify-content:flex-end;}
+.resources-body{padding:1rem 1.4rem 2rem;display:flex;flex-direction:column;gap:1.4rem;}
+.resource-type-group{display:flex;flex-direction:column;gap:0.5rem;}
+.resource-type-title{font-size:0.7rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;font-weight:600;}
+.resource-list{display:flex;flex-direction:column;gap:0.4rem;}
+.resource-item{position:relative;display:flex;align-items:center;justify-content:space-between;gap:0.6rem;padding:0.55rem 0.8rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:0.82rem;color:var(--text);}
+.resource-item-name{flex:1;cursor:default;}
+.resource-edit-btn{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:0.75rem;padding:0.2rem 0.4rem;flex-shrink:0;}
+.resource-edit-btn:hover{color:var(--accent);}
+.resource-empty{color:var(--text-dim);font-size:0.78rem;padding:0.4rem 0;}
+.resource-tooltip{position:fixed;z-index:900;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.6rem 0.8rem;font-size:0.72rem;color:var(--text-muted);max-width:260px;box-shadow:0 10px 30px rgba(0,0,0,0.5);pointer-events:none;opacity:0;transition:opacity 0.15s;}
+.resource-tooltip.visible{opacity:1;}
+.resource-tooltip-title{color:var(--accent2);font-weight:600;margin-bottom:0.3rem;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;}
+.resource-tooltip-item{padding:0.15rem 0;border-top:1px solid var(--border);}
+.resource-tooltip-item:first-of-type{border-top:none;padding-top:0;}
+
+/* ══════════════════════════════════════════
+   GÜNLÜK PLAN
+══════════════════════════════════════════ */
+.calendar-scroll{padding:1rem 1.4rem 2rem;overflow-x:auto;}
+.calendar-daybar{display:grid;grid-template-columns:56px repeat(7,1fr);gap:0;min-width:820px;position:sticky;top:0;background:var(--bg);z-index:2;}
+.calendar-daycell{text-align:center;padding:0.5rem 0.3rem;border-bottom:1px solid var(--border);font-family:var(--ff-mono);}
+.calendar-daycell .dname{font-size:0.65rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;}
+.calendar-daycell .dnum{font-size:0.9rem;color:var(--text);margin-top:0.2rem;}
+.calendar-daycell.today .dnum{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--accent);color:var(--bg);}
+.calendar-body-scroll{max-height:64vh;overflow-y:auto;min-width:820px;}
+.calendar-grid-wrap{position:relative;min-width:820px;}
+.calendar-grid{display:grid;grid-template-columns:56px repeat(7,1fr);}
+.calendar-hour-label{grid-column:1;height:52px;font-size:0.62rem;color:var(--text-dim);font-family:var(--ff-mono);text-align:right;padding-right:0.4rem;transform:translateY(-0.6em);}
+.calendar-hour-row{grid-column:2/-1;display:grid;grid-template-columns:repeat(7,1fr);border-top:1px solid var(--border);height:52px;}
+.calendar-cell{border-right:1px solid var(--border);cursor:pointer;}
+.calendar-cell:hover{background:rgba(196,163,90,0.06);}
+.calendar-events-layer{position:absolute;top:0;left:56px;right:0;bottom:0;display:grid;grid-template-columns:repeat(7,1fr);pointer-events:none;}
+.calendar-day-col{position:relative;pointer-events:none;}
+.calendar-event{position:absolute;left:2px;right:2px;border-radius:6px;padding:0.25rem 0.4rem;font-size:0.66rem;color:#0a0a12;overflow:hidden;cursor:grab;pointer-events:auto;box-shadow:0 2px 8px rgba(0,0,0,0.35);user-select:none;}
+.calendar-event.dragging{opacity:0.75;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,0.6);}
+.calendar-event .ce-title{font-weight:700;line-height:1.2;}
+.calendar-event .ce-desc{font-size:0.6rem;opacity:0.85;margin-top:0.15rem;line-height:1.2;}
+.calendar-event .ce-resize{position:absolute;left:0;right:0;height:7px;cursor:ns-resize;}
+.calendar-event .ce-resize.top{top:0;}
+.calendar-event .ce-resize.bottom{bottom:0;}
+.calendar-color-row{display:flex;gap:0.5rem;flex-wrap:wrap;}
+.calendar-color-swatch{width:26px;height:26px;border-radius:50%;cursor:pointer;border:2px solid transparent;}
+.calendar-color-swatch.active{border-color:var(--text);}
+.calendar-time-row{display:flex;gap:0.6rem;}
+.calendar-time-row .form-group{flex:1;}
 .btn-success { padding:0.6rem 1.2rem;background:rgba(92,224,168,0.12);border:1px solid rgba(92,224,168,0.35);border-radius:6px;color:#7df0b7;font-family:var(--ff-body);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s; }
 .btn-success:hover { background:rgba(92,224,168,0.18);border-color:#5ce0a8;color:#b7ffd7; }
 
@@ -511,6 +567,8 @@ body::before {
       <button class="nav-btn" id="nav-archive">Arşiv</button>
       <button class="nav-btn" id="nav-exam">Denemeler</button>
       <button class="nav-btn" id="nav-notes">Notlar</button>
+      <button class="nav-btn" id="nav-resources">Kaynaklar</button>
+      <button class="nav-btn" id="nav-calendar">Günlük Plan</button>
       <button class="signout-btn" id="signout-btn">çıkış</button>
     </div>
   </header>
@@ -573,6 +631,27 @@ body::before {
     <div class="notes-tabs" id="notes-tabs"></div>
     <div class="notes-grid" id="notes-grid"></div>
   </div>
+
+  <!-- Resources -->
+  <div class="view" id="view-resources">
+    <div class="resources-subject-tabs" id="resources-subject-tabs"></div>
+    <div class="resources-subtabs" id="resources-subtabs"></div>
+    <div class="resources-toolbar"><button class="btn-primary" id="new-resource-btn">+ Yeni Kaynak Ekle</button></div>
+    <div class="resources-body" id="resources-body"></div>
+  </div>
+
+  <!-- Daily Plan / Calendar -->
+  <div class="view" id="view-calendar">
+    <div class="calendar-scroll">
+      <div class="calendar-daybar" id="calendar-daybar"></div>
+      <div class="calendar-body-scroll">
+        <div class="calendar-grid-wrap" id="calendar-grid-wrap">
+          <div class="calendar-grid" id="calendar-grid"></div>
+          <div class="calendar-events-layer" id="calendar-events-layer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -589,16 +668,15 @@ body::before {
       <div class="form-group"><label class="form-label">Konu</label><input class="form-input" id="f-topic" placeholder="Paragraf, Logaritma..."></div>
       <div class="form-group"><label class="form-label">TYT / AYT</label>
         <div class="toggle-group">
-          <button class="toggle-btn" data-val="TYT" onclick="selectToggle(this,'exam-type')">TYT</button>
-          <button class="toggle-btn" data-val="AYT" onclick="selectToggle(this,'exam-type')">AYT</button>
-          <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type')">Boş</button>
+          <button class="toggle-btn" data-val="TYT" onclick="selectToggle(this,'exam-type');onTaskExamTypeChanged()">TYT</button>
+          <button class="toggle-btn" data-val="AYT" onclick="selectToggle(this,'exam-type');onTaskExamTypeChanged()">AYT</button>
+          <button class="toggle-btn" data-val="GEO" onclick="selectToggle(this,'exam-type');onTaskExamTypeChanged()">GEO</button>
+          <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type');onTaskExamTypeChanged()">Boş</button>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Görev Türü</label><input class="form-input" id="f-type" placeholder="Test, Konu Anlatımı, Video, Deneme..."></div>
-      <div class="form-group"><label class="form-label">Kaynak</label><input class="form-input" id="f-source" placeholder="Hoca / Kitap / Kanal adı..."></div>
-      <div class="form-group"><label class="form-label">Soru Sayısı</label><input class="form-input" id="f-questions" type="number" placeholder="40"></div>
-      <div class="form-group"><label class="form-label">Tahmini Süre (dakika)</label><input class="form-input" id="f-duration" type="number" placeholder="45"></div>
-      <div class="form-group"><label class="form-label">Not</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
+      <div class="form-group"><label class="form-label">Kaynak</label><select class="form-select" id="f-source"><option value="">Kaynak seç...</option></select></div>
+      <div class="form-group"><label class="form-label">Ayrıntılar</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
       <div class="form-group"><label class="form-label">Tekrarlayan Görev</label>
         <div class="toggle-group">
           <button class="toggle-btn active" data-val="false" onclick="selectToggle(this,'recurring')">Hayır</button>
@@ -609,6 +687,61 @@ body::before {
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('task-modal')">İptal</button>
       <button class="btn-primary" id="save-task-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resource Modal -->
+<div class="modal-overlay" id="resource-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="resource-modal-title">Yeni Kaynak</div>
+      <button class="modal-close" onclick="closeModal('resource-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Kaynak Adı</label><input class="form-input" id="res-name" placeholder="Örn: 3D Yayınları Soru Bankası"></div>
+      <div class="form-group"><label class="form-label">Ders</label>
+        <select class="form-select" id="res-subject" onchange="onResourceSubjectChanged()"></select>
+      </div>
+      <div class="form-group" id="res-examtype-group"><label class="form-label">TYT / AYT / GEO</label>
+        <select class="form-select" id="res-examtype"></select>
+      </div>
+      <div class="form-group"><label class="form-label">Tip</label>
+        <select class="form-select" id="res-type"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('resource-modal')">İptal</button>
+      <button class="btn-primary" id="save-resource-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Resource Tasks Tooltip -->
+<div class="resource-tooltip" id="resource-tooltip"></div>
+
+<!-- Calendar Event Modal -->
+<div class="modal-overlay" id="calendar-event-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="calendar-event-title">Yeni Etkinlik</div>
+      <button class="modal-close" onclick="cancelCalendarDraft()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">İsim</label><input class="form-input" id="cal-ev-name" placeholder="Etkinlik adı..."></div>
+      <div class="calendar-time-row">
+        <div class="form-group"><label class="form-label">Başlangıç</label><input class="form-input" type="time" id="cal-ev-start" step="900"></div>
+        <div class="form-group"><label class="form-label">Bitiş</label><input class="form-input" type="time" id="cal-ev-end" step="900"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Renk</label>
+        <div class="calendar-color-row" id="cal-ev-colors"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-textarea" id="cal-ev-desc" placeholder="Açıklama..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="cal-ev-delete-btn" style="display:none">Sil</button>
+      <button class="btn-secondary" onclick="cancelCalendarDraft()">İptal</button>
+      <button class="btn-primary" id="save-calendar-event-btn">Kaydet</button>
     </div>
   </div>
 </div>
