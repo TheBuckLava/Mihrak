@@ -216,6 +216,7 @@ body::before {
 .task-badge { font-size:0.58rem;padding:0.1rem 0.4rem;border-radius:3px;font-weight:600;text-transform:uppercase;font-family:var(--ff-mono); }
 .badge-tyt { background:rgba(94,148,224,0.15);color:#5e94e0; }
 .badge-ayt { background:rgba(224,92,122,0.15);color:#e05c7a; }
+.badge-geo { background:rgba(92,224,212,0.15);color:#5ce0d4; }
 .task-duration { font-size:0.58rem;color:var(--text-dim);margin-left:auto;font-family:var(--ff-mono); }
 .task-actions { display:flex;gap:0.3rem;margin-top:0.3rem;align-items:center; }
 .complete-btn { font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text-muted);cursor:pointer;font-family:var(--ff-body);font-weight:500;transition:all 0.2s; }
@@ -482,6 +483,49 @@ body::before {
 .note-editor { background:var(--surface2);border:1px solid var(--border);border-radius:0 0 6px 6px;color:var(--text);font-family:var(--ff-body);font-size:0.85rem;padding:0.7rem;min-height:180px;outline:none;white-space:pre-wrap;word-break:break-word;overflow-y:auto; }
 .note-editor:focus { border-color:var(--accent); }
 .note-editor [style] { display:inline; }
+
+/* ── KAYNAKLAR ── */
+.resource-type-group { margin-bottom:1.3rem; }
+.resource-type-label { font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.5rem; }
+.resource-items { display:flex;flex-direction:column;gap:0.4rem; }
+.resource-item { display:flex;align-items:center;gap:0.6rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0.55rem 0.7rem;transition:border-color 0.2s; }
+.resource-item:hover { border-color:var(--border2); }
+.resource-name { flex:1;font-size:0.8rem;color:var(--text);word-break:break-word; }
+.resource-tooltip { position:fixed;display:none;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.55rem 0.75rem;font-size:0.7rem;color:var(--text);z-index:800;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,0.5);pointer-events:none; }
+.resource-tooltip.open { display:block; }
+.resource-tooltip-item { padding:0.2rem 0;border-bottom:1px solid var(--border); }
+.resource-tooltip-item:last-child { border-bottom:none; }
+.resource-tooltip-empty { color:var(--text-dim); }
+
+/* ── GÜNLÜK PLAN ── */
+.plan-week-nav { display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;flex-wrap:wrap; }
+.plan-week-label { font-family:var(--ff-head);font-size:1rem;font-weight:600;color:var(--accent); }
+.plan-grid-wrap { overflow:auto;max-height:75vh;border:1px solid var(--border);border-radius:10px;background:var(--surface); }
+.plan-grid { display:grid;grid-template-columns:56px repeat(7,minmax(112px,1fr));position:relative;min-width:850px; }
+.plan-head-cell { position:sticky;top:0;z-index:5;background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:0.5rem 0.3rem;text-align:center; }
+.plan-head-cell.corner { z-index:6; }
+.plan-head-cell.today-col { background:linear-gradient(var(--accent-glow),var(--accent-glow)),var(--surface2); }
+.plan-head-day { font-size:0.6rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;font-family:var(--ff-mono); }
+.plan-head-date { font-family:var(--ff-head);font-size:1.15rem;font-weight:600;color:var(--text);margin-top:0.15rem; }
+.plan-head-date.today { color:var(--accent); }
+.plan-hour-label { border-right:1px solid var(--border);border-bottom:1px solid var(--border);font-size:0.6rem;color:var(--text-dim);font-family:var(--ff-mono);text-align:right;padding:0.2rem 0.4rem;box-sizing:border-box; }
+.plan-hour-cell { height:56px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);box-sizing:border-box;cursor:pointer; }
+.plan-hour-cell:hover { background:rgba(196,163,90,0.06); }
+.plan-hour-cell.today-col-bg { background:rgba(196,163,90,0.03); }
+.plan-block { position:absolute;border-radius:5px;padding:0.25rem 0.45rem;overflow:hidden;cursor:grab;box-shadow:0 2px 10px rgba(0,0,0,0.4);z-index:2;touch-action:none; }
+.plan-block:active { cursor:grabbing; }
+.plan-block-title { font-size:0.7rem;font-weight:600;color:#fff;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.6); }
+.plan-block-time { font-size:0.58rem;color:rgba(255,255,255,0.85);font-family:var(--ff-mono);text-shadow:0 1px 2px rgba(0,0,0,0.5); }
+.plan-block-desc { font-size:0.6rem;color:rgba(255,255,255,0.85);margin-top:0.15rem;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.5); }
+.plan-resize-handle { position:absolute;left:0;right:0;height:7px;cursor:ns-resize;touch-action:none; }
+.plan-resize-handle.top { top:0; }
+.plan-resize-handle.bottom { bottom:0; }
+.plan-color-picker { display:flex;gap:0.5rem;flex-wrap:wrap; }
+.plan-color-swatch { width:22px;height:22px;border-radius:50%;border:2px solid var(--border);cursor:pointer; }
+.plan-color-swatch.active { border-color:var(--text);box-shadow:0 0 0 2px var(--accent-glow); }
+@media (max-width:768px) {
+  .plan-grid { grid-template-columns:44px repeat(7,minmax(96px,1fr)); }
+}
 </style>
 </head>
 <body>
@@ -511,6 +555,8 @@ body::before {
       <button class="nav-btn" id="nav-archive">Arşiv</button>
       <button class="nav-btn" id="nav-exam">Denemeler</button>
       <button class="nav-btn" id="nav-notes">Notlar</button>
+      <button class="nav-btn" id="nav-resources">Kaynaklar</button>
+      <button class="nav-btn" id="nav-plan">Günlük Plan</button>
       <button class="signout-btn" id="signout-btn">çıkış</button>
     </div>
   </header>
@@ -573,6 +619,29 @@ body::before {
     <div class="notes-tabs" id="notes-tabs"></div>
     <div class="notes-grid" id="notes-grid"></div>
   </div>
+
+  <!-- Resources -->
+  <div class="view" id="view-resources">
+    <div class="notes-view-header">
+      <div class="notes-view-title">Kaynaklar</div>
+      <button class="btn-primary" id="add-resource-btn">+ Yeni Kaynak Ekle</button>
+    </div>
+    <div class="notes-tabs" id="resource-subject-tabs"></div>
+    <div class="toggle-group" id="resource-examtype-tabs" style="max-width:360px;margin-bottom:1rem"></div>
+    <div id="resource-groups"></div>
+  </div>
+
+  <!-- Daily Plan -->
+  <div class="view" id="view-plan">
+    <div class="plan-week-nav">
+      <button class="btn-secondary" id="plan-prev-week">‹ Önceki hafta</button>
+      <div class="plan-week-label" id="plan-week-label"></div>
+      <button class="btn-secondary" id="plan-next-week">Sonraki hafta ›</button>
+    </div>
+    <div class="plan-grid-wrap" id="plan-grid-wrap">
+      <div class="plan-grid" id="plan-grid"></div>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -587,18 +656,17 @@ body::before {
     <div class="modal-body">
       <div class="form-group"><label class="form-label">Ders *</label><input class="form-input" id="f-lesson" placeholder="TYT Türkçe, AYT Matematik..."></div>
       <div class="form-group"><label class="form-label">Konu</label><input class="form-input" id="f-topic" placeholder="Paragraf, Logaritma..."></div>
-      <div class="form-group"><label class="form-label">TYT / AYT</label>
+      <div class="form-group"><label class="form-label">TYT / AYT / GEO</label>
         <div class="toggle-group">
           <button class="toggle-btn" data-val="TYT" onclick="selectToggle(this,'exam-type')">TYT</button>
           <button class="toggle-btn" data-val="AYT" onclick="selectToggle(this,'exam-type')">AYT</button>
+          <button class="toggle-btn" data-val="GEO" onclick="selectToggle(this,'exam-type')">GEO</button>
           <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type')">Boş</button>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Görev Türü</label><input class="form-input" id="f-type" placeholder="Test, Konu Anlatımı, Video, Deneme..."></div>
-      <div class="form-group"><label class="form-label">Kaynak</label><input class="form-input" id="f-source" placeholder="Hoca / Kitap / Kanal adı..."></div>
-      <div class="form-group"><label class="form-label">Soru Sayısı</label><input class="form-input" id="f-questions" type="number" placeholder="40"></div>
-      <div class="form-group"><label class="form-label">Tahmini Süre (dakika)</label><input class="form-input" id="f-duration" type="number" placeholder="45"></div>
-      <div class="form-group"><label class="form-label">Not</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
+      <div class="form-group"><label class="form-label">Kaynak</label><select class="form-select" id="f-source"><option value="">Önce ders yaz...</option></select></div>
+      <div class="form-group"><label class="form-label">Ayrıntılar</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
       <div class="form-group"><label class="form-label">Tekrarlayan Görev</label>
         <div class="toggle-group">
           <button class="toggle-btn active" data-val="false" onclick="selectToggle(this,'recurring')">Hayır</button>
@@ -741,6 +809,69 @@ body::before {
   </div>
 </div>
 
+<!-- Resource Modal -->
+<div class="modal-overlay" id="resource-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="resource-modal-title">Yeni Kaynak</div>
+      <button class="modal-close" onclick="closeModal('resource-modal')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Kaynak Adı *</label><input class="form-input" id="r-name" placeholder="3D Hoca Soru Bankası..."></div>
+      <div class="form-group"><label class="form-label">Ders</label>
+        <select class="form-select" id="r-subject">
+          <option value="Türkçe">Türkçe</option>
+          <option value="Sosyal">Sosyal</option>
+          <option value="Matematik">Matematik</option>
+          <option value="Fizik">Fizik</option>
+          <option value="Kimya">Kimya</option>
+          <option value="Biyoloji">Biyoloji</option>
+        </select>
+      </div>
+      <div class="form-group" id="r-examtype-group"><label class="form-label">TYT / AYT / GEO</label>
+        <select class="form-select" id="r-examtype"></select>
+      </div>
+      <div class="form-group"><label class="form-label">Tip</label>
+        <select class="form-select" id="r-type">
+          <option value="Soru Bankası">Soru Bankası</option>
+          <option value="Konu Anlatımlı">Konu Anlatımlı</option>
+          <option value="Oynatma Listesi">Oynatma Listesi</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('resource-modal')">İptal</button>
+      <button class="btn-primary" id="save-resource-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<div class="resource-tooltip" id="resource-tooltip"></div>
+
+<!-- Plan Block Modal -->
+<div class="modal-overlay" id="plan-block-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="plan-modal-title">Yeni Etkinlik</div>
+      <button class="modal-close" id="plan-modal-close-btn">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Başlık</label><input class="form-input" id="p-title" placeholder="Başlık ekle"></div>
+      <div class="form-group" style="display:flex;gap:0.8rem">
+        <div style="flex:1"><label class="form-label">Başlangıç</label><input class="form-input" id="p-start" type="time"></div>
+        <div style="flex:1"><label class="form-label">Bitiş</label><input class="form-input" id="p-end" type="time"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Renk</label><div class="plan-color-picker" id="plan-color-picker"></div></div>
+      <div class="form-group"><label class="form-label">Açıklama</label><textarea class="form-textarea" id="p-desc" placeholder="Açıklama..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="plan-cancel-btn">İptal</button>
+      <button class="delete-btn" id="plan-delete-btn" style="border:1px solid var(--border);padding:0.6rem 1rem">Sil</button>
+      <button class="btn-primary" id="plan-save-btn">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════════════
 // SOUND ENGINE
@@ -822,7 +953,10 @@ let _tasks=[],_dayNotes={},_archivedWeeks=[],_exams=[],_notes=[];
 let _isGuest=false,_editingTaskId=null,_currentDayNoteKey=null,_dragTaskId=null;
 let _examTypeVal='',_recurringVal='false';
 let _duplicateMode=false;
-let _unsubTasks=null,_unsubNotes=null,_unsubArchive=null,_unsubExams=null,_unsubNotesDb=null;
+let _unsubTasks=null,_unsubNotes=null,_unsubArchive=null,_unsubExams=null,_unsubNotesDb=null,_unsubResources=null,_unsubPlan=null;
+let _resources=[],_planBlocks=[],_planPendingBlocks=[];
+let _activeResSubject='Türkçe',_activeResExamType='TYT',_editingResourceId=null;
+let _planWeekOffset=0,_editingPlanId=null,_planModalIsNew=false,_selectedPlanColor=null,_planJustDragged=false;
 let _editingExamId=null,_editingNoteId=null;
 let _examSineType='TYT';
 let _wrongCounts={};
@@ -890,7 +1024,9 @@ window.addEventListener('load', () => {
           document.getElementById('login-screen').style.display='flex';
           return;
         }
-        _uid=user.uid; _isGuest=false; startApp();
+        _uid=user.uid; _isGuest=false;
+        document.getElementById('login-screen').style.display='none';
+        startApp();
       } else {
         document.getElementById('login-screen').style.display='flex';
       }
@@ -904,7 +1040,7 @@ document.getElementById('google-login-btn').onclick = async () => {
 };
 document.getElementById('signout-btn').onclick = async () => {
   _snd('click');
-  [_unsubTasks,_unsubNotes,_unsubArchive,_unsubExams,_unsubNotesDb].forEach(u=>u&&u());
+  [_unsubTasks,_unsubNotes,_unsubArchive,_unsubExams,_unsubNotesDb,_unsubResources,_unsubPlan].forEach(u=>u&&u());
   await _firestore.signOut(_auth); location.reload();
 };
 
@@ -937,6 +1073,12 @@ function subscribeData() {
   });
   _unsubNotesDb = onSnapshot(collection(_db,`users/${_uid}/notes`), s => {
     _notes=s.docs.map(d=>({id:d.id,...d.data()})); renderNotes();
+  });
+  _unsubResources = onSnapshot(collection(_db,`users/${_uid}/resources`), s => {
+    _resources=s.docs.map(d=>({id:d.id,...d.data()})); renderResources(); refreshSourceOptions();
+  });
+  _unsubPlan = onSnapshot(collection(_db,`users/${_uid}/planBlocks`), s => {
+    _planBlocks=s.docs.map(d=>({id:d.id,...d.data()})); if(document.getElementById('view-plan').classList.contains('active')) renderPlanGrid();
   });
 }
 
@@ -1454,14 +1596,13 @@ function _fillTaskForm(task) {
   document.getElementById('f-lesson').value=task.lesson||'';
   document.getElementById('f-topic').value=task.topic||'';
   document.getElementById('f-type').value=task.taskType||'';
-  document.getElementById('f-source').value=task.source||'';
-  document.getElementById('f-questions').value=task.questions||'';
-  document.getElementById('f-duration').value=task.duration||'';
   document.getElementById('f-note').value=task.note||'';
   _examTypeVal=task.examType||'';
   _recurringVal=(task.recurring===true||task.recurring==='true')?'true':'false';
   resetToggle('exam-type',_examTypeVal);
   resetToggle('recurring',_recurringVal);
+  refreshSourceOptions();
+  _setSourceValuePreserving(task.source||'');
 }
 
 function openDuplicateTask(id) {
@@ -1517,17 +1658,19 @@ document.getElementById('add-task-btn').onclick=()=>{
   _duplicateMode=false;
   document.getElementById('save-task-btn').textContent='Kaydet';
   document.getElementById('modal-title').textContent='Yeni Görev';
-  ['f-lesson','f-topic','f-type','f-source','f-questions','f-duration','f-note'].forEach(id=>document.getElementById(id).value='');
+  ['f-lesson','f-topic','f-type','f-note'].forEach(id=>document.getElementById(id).value='');
   _examTypeVal='';_recurringVal='false';
   resetToggle('exam-type','');resetToggle('recurring','false');
+  refreshSourceOptions();
   document.getElementById('task-modal').classList.add('open');
 };
+document.getElementById('f-lesson').addEventListener('input', ()=>{ if(typeof refreshSourceOptions==='function') refreshSourceOptions(); });
 
 document.getElementById('save-task-btn').onclick=async()=>{
   _snd('save');
   const lesson=document.getElementById('f-lesson').value.trim();
   if(!lesson){showToast('Ders alanı zorunlu');return;}
-  const data={lesson,topic:document.getElementById('f-topic').value.trim(),examType:_examTypeVal,taskType:document.getElementById('f-type').value.trim(),source:document.getElementById('f-source').value.trim(),questions:document.getElementById('f-questions').value.trim(),duration:document.getElementById('f-duration').value.trim(),note:document.getElementById('f-note').value.trim(),recurring:_recurringVal,completed:false};
+  const data={lesson,topic:document.getElementById('f-topic').value.trim(),examType:_examTypeVal,taskType:document.getElementById('f-type').value.trim(),source:document.getElementById('f-source').value,note:document.getElementById('f-note').value.trim(),recurring:_recurringVal,completed:false};
   if(!_editingTaskId){
     data.createdAt=Date.now();
     data.dayKey=null;
@@ -1625,15 +1768,7 @@ function openEdit(id) {
   _duplicateMode=false;
   document.getElementById('save-task-btn').textContent='Kaydet';
   document.getElementById('modal-title').textContent='Görevi Düzenle';
-  document.getElementById('f-lesson').value=task.lesson||'';
-  document.getElementById('f-topic').value=task.topic||'';
-  document.getElementById('f-type').value=task.taskType||'';
-  document.getElementById('f-source').value=task.source||'';
-  document.getElementById('f-questions').value=task.questions||'';
-  document.getElementById('f-duration').value=task.duration||'';
-  document.getElementById('f-note').value=task.note||'';
-  _examTypeVal=task.examType||'';_recurringVal=task.recurring||'false';
-  resetToggle('exam-type',_examTypeVal);resetToggle('recurring',_recurringVal);
+  _fillTaskForm(task);
   document.getElementById('task-modal').classList.add('open');
 }
 
@@ -1681,6 +1816,8 @@ document.getElementById('nav-planner').onclick=()=>switchView('view-planner','na
 document.getElementById('nav-archive').onclick=()=>{switchView('view-archive','nav-archive');renderArchive();};
 document.getElementById('nav-exam').onclick=()=>{switchView('view-exam','nav-exam');renderExams();};
 document.getElementById('nav-notes').onclick=()=>{switchView('view-notes','nav-notes');renderNotes();};
+document.getElementById('nav-resources').onclick=()=>{switchView('view-resources','nav-resources');renderResources();};
+document.getElementById('nav-plan').onclick=()=>{switchView('view-plan','nav-plan');renderPlanGrid();};
 
 // ══════════════════════════════════════════
 // TOGGLES
@@ -1688,7 +1825,7 @@ document.getElementById('nav-notes').onclick=()=>{switchView('view-notes','nav-n
 function selectToggle(btn,group) {
   btn.closest('.toggle-group').querySelectorAll('.toggle-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  if(group==='exam-type')_examTypeVal=btn.dataset.val;
+  if(group==='exam-type'){_examTypeVal=btn.dataset.val; if(typeof refreshSourceOptions==='function') refreshSourceOptions();}
   if(group==='recurring')_recurringVal=btn.dataset.val;
 }
 function resetToggle(group,val) {
@@ -2270,6 +2407,483 @@ setInterval(() => {
   if (_recentDeleted.length !== before) renderRecentDeletedList();
 }, 60000);
 
+
+// ══════════════════════════════════════════
+// KAYNAKLAR
+// ══════════════════════════════════════════
+const RESOURCE_SUBJECTS = ['Türkçe','Sosyal','Matematik','Fizik','Kimya','Biyoloji'];
+const RESOURCE_SUBJECT_KEYWORDS = {
+  'Türkçe': ['türkçe','turkce'],
+  'Sosyal': ['tarih','coğrafya','cografya','felsefe','din kültür','din kultur','sosyal'],
+  'Matematik': ['matematik','geometri'],
+  'Fizik': ['fizik'],
+  'Kimya': ['kimya'],
+  'Biyoloji': ['biyoloji']
+};
+const RESOURCE_TYPES = ['Soru Bankası','Konu Anlatımlı','Oynatma Listesi'];
+
+function detectSubjectFromLesson(text) {
+  const l=(text||'').toLowerCase();
+  for (const subj of RESOURCE_SUBJECTS) {
+    if (RESOURCE_SUBJECT_KEYWORDS[subj].some(k=>l.includes(k))) return subj;
+  }
+  return null;
+}
+function subjectHasExamSplit(subj) { return subj==='Matematik'||subj==='Fizik'||subj==='Kimya'||subj==='Biyoloji'; }
+function subjectExamOptions(subj) {
+  if (subj==='Matematik') return ['TYT','AYT','GEO'];
+  if (subjectHasExamSplit(subj)) return ['TYT','AYT'];
+  return ['TYT'];
+}
+
+function renderResources() {
+  const tabsEl=document.getElementById('resource-subject-tabs');
+  if(!tabsEl) return;
+  tabsEl.innerHTML=RESOURCE_SUBJECTS.map(s=>`<button class="note-tab-btn ${s===_activeResSubject?'active':''}" onclick="switchResourceSubject('${s}')">${s}</button>`).join('');
+
+  const examWrap=document.getElementById('resource-examtype-tabs');
+  const opts=subjectExamOptions(_activeResSubject);
+  if(opts.length>1){
+    examWrap.style.display='flex';
+    if(!opts.includes(_activeResExamType)) _activeResExamType=opts[0];
+    examWrap.innerHTML=opts.map(o=>`<button class="toggle-btn ${o===_activeResExamType?'active':''}" onclick="switchResourceExamType('${o}')">${o==='GEO'?'Geometri':o}</button>`).join('');
+  } else {
+    examWrap.style.display='none';
+    _activeResExamType='TYT';
+  }
+
+  const listEl=document.getElementById('resource-groups');
+  const relevant=_resources.filter(r=>r.subject===_activeResSubject && (opts.length>1 ? r.examType===_activeResExamType : true));
+  if(!relevant.length){
+    listEl.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;padding:2rem 0.2rem">bu kategoride henüz kaynak yok</div>';
+    return;
+  }
+  listEl.innerHTML=RESOURCE_TYPES.map(type=>{
+    const items=relevant.filter(r=>r.type===type);
+    if(!items.length) return '';
+    return `<div class="resource-type-group">
+      <div class="resource-type-label">${type}</div>
+      <div class="resource-items">
+        ${items.map(r=>`
+          <div class="resource-item" data-id="${r.id}" onmouseenter="scheduleResourceTooltip(this,'${r.id}')" onmouseleave="hideResourceTooltip()">
+            <span class="resource-name">${escHtml(r.name)}</span>
+            <button class="view-btn" onclick="event.stopPropagation();openEditResource('${r.id}')">düzenle</button>
+            <button class="delete-btn" style="border:1px solid var(--border)" onclick="event.stopPropagation();deleteResource('${r.id}')">sil</button>
+          </div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function switchResourceSubject(s){ _snd('click'); _activeResSubject=s; renderResources(); }
+function switchResourceExamType(o){ _snd('click'); _activeResExamType=o; renderResources(); }
+
+function populateResourceExamSelect(subject) {
+  const sel=document.getElementById('r-examtype');
+  const wrap=document.getElementById('r-examtype-group');
+  const opts=subjectExamOptions(subject);
+  if(opts.length<=1){ wrap.style.display='none'; sel.innerHTML='<option value="TYT">TYT</option>'; }
+  else { wrap.style.display=''; sel.innerHTML=opts.map(o=>`<option value="${o}">${o==='GEO'?'Geometri':o}</option>`).join(''); }
+}
+
+document.getElementById('add-resource-btn').onclick=()=>{
+  _snd('click');
+  _editingResourceId=null;
+  document.getElementById('resource-modal-title').textContent='Yeni Kaynak';
+  document.getElementById('r-name').value='';
+  document.getElementById('r-subject').value=_activeResSubject;
+  populateResourceExamSelect(_activeResSubject);
+  const opts=subjectExamOptions(_activeResSubject);
+  document.getElementById('r-examtype').value=opts.includes(_activeResExamType)?_activeResExamType:opts[0];
+  document.getElementById('r-type').value=RESOURCE_TYPES[0];
+  document.getElementById('resource-modal').classList.add('open');
+};
+
+document.getElementById('r-subject').addEventListener('change', e=>{ populateResourceExamSelect(e.target.value); });
+
+document.getElementById('save-resource-btn').onclick=async()=>{
+  _snd('save');
+  const name=document.getElementById('r-name').value.trim();
+  if(!name){ showToast('Kaynak adı zorunlu'); return; }
+  const subject=document.getElementById('r-subject').value;
+  const opts=subjectExamOptions(subject);
+  const examType= opts.length<=1 ? 'TYT' : document.getElementById('r-examtype').value;
+  const type=document.getElementById('r-type').value;
+  const data={name,subject,examType,type,createdAt:_editingResourceId?(_resources.find(r=>r.id===_editingResourceId)?.createdAt||Date.now()):Date.now()};
+  try{
+    const{collection,doc,addDoc,updateDoc}=_firestore;
+    if(_editingResourceId){ await updateDoc(doc(_db,`users/${_uid}/resources`,_editingResourceId),data); showToast('Kaynak güncellendi'); }
+    else { await addDoc(collection(_db,`users/${_uid}/resources`),data); showToast('Kaynak eklendi'); }
+    closeModal('resource-modal');
+  }catch(e){ showToast('Hata: '+e.message); }
+};
+
+function openEditResource(id) {
+  const r=_resources.find(x=>x.id===id); if(!r) return;
+  _editingResourceId=id;
+  document.getElementById('resource-modal-title').textContent='Kaynağı Düzenle';
+  document.getElementById('r-name').value=r.name||'';
+  document.getElementById('r-subject').value=r.subject;
+  populateResourceExamSelect(r.subject);
+  document.getElementById('r-examtype').value=r.examType||'TYT';
+  document.getElementById('r-type').value=r.type;
+  document.getElementById('resource-modal').classList.add('open');
+}
+
+async function deleteResource(id) {
+  if(!confirm('Bu kaynağı silmek istediğinden emin misin?')) return;
+  _snd('delete');
+  const{doc,deleteDoc}=_firestore;
+  await deleteDoc(doc(_db,`users/${_uid}/resources`,id));
+  showToast('Kaynak silindi');
+}
+
+let _resTooltipTimer=null;
+function scheduleResourceTooltip(el,id) {
+  clearTimeout(_resTooltipTimer);
+  _resTooltipTimer=setTimeout(()=>showResourceTooltip(el,id), 1000);
+}
+function hideResourceTooltip() {
+  clearTimeout(_resTooltipTimer);
+  const tip=document.getElementById('resource-tooltip');
+  if(tip) tip.classList.remove('open');
+}
+function showResourceTooltip(el,id) {
+  const r=_resources.find(x=>x.id===id); if(!r) return;
+  const recent=getRecentTasksForResource(r.name);
+  const tip=document.getElementById('resource-tooltip');
+  if(!recent.length){ tip.innerHTML='<div class="resource-tooltip-empty">bu kaynakla henüz görev yapılmamış</div>'; }
+  else { tip.innerHTML=recent.map(t=>`<div class="resource-tooltip-item">${escHtml(t.lesson||'')}${t.topic?' · '+escHtml(t.topic):''}</div>`).join(''); }
+  const rect=el.getBoundingClientRect();
+  tip.style.left=rect.left+'px';
+  tip.style.top=(rect.bottom+6)+'px';
+  tip.classList.add('open');
+}
+function getRecentTasksForResource(name) {
+  const active=_tasks.filter(t=>t.source===name);
+  const archived=[];
+  _archivedWeeks.forEach(w=>(w.tasks||[]).forEach(t=>{ if(t.source===name) archived.push(t); }));
+  return [...active,...archived].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0)).slice(0,3);
+}
+
+// Yeni Görev formundaki Kaynak dropdown'unu Ders alanına göre doldurur
+function refreshSourceOptions() {
+  const lessonEl=document.getElementById('f-lesson');
+  const sel=document.getElementById('f-source');
+  if(!lessonEl||!sel) return;
+  const currentVal=sel.value;
+  const subject=detectSubjectFromLesson(lessonEl.value);
+  if(!subject){ sel.innerHTML='<option value="">Önce ders yaz...</option>'; return; }
+  const opts=subjectExamOptions(subject);
+  let matches;
+  if(opts.length<=1){ matches=_resources.filter(r=>r.subject===subject); }
+  else {
+    const want=['TYT','AYT','GEO'].includes(_examTypeVal) ? _examTypeVal : null;
+    matches = want ? _resources.filter(r=>r.subject===subject && r.examType===want) : _resources.filter(r=>r.subject===subject);
+  }
+  if(!matches.length){ sel.innerHTML='<option value="">bu ders için kaynak yok</option>'; return; }
+  sel.innerHTML='<option value="">Kaynak seç...</option>'+matches.map(r=>`<option value="${escHtml(r.name)}">${escHtml(r.name)} (${r.type})</option>`).join('');
+  if(currentVal && matches.some(r=>r.name===currentVal)) sel.value=currentVal;
+}
+function _setSourceValuePreserving(value) {
+  const sel=document.getElementById('f-source');
+  if(!sel||!value) return;
+  const exists=[...sel.options].some(o=>o.value===value);
+  if(!exists){
+    const opt=document.createElement('option');
+    opt.value=value; opt.textContent=value+' (eski)';
+    sel.insertBefore(opt, sel.firstChild ? sel.firstChild.nextSibling : null);
+  }
+  sel.value=value;
+}
+
+// ══════════════════════════════════════════
+// GÜNLÜK PLAN
+// ══════════════════════════════════════════
+const PLAN_HOUR_HEIGHT = 56; // .plan-hour-cell yüksekliğiyle birebir eşleşmeli
+const PLAN_COLORS = ['#5c9ee0','#5ce0a8','#e08c5c','#e05c7a','#a05ce0','#e8c97a','#5ce0d4','#8a8aa8'];
+
+function minToHHMM(min) { const h=Math.floor(min/60)%24, m=((min%60)+60)%60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; }
+function hhmmToMin(str) { const parts=String(str||'0:0').split(':'); return (parseInt(parts[0],10)||0)*60+(parseInt(parts[1],10)||0); }
+
+function renderPlanGrid() {
+  const grid=document.getElementById('plan-grid');
+  if(!grid) return;
+  const ws=getWeekStart(_planWeekOffset), days=getDaysOfWeek(ws);
+  document.getElementById('plan-week-label').textContent=formatWeekRange(days);
+
+  grid.innerHTML='';
+
+  const corner=document.createElement('div');
+  corner.className='plan-head-cell corner';
+  grid.appendChild(corner);
+
+  days.forEach(d=>{
+    const cell=document.createElement('div');
+    cell.className='plan-head-cell'+(isToday(d)?' today-col':'');
+    cell.innerHTML=`<div class="plan-head-day">${DAYS_SHORT[d.getDay()]}</div><div class="plan-head-date ${isToday(d)?'today':''}">${d.getDate()}</div>`;
+    grid.appendChild(cell);
+  });
+
+  for(let h=0; h<24; h++){
+    const label=document.createElement('div');
+    label.className='plan-hour-label';
+    label.textContent=`${String(h).padStart(2,'0')}:00`;
+    grid.appendChild(label);
+    days.forEach(d=>{
+      const key=dateKey(d);
+      const cell=document.createElement('div');
+      cell.className='plan-hour-cell'+(isToday(d)?' today-col-bg':'');
+      cell.dataset.dateKey=key;
+      cell.dataset.hour=String(h);
+      cell.addEventListener('click', ()=>{ if(_isGuest) return; createPlanBlockAt(key, h*60); });
+      grid.appendChild(cell);
+    });
+  }
+
+  renderPlanBlocks(days);
+
+  const wrap=document.getElementById('plan-grid-wrap');
+  const refCell=grid.querySelector('.plan-hour-cell[data-hour="7"]');
+  if(refCell && wrap) wrap.scrollTop = Math.max(0, refCell.offsetTop - 40);
+}
+
+function renderPlanBlocks(days) {
+  const grid=document.getElementById('plan-grid');
+  if(!grid) return;
+  grid.querySelectorAll('.plan-block').forEach(el=>el.remove());
+  const zeroCell=grid.querySelector('.plan-hour-cell[data-hour="0"]');
+  if(!zeroCell) return;
+  const baseTop=zeroCell.offsetTop;
+  const dayKeys=days.map(dateKey);
+  const weekBlocks=[..._planBlocks,..._planPendingBlocks].filter(b=>dayKeys.includes(b.dateKey));
+
+  weekBlocks.forEach(b=>{
+    const refCell=grid.querySelector(`.plan-hour-cell[data-date-key="${b.dateKey}"][data-hour="0"]`);
+    if(!refCell) return;
+    const left=refCell.offsetLeft, width=refCell.offsetWidth;
+    const top=baseTop+(b.startMin/60)*PLAN_HOUR_HEIGHT;
+    const height=Math.max(18, ((b.endMin-b.startMin)/60)*PLAN_HOUR_HEIGHT);
+    const el=document.createElement('div');
+    el.className='plan-block';
+    el.dataset.id=b.id;
+    el.dataset.baseTop=String(baseTop);
+    el.style.left=left+'px'; el.style.width=width+'px';
+    el.style.top=top+'px'; el.style.height=height+'px';
+    el.style.background=b.color||PLAN_COLORS[0];
+    el.innerHTML=`
+      <div class="plan-resize-handle top"></div>
+      <div class="plan-block-title">${escHtml(b.title||'(Başlıksız)')}</div>
+      <div class="plan-block-time">${minToHHMM(b.startMin)}–${minToHHMM(b.endMin)}</div>
+      ${b.description?`<div class="plan-block-desc">${escHtml(b.description)}</div>`:''}
+      <div class="plan-resize-handle bottom"></div>`;
+    el.addEventListener('click', e=>{
+      if(e.target.classList.contains('plan-resize-handle')) return;
+      if(_planJustDragged){ _planJustDragged=false; return; }
+      openPlanBlockModal(b.id, !!b._isNew);
+    });
+    if(!_isGuest){
+      attachPlanBlockDrag(el, b);
+      attachPlanResize(el.querySelector('.plan-resize-handle.top'), b, 'start');
+      attachPlanResize(el.querySelector('.plan-resize-handle.bottom'), b, 'end');
+    }
+    grid.appendChild(el);
+  });
+}
+
+function createPlanBlockAt(dayKey, startMin) {
+  const id='_pending_'+Date.now();
+  _planPendingBlocks=[{ id, dateKey:dayKey, startMin, endMin:Math.min(startMin+60,1440), title:'', description:'', color:PLAN_COLORS[0], _isNew:true }];
+  renderPlanGrid();
+  openPlanBlockModal(id, true);
+}
+
+function renderPlanColorPicker(activeColor) {
+  const wrap=document.getElementById('plan-color-picker');
+  _selectedPlanColor=activeColor;
+  wrap.innerHTML=PLAN_COLORS.map(c=>`<div class="plan-color-swatch ${c===activeColor?'active':''}" style="background:${c}" data-color="${c}" onclick="selectPlanColor('${c}',this)"></div>`).join('');
+}
+function selectPlanColor(c, el) {
+  _selectedPlanColor=c;
+  el.parentElement.querySelectorAll('.plan-color-swatch').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function openPlanBlockModal(id, isNew) {
+  const source = isNew ? _planPendingBlocks : _planBlocks;
+  const b=source.find(x=>x.id===id);
+  if(!b) return;
+  _editingPlanId=id;
+  _planModalIsNew=!!isNew;
+  document.getElementById('plan-modal-title').textContent = isNew ? 'Yeni Etkinlik' : 'Etkinliği Düzenle';
+  document.getElementById('p-title').value=b.title||'';
+  document.getElementById('p-start').value=minToHHMM(b.startMin);
+  document.getElementById('p-end').value=minToHHMM(b.endMin);
+  document.getElementById('p-desc').value=b.description||'';
+  renderPlanColorPicker(b.color||PLAN_COLORS[0]);
+  document.getElementById('plan-delete-btn').style.display = isNew ? 'none' : '';
+  document.getElementById('plan-block-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('p-title').focus(), 60);
+}
+
+function cancelPlanModal() {
+  if(_planModalIsNew){ _planPendingBlocks=[]; renderPlanGrid(); }
+  closeModal('plan-block-modal');
+}
+document.getElementById('plan-modal-close-btn').onclick=cancelPlanModal;
+document.getElementById('plan-cancel-btn').onclick=cancelPlanModal;
+document.getElementById('plan-block-modal').addEventListener('click', e=>{ if(e.target.id==='plan-block-modal') cancelPlanModal(); });
+
+document.getElementById('plan-save-btn').onclick=async()=>{
+  _snd('save');
+  const title=document.getElementById('p-title').value.trim();
+  const startStr=document.getElementById('p-start').value;
+  const endStr=document.getElementById('p-end').value;
+  if(!startStr||!endStr){ showToast('Saat aralığı gerekli'); return; }
+  const startMin=hhmmToMin(startStr), endMin=hhmmToMin(endStr);
+  if(endMin<=startMin){ showToast('Bitiş saati başlangıçtan sonra olmalı'); return; }
+  const color=_selectedPlanColor||PLAN_COLORS[0];
+  const description=document.getElementById('p-desc').value.trim();
+  const source = _planModalIsNew ? _planPendingBlocks : _planBlocks;
+  const b=source.find(x=>x.id===_editingPlanId);
+  if(!b) return;
+  const data={ dateKey:b.dateKey, title: title||'(Başlıksız)', startMin, endMin, color, description };
+  try{
+    const{collection,doc,addDoc,updateDoc}=_firestore;
+    if(_planModalIsNew){
+      data.createdAt=Date.now();
+      await addDoc(collection(_db,`users/${_uid}/planBlocks`),data);
+      _planPendingBlocks=[];
+    } else {
+      await updateDoc(doc(_db,`users/${_uid}/planBlocks`,_editingPlanId),data);
+    }
+    closeModal('plan-block-modal');
+    showToast('Kaydedildi');
+    renderPlanGrid();
+  }catch(e){ showToast('Hata: '+e.message); }
+};
+
+document.getElementById('plan-delete-btn').onclick=async()=>{
+  if(_planModalIsNew) return;
+  if(!confirm('Bu etkinliği silmek istediğinden emin misin?')) return;
+  _snd('delete');
+  try{
+    const{doc,deleteDoc}=_firestore;
+    await deleteDoc(doc(_db,`users/${_uid}/planBlocks`,_editingPlanId));
+    closeModal('plan-block-modal');
+    showToast('Etkinlik silindi');
+    renderPlanGrid();
+  }catch(e){ showToast('Hata: '+e.message); }
+};
+
+async function savePlanBlockFields(id, fields) {
+  try{
+    const{doc,updateDoc}=_firestore;
+    await updateDoc(doc(_db,`users/${_uid}/planBlocks`,id),fields);
+  }catch(e){
+    showToast('Değişiklik kaydedilemedi');
+    renderPlanGrid();
+  }
+}
+
+function attachPlanBlockDrag(el, block) {
+  el.addEventListener('pointerdown', e=>{
+    if(e.target.closest('.plan-resize-handle')) return;
+    if(e.button!==undefined && e.button!==0 && e.pointerType==='mouse') return;
+    e.preventDefault();
+    const grid=document.getElementById('plan-grid');
+    const startY=e.clientY, startX=e.clientX;
+    const startTop=parseFloat(el.style.top);
+    let moved=false, newDateKey=block.dateKey;
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+    el.style.zIndex='10';
+
+    function onMove(ev){
+      const dy=ev.clientY-startY, dx=ev.clientX-startX;
+      if(Math.abs(dy)>4||Math.abs(dx)>4) moved=true;
+      if(!moved) return;
+      const step=PLAN_HOUR_HEIGHT/4;
+      const snappedTop=startTop+Math.round(dy/step)*step;
+      el.style.top=snappedTop+'px';
+      const under=document.elementFromPoint(ev.clientX, ev.clientY);
+      const cell=under && under.closest ? under.closest('.plan-hour-cell') : null;
+      if(cell && cell.dataset.dateKey){
+        newDateKey=cell.dataset.dateKey;
+        const refCell=grid.querySelector(`.plan-hour-cell[data-date-key="${newDateKey}"][data-hour="0"]`);
+        if(refCell){ el.style.left=refCell.offsetLeft+'px'; el.style.width=refCell.offsetWidth+'px'; }
+      }
+    }
+    async function onUp(ev){
+      try{ el.releasePointerCapture(e.pointerId); }catch(err){}
+      document.removeEventListener('pointermove',onMove);
+      document.removeEventListener('pointerup',onUp);
+      el.style.zIndex='';
+      if(!moved) return;
+      _planJustDragged=true;
+      const zeroCell=grid.querySelector('.plan-hour-cell[data-hour="0"]');
+      const baseTop=zeroCell.offsetTop;
+      const newTop=parseFloat(el.style.top);
+      const duration=block.endMin-block.startMin;
+      let newStart=Math.round(((newTop-baseTop)/PLAN_HOUR_HEIGHT)*60/15)*15;
+      newStart=Math.max(0, Math.min(1440-duration, newStart));
+      const newEnd=newStart+duration;
+      if(block._isNew){
+        block.dateKey=newDateKey; block.startMin=newStart; block.endMin=newEnd;
+        renderPlanGrid();
+      } else {
+        await savePlanBlockFields(block.id, { dateKey:newDateKey, startMin:newStart, endMin:newEnd });
+      }
+    }
+    document.addEventListener('pointermove',onMove);
+    document.addEventListener('pointerup',onUp);
+  });
+}
+
+function attachPlanResize(handleEl, block, edge) {
+  if(!handleEl) return;
+  handleEl.addEventListener('pointerdown', e=>{
+    e.stopPropagation(); e.preventDefault();
+    const parentBlock=handleEl.closest('.plan-block');
+    const baseTop=parseFloat(parentBlock.dataset.baseTop);
+    const startY=e.clientY;
+    const origStart=block.startMin, origEnd=block.endMin;
+    let curStart=origStart, curEnd=origEnd;
+    try{ handleEl.setPointerCapture(e.pointerId); }catch(err){}
+
+    function onMove(ev){
+      const dy=ev.clientY-startY;
+      const deltaMin=Math.round(dy/(PLAN_HOUR_HEIGHT/4))*15;
+      if(edge==='start'){
+        curStart=Math.max(0, Math.min(origEnd-15, origStart+deltaMin));
+        curEnd=origEnd;
+      } else {
+        curEnd=Math.min(1440, Math.max(origStart+15, origEnd+deltaMin));
+        curStart=origStart;
+      }
+      parentBlock.style.top=(baseTop+(curStart/60)*PLAN_HOUR_HEIGHT)+'px';
+      parentBlock.style.height=Math.max(18, ((curEnd-curStart)/60)*PLAN_HOUR_HEIGHT)+'px';
+      const timeEl=parentBlock.querySelector('.plan-block-time');
+      if(timeEl) timeEl.textContent=`${minToHHMM(curStart)}–${minToHHMM(curEnd)}`;
+    }
+    async function onUp(){
+      try{ handleEl.releasePointerCapture(e.pointerId); }catch(err){}
+      document.removeEventListener('pointermove',onMove);
+      document.removeEventListener('pointerup',onUp);
+      if(curStart===origStart && curEnd===origEnd) return;
+      if(block._isNew){
+        block.startMin=curStart; block.endMin=curEnd;
+        renderPlanGrid();
+      } else {
+        await savePlanBlockFields(block.id, { startMin:curStart, endMin:curEnd });
+      }
+    }
+    document.addEventListener('pointermove',onMove);
+    document.addEventListener('pointerup',onUp);
+  });
+}
+
+document.getElementById('plan-prev-week').onclick=()=>{ _snd('click'); _planWeekOffset--; renderPlanGrid(); };
+document.getElementById('plan-next-week').onclick=()=>{ _snd('click'); _planWeekOffset++; renderPlanGrid(); };
 
 // ══════════════════════════════════════════
 // UTILS
