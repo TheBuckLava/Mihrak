@@ -1156,14 +1156,11 @@ function createWeekBlock(days,label) {
   block.className='week-block';
   const wt=_tasks.filter(t=>t.dayKey&&days.some(d=>dateKey(d)===t.dayKey));
   const done=wt.filter(t=>t.completed).length;
-  const min=wt.reduce((s,t)=>s+(parseInt(t.duration)||0),0);
-  const h=Math.floor(min/60),m=min%60;
   block.innerHTML=`
     <div class="week-header">
       <div class="week-label">${label} · ${formatWeekRange(days)}</div>
       <div class="week-summary">
         <div class="week-stat"><span>${done}/${wt.length}</span> tamamlandı</div>
-        <div class="week-stat"><span>${h>0?h+'s ':''} ${m}dk</span> toplam</div>
       </div>
     </div>
     <div class="days-grid" id="dg-${label.replace(/\s/g,'')}"></div>`;
@@ -1441,15 +1438,12 @@ function createArchiveWeekBlock(week) {
   const tasks=(week.tasks||[]);
   const dayNotes=week.dayNotes||{};
   const completed=tasks.filter(t=>t.completed).length;
-  const totalMin=tasks.reduce((s,t)=>s+(parseInt(t.duration)||0),0);
-  const hrs=Math.floor(totalMin/60), mins=totalMin%60;
   block.innerHTML=`
     <div class="week-header">
       <div class="week-label">Arşiv · ${week.label||formatWeekRange(days)}</div>
       <div style="display:flex;align-items:center;gap:0.8rem;flex-wrap:wrap">
         <div class="week-summary">
           <div class="week-stat"><span>${completed}/${tasks.length}</span> tamamlandı</div>
-          <div class="week-stat"><span>${hrs>0?hrs+'s ':''}${mins}dk</span> toplam</div>
         </div>
         <button class="archive-restore-btn" onclick="restoreUnfinishedFromArchive('${week.id}')">tamamlanmayan görevleri aktar</button>
       </div>
