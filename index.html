@@ -13,7 +13,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <script type="module">
   import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js";
@@ -57,8 +57,8 @@
   --accent2: #e8c97a;
   --accent-glow: rgba(196,163,90,0.15);
   --text: #e8e4f0;
-  --text-muted: #7a7590;
-  --text-dim: #4a4560;
+  --text-muted: #9691ab;
+  --text-dim: #7f7a96;
   --color-turkce: #e05c7a;
   --color-matematik: #5c9ee0;
   --color-fizik: #e08c5c;
@@ -69,7 +69,7 @@
   --color-cografya: #7ae05c;
   --color-felsefe: #e05ce0;
   --color-dil: #5c7ae0;
-  --ff-head: 'Playfair Display', serif;
+  --ff-head: 'Sora', 'Outfit', sans-serif;
   --ff-body: 'Outfit', sans-serif;
   --ff-mono: 'JetBrains Mono', monospace;
 }
@@ -96,7 +96,7 @@ body::before {
   background:radial-gradient(ellipse at 50% 40%, rgba(196,163,90,0.08) 0%, transparent 70%);
 }
 .login-logo { font-family:var(--ff-head);font-size:clamp(3rem,10vw,5rem);font-weight:600;letter-spacing:0.3em;color:var(--accent);text-shadow:0 0 60px rgba(196,163,90,0.4);animation:fadeUp 0.8s ease both; }
-.login-subtitle { font-size:0.75rem;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;animation:fadeUp 0.8s 0.2s ease both; }
+.login-subtitle { font-size:0.79rem;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;animation:fadeUp 0.8s 0.2s ease both; }
 .login-btn { display:flex;align-items:center;gap:0.8rem;padding:0.9rem 2rem;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--ff-body);font-size:0.9rem;cursor:pointer;transition:all 0.3s;animation:fadeUp 0.8s 0.4s ease both; }
 .login-btn:hover { background:var(--surface3);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px var(--accent-glow); }
 .login-btn svg { width:18px;height:18px; }
@@ -113,13 +113,13 @@ body::before {
   background:var(--surface);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);
 }
 .header-logo { font-family:var(--ff-head);font-size:1.5rem;font-weight:600;letter-spacing:0.2em;color:var(--accent);text-shadow:0 0 20px rgba(196,163,90,0.3);display:flex;flex-direction:column;justify-content:center;line-height:1.15; }
-.header-byline { font-family:var(--ff-mono);font-size:0.45rem;letter-spacing:0.1em;color:var(--text-dim);font-weight:300;text-shadow:none;margin-left:72px; }
+.header-byline { font-family:var(--ff-mono);font-size:0.53rem;letter-spacing:0.1em;color:var(--text-dim);font-weight:300;text-shadow:none;margin-left:72px; }
 .header-logo-img { width:64px; height:64px; object-fit:contain; display:block; flex-shrink:0; }
 .header-actions { display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap; }
 
-.nav-btn { padding:0.4rem 0.85rem;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);font-family:var(--ff-body);font-size:0.75rem;font-weight:500;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.05em; }
+.nav-btn { padding:0.4rem 0.85rem;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-muted);font-family:var(--ff-body);font-size:0.79rem;font-weight:500;cursor:pointer;transition:all 0.2s;text-transform:uppercase;letter-spacing:0.05em; }
 .nav-btn:hover,.nav-btn.active { border-color:var(--accent);color:var(--accent);background:var(--accent-glow); }
-.signout-btn { padding:0.4rem 0.7rem;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
+.signout-btn { padding:0.4rem 0.7rem;background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--text-dim);font-size:0.79rem;cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
 .signout-btn:hover { border-color:#e05c7a;color:#e05c7a; }
 
 @media (max-width:500px) {
@@ -128,7 +128,7 @@ body::before {
   .header-logo-img { width:56px; height:56px; }
   .header-byline { margin-left:64px; }
   .header-actions { width:100%;justify-content:center; }
-  .nav-btn { flex:1;text-align:center;font-size:0.7rem;padding:0.4rem 0.5rem; }
+  .nav-btn { flex:1;text-align:center;font-size:0.75rem;padding:0.4rem 0.5rem; }
   .signout-btn { width:100%;text-align:center; }
 }
 
@@ -144,8 +144,8 @@ body::before {
 .pool-panel { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:visible;position:static;top:auto; align-self:start; }
 .pool-header { padding:1rem 1.2rem 0.8rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
 .pool-title { font-family:var(--ff-head);font-size:1.05rem;font-weight:600;color:var(--text); }
-.pool-count { font-size:0.7rem;color:var(--text-muted);background:var(--surface3);padding:0.2rem 0.5rem;border-radius:20px;border:1px solid var(--border); }
-.add-task-btn { width:100%;padding:0.75rem;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--accent);font-family:var(--ff-body);font-size:0.8rem;font-weight:500;cursor:pointer;transition:all 0.2s;margin:0.8rem 0 0; }
+.pool-count { font-size:0.75rem;color:var(--text-muted);background:var(--surface3);padding:0.2rem 0.5rem;border-radius:20px;border:1px solid var(--border); }
+.add-task-btn { width:100%;padding:0.75rem;background:transparent;border:1px dashed var(--border2);border-radius:6px;color:var(--accent);font-family:var(--ff-body);font-size:0.83rem;font-weight:500;cursor:pointer;transition:all 0.2s;margin:0.8rem 0 0; }
 .add-task-btn:hover { background:var(--accent-glow);border-color:var(--accent); }
 .pool-tasks { padding:0.8rem;min-height:80px;max-height:none;overflow:visible;display:flex;flex-direction:column;gap:0.4rem; }
 .pool-tasks::-webkit-scrollbar { width:3px; }
@@ -157,7 +157,7 @@ body::before {
 .week-header { padding:0.75rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface2); }
 .week-label { font-family:var(--ff-head);font-size:0.95rem;font-weight:600;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase; }
 .week-summary { display:flex;gap:1rem;align-items:center; }
-.week-stat { font-size:0.7rem;color:var(--text-dim); }
+.week-stat { font-size:0.75rem;color:var(--text-dim); }
 .week-stat span { color:var(--accent);font-weight:600; }
 
 @media (max-width:768px) {
@@ -178,7 +178,7 @@ body::before {
 .day-header { padding:0.6rem 0.7rem 0.5rem;border-bottom:1px solid var(--border);background:var(--surface2);position:sticky;top:0; }
 @media (max-width:768px) {
   .day-header { display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.9rem;position:static; }
-  .day-name { font-size:0.65rem;letter-spacing:0.12em;color:var(--accent);min-width:28px;margin-bottom:0; }
+  .day-name { font-size:0.71rem;letter-spacing:0.12em;color:var(--accent);min-width:28px;margin-bottom:0; }
   .day-date { font-size:1rem; }
   .day-progress { display:none; }
   .day-progress-bar { flex:1;margin-top:0;height:3px; }
@@ -186,17 +186,18 @@ body::before {
   .day-tasks { min-height:40px;padding:0.5rem 0.8rem; }
 }
 
-.day-name { font-size:0.6rem;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.12rem;font-family:var(--ff-mono); }
+.day-name { font-size:0.67rem;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.12rem;font-family:var(--ff-mono); }
 .day-date { font-family:var(--ff-head);font-size:1.3rem;font-weight:600;color:var(--text);line-height:1; }
 .day-date.today { color:var(--accent); }
-.day-progress { font-size:0.55rem;color:var(--text-dim);margin-top:0.2rem; }
+.day-progress { font-size:0.63rem;color:var(--text-dim);margin-top:0.2rem; }
 .day-progress-bar { height:2px;background:var(--border);border-radius:1px;margin-top:0.25rem;overflow:hidden; }
 .day-progress-fill { height:100%;background:var(--accent);border-radius:1px;transition:width 0.4s ease; }
-.day-note-btn { font-size:0.55rem;color:var(--text-dim);cursor:pointer;padding:0.15rem 0.3rem;border-radius:2px;transition:all 0.2s;border:none;background:none;font-family:var(--ff-mono); }
+.day-note-btn { font-size:0.63rem;color:var(--text-dim);cursor:pointer;padding:0.15rem 0.3rem;border-radius:2px;transition:all 0.2s;border:none;background:none;font-family:var(--ff-mono); }
 .day-note-btn:hover { color:var(--accent); }
 .day-note-btn.has-note { color:var(--accent2); }
 .day-tasks { flex:1;padding:0.4rem;display:flex;flex-direction:column;gap:0.3rem;min-height:60px; }
 .day-tasks.drag-over { background:rgba(196,163,90,0.06); }
+.day-tasks.drag-possible,#pool-tasks.drag-possible { outline:1px dashed rgba(196,163,90,0.3);outline-offset:-1px;background:rgba(196,163,90,0.02); }
 
 /* ── TASK CARD ── */
 .task-card {
@@ -211,22 +212,22 @@ body::before {
 .task-card.completed { opacity:0.4; }
 .task-card.completed .task-name { text-decoration:line-through; }
 
-.task-name { font-size:0.78rem;font-weight:500;color:var(--text);margin-bottom:0.2rem;line-height:1.35; word-break:break-word; overflow-wrap:anywhere; }
+.task-name { font-size:0.81rem;font-weight:500;color:var(--text);margin-bottom:0.2rem;line-height:1.35; word-break:break-word; overflow-wrap:anywhere; }
 .task-meta { display:flex;flex-wrap:wrap;gap:0.2rem;align-items:center; }
-.task-badge { font-size:0.58rem;padding:0.1rem 0.4rem;border-radius:3px;font-weight:600;text-transform:uppercase;font-family:var(--ff-mono); }
+.task-badge { font-size:0.65rem;padding:0.1rem 0.4rem;border-radius:3px;font-weight:600;text-transform:uppercase;font-family:var(--ff-mono); }
 .badge-tyt { background:rgba(94,148,224,0.15);color:#5e94e0; }
 .badge-ayt { background:rgba(224,92,122,0.15);color:#e05c7a; }
 .badge-geo { background:rgba(92,224,212,0.15);color:#5ce0d4; }
-.task-duration { font-size:0.58rem;color:var(--text-dim);margin-left:auto;font-family:var(--ff-mono); }
+.task-duration { font-size:0.65rem;color:var(--text-dim);margin-left:auto;font-family:var(--ff-mono); }
 .task-actions { display:flex;gap:0.3rem;margin-top:0.3rem;align-items:center; }
-.complete-btn { font-size:0.6rem;padding:0.2rem 0.5rem;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text-muted);cursor:pointer;font-family:var(--ff-body);font-weight:500;transition:all 0.2s; }
+.complete-btn { font-size:0.67rem;padding:0.2rem 0.5rem;border-radius:3px;border:1px solid var(--border2);background:transparent;color:var(--text-muted);cursor:pointer;font-family:var(--ff-body);font-weight:500;transition:all 0.2s; }
 .complete-btn:hover { border-color:#5ce0a8;color:#5ce0a8; }
 .task-card.completed .complete-btn { border-color:#5ce0a8;color:#5ce0a8;background:rgba(92,224,168,0.08); }
-.view-btn { font-size:0.6rem;padding:0.2rem 0.4rem;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
+.view-btn { font-size:0.67rem;padding:0.2rem 0.4rem;border-radius:3px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
 .view-btn:hover { border-color:var(--accent);color:var(--accent); }
-.delete-btn { font-size:0.6rem;padding:0.2rem 0.4rem;border-radius:3px;border:1px solid transparent;background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s;margin-left:auto; }
+.delete-btn { font-size:0.67rem;padding:0.2rem 0.4rem;border-radius:3px;border:1px solid transparent;background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s;margin-left:auto; }
 .delete-btn:hover { border-color:#e05c7a;color:#e05c7a; }
-.repeat-badge { font-size:0.55rem;color:var(--accent2); }
+.repeat-badge { font-size:0.63rem;color:var(--accent2); }
 
 /* ── DERS RENKLERİ (düzeltildi) ── */
 .task-card[data-lesson*="ürkçe"]::before { background:var(--color-turkce); }
@@ -245,17 +246,17 @@ body::before {
   display:inline-flex; align-items:flex-start; max-width:100%;
   padding:0.18rem 0.45rem; border-radius:10px;
   background:rgba(232,201,122,0.12); border:1px solid rgba(232,201,122,0.28);
-  color:var(--accent2); font-size:0.58rem; font-family:var(--ff-mono); line-height:1.45;
+  color:var(--accent2); font-size:0.65rem; font-family:var(--ff-mono); line-height:1.45;
   white-space:normal; overflow-wrap:anywhere; word-break:break-word;
 }
 .task-origin-chip {
   display:inline-flex; align-items:center;
   padding:0.14rem 0.45rem; border-radius:999px;
   background:rgba(224,92,122,0.12); border:1px solid rgba(224,92,122,0.28);
-  color:#ff9db1; font-size:0.58rem; font-family:var(--ff-mono);
+  color:#ff9db1; font-size:0.65rem; font-family:var(--ff-mono);
 }
 .task-card.drag-target { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow); }
-.empty-drop { font-size:0.6rem;color:var(--text-dim);text-align:center;padding:0.8rem 0.5rem;pointer-events:none; }
+.empty-drop { font-size:0.67rem;color:var(--text-dim);text-align:center;padding:0.8rem 0.5rem;pointer-events:none; }
 
 /* ── MODAL ── */
 .modal-overlay { display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:500;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px); }
@@ -273,7 +274,7 @@ body::before {
 .modal-footer { padding:0.9rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end; }
 
 .form-group { display:flex;flex-direction:column;gap:0.35rem; }
-.form-label { font-size:0.65rem;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;font-weight:600; }
+.form-label { font-size:0.71rem;letter-spacing:0.1em;color:var(--text-muted);text-transform:uppercase;font-weight:600; }
 .form-input,.form-select,.form-textarea { background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:var(--ff-body);font-size:0.85rem;padding:0.6rem 0.8rem;transition:border-color 0.2s;width:100%; }
 .form-input:focus,.form-select:focus,.form-textarea:focus { outline:none;border-color:var(--accent); }
 .form-textarea { resize:vertical;min-height:70px; }
@@ -281,7 +282,7 @@ body::before {
 .form-select option { background:var(--surface2); }
 
 .toggle-group { display:flex;gap:0.4rem; }
-.toggle-btn { flex:1;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--ff-body);font-size:0.78rem;font-weight:500;cursor:pointer;transition:all 0.2s;text-align:center; }
+.toggle-btn { flex:1;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-family:var(--ff-body);font-size:0.81rem;font-weight:500;cursor:pointer;transition:all 0.2s;text-align:center; }
 .toggle-btn.active { border-color:var(--accent);color:var(--accent);background:var(--accent-glow); }
 
 .btn-primary { padding:0.6rem 1.4rem;background:var(--accent);border:none;border-radius:6px;color:var(--bg);font-family:var(--ff-body);font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.2s; }
@@ -295,7 +296,7 @@ body::before {
 /* ── DETAIL ── */
 .detail-row { display:flex;gap:0.8rem;align-items:flex-start;padding:0.5rem 0;border-bottom:1px solid var(--border); }
 .detail-row:last-child { border-bottom:none; }
-.detail-key { font-size:0.62rem;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;min-width:90px;padding-top:0.1rem;font-family:var(--ff-mono); }
+.detail-key { font-size:0.68rem;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;min-width:90px;padding-top:0.1rem;font-family:var(--ff-mono); }
 .detail-val { font-size:0.82rem;color:var(--text);flex:1;line-height:1.5; }
 .detail-completed { color:#5ce0a8; }
 
@@ -306,25 +307,25 @@ body::before {
 .archive-week-header:hover { background:var(--surface3); }
 .archive-week-label { font-family:var(--ff-head);font-size:1rem;font-weight:600;color:var(--text-muted); }
 .archive-stats { display:flex;gap:1.2rem; }
-.archive-stat { font-size:0.65rem;color:var(--text-dim); }
+.archive-stat { font-size:0.71rem;color:var(--text-dim); }
 .archive-stat span { color:var(--accent); }
 .archive-week-body { display:block;padding:0; }
 .archive-week-body.open { display:block; }
-.archive-restore-btn { padding:0.35rem 0.7rem;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--accent2);font-family:var(--ff-body);font-size:0.72rem;cursor:pointer;transition:all 0.2s; }
+.archive-restore-btn { padding:0.35rem 0.7rem;background:transparent;border:1px solid var(--border2);border-radius:6px;color:var(--accent2);font-family:var(--ff-body);font-size:0.76rem;cursor:pointer;transition:all 0.2s; }
 .archive-restore-btn:hover { border-color:var(--accent);color:var(--accent);background:var(--accent-glow); }
 .archive-tasks { display:flex;flex-wrap:wrap;gap:0.5rem; }
 
 /* ── GÜN NOTU ── */
-.day-note-display { font-size:0.72rem;color:var(--text-muted);padding:0.4rem 0.7rem;margin:0 0.4rem 0.4rem;background:var(--surface2);border-radius:4px;border-left:2px solid var(--accent);line-height:1.5;white-space:pre-wrap; }
-.day-hours-display { font-size:0.66rem;color:var(--accent2);padding:0.38rem 0.7rem;margin:0 0.4rem 0.4rem;background:rgba(232,201,122,0.08);border-radius:4px;border-left:2px solid var(--accent2);font-family:var(--ff-mono); }
+.day-note-display { font-size:0.76rem;color:var(--text-muted);padding:0.4rem 0.7rem;margin:0 0.4rem 0.4rem;background:var(--surface2);border-radius:4px;border-left:2px solid var(--accent);line-height:1.5;white-space:pre-wrap; }
+.day-hours-display { font-size:0.71rem;color:var(--accent2);padding:0.38rem 0.7rem;margin:0 0.4rem 0.4rem;background:rgba(232,201,122,0.08);border-radius:4px;border-left:2px solid var(--accent2);font-family:var(--ff-mono); }
 .day-meta-stack { display:flex; flex-direction:column; gap:0; }
 
 /* ── TOAST ── */
-.toast { position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:0.65rem 1.3rem;font-size:0.75rem;color:var(--text);z-index:9000;transition:transform 0.3s ease;pointer-events:none;white-space:nowrap; }
+.toast { position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface3);border:1px solid var(--border2);border-radius:6px;padding:0.65rem 1.3rem;font-size:0.79rem;color:var(--text);z-index:9000;transition:transform 0.3s ease;pointer-events:none;white-space:nowrap; }
 .toast.show { transform:translateX(-50%) translateY(0); }
 
 /* ── LOADING ── */
-#loading { display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:0.8rem;letter-spacing:0.2em;color:var(--text-dim);font-family:var(--ff-mono); }
+#loading { display:flex;align-items:center;justify-content:center;min-height:100vh;font-size:0.83rem;letter-spacing:0.2em;color:var(--text-dim);font-family:var(--ff-mono); }
 .dot-pulse::after { content:'...';animation:dots 1.5s infinite; }
 @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
 
@@ -334,7 +335,7 @@ body::before {
 
 .pool-danger-actions { margin-top:0.8rem; display:flex; flex-direction:column; gap:0.45rem; }
 .pool-danger-row { display:grid; grid-template-columns:1fr 1fr; gap:0.45rem; }
-.pool-danger-btn { width:100%; padding:0.7rem 0.75rem; border-radius:6px; border:1px solid rgba(224,92,122,0.35); background:rgba(224,92,122,0.10); color:#ff9db1; font-family:var(--ff-body); font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.18s; }
+.pool-danger-btn { width:100%; padding:0.7rem 0.75rem; border-radius:6px; border:1px solid rgba(224,92,122,0.35); background:rgba(224,92,122,0.10); color:#ff9db1; font-family:var(--ff-body); font-size:0.81rem; font-weight:600; cursor:pointer; transition:all 0.18s; }
 .pool-danger-btn:hover { background:rgba(224,92,122,0.16); border-color:#e05c7a; color:#ffd0da; }
 .pool-danger-btn.full { width:100%; }
 
@@ -357,7 +358,7 @@ body::before {
 .task-card.priority { box-shadow: 0 0 0 2px #e05c7a; border-color:#e05c7a; }
 .task-card.priority:hover { box-shadow: 0 0 0 2px #e05c7a, 0 4px 14px rgba(0,0,0,0.35); }
 .bulk-check-stack { display:flex; flex-direction:column; align-items:flex-end; justify-content:flex-end; gap:0.25rem; min-width:30px; margin-left:auto; }
-.bulk-check-label { font-size:0.52rem; color:var(--text-dim); font-family:var(--ff-mono); line-height:1; }
+.bulk-check-label { font-size:0.6rem; color:var(--text-dim); font-family:var(--ff-mono); line-height:1; }
 .bulk-check { width:24px; height:24px; accent-color:#e05c7a; cursor:pointer; }
 .task-card.bulk-mode { border-color:rgba(224,92,122,0.35); }
 
@@ -365,8 +366,8 @@ body::before {
 
 .recent-deleted-list { display:flex; flex-direction:column; gap:0.55rem; }
 .recent-deleted-item { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:0.7rem 0.8rem; }
-.recent-meta { font-size:0.62rem; color:var(--text-dim); margin-bottom:0.3rem; font-family:var(--ff-mono); }
-.restore-btn { font-size:0.65rem; padding:0.22rem 0.55rem; border-radius:4px; border:1px solid rgba(232,201,122,0.35); background:rgba(232,201,122,0.12); color:var(--accent2); cursor:pointer; font-family:var(--ff-body); font-weight:600; }
+.recent-meta { font-size:0.68rem; color:var(--text-dim); margin-bottom:0.3rem; font-family:var(--ff-mono); }
+.restore-btn { font-size:0.71rem; padding:0.22rem 0.55rem; border-radius:4px; border:1px solid rgba(232,201,122,0.35); background:rgba(232,201,122,0.12); color:var(--accent2); cursor:pointer; font-family:var(--ff-body); font-weight:600; }
 .restore-btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
 
 .nav-btn.flash { animation:navFlash 0.75s ease 0s 3; }
@@ -386,69 +387,69 @@ body::before {
 .exam-card-header:hover { background:var(--surface3); }
 .exam-card-title { font-family:var(--ff-head);font-size:1rem;font-weight:600;color:var(--text); }
 .exam-card-meta { display:flex;align-items:center;gap:1rem; }
-.exam-card-net { font-size:0.8rem;font-family:var(--ff-mono); }
+.exam-card-net { font-size:0.83rem;font-family:var(--ff-mono); }
 .exam-card-net span { color:var(--accent);font-weight:600; }
-.exam-card-date { font-size:0.65rem;color:var(--text-dim);font-family:var(--ff-mono); }
+.exam-card-date { font-size:0.71rem;color:var(--text-dim);font-family:var(--ff-mono); }
 .exam-card-actions { display:flex;gap:0.4rem; }
 .exam-card-body { display:none;padding:1rem 1.2rem; }
 .exam-card-body.open { display:block; }
 
 /* Net tablosu */
 .net-table { width:100%;border-collapse:collapse;margin-bottom:1rem; }
-.net-table th { font-size:0.62rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;padding:0.4rem 0.6rem;border-bottom:1px solid var(--border);text-align:left;font-family:var(--ff-mono); }
-.net-table td { font-size:0.78rem;padding:0.35rem 0.6rem;border-bottom:1px solid var(--border);color:var(--text); }
+.net-table th { font-size:0.68rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.08em;padding:0.4rem 0.6rem;border-bottom:1px solid var(--border);text-align:left;font-family:var(--ff-mono); }
+.net-table td { font-size:0.81rem;padding:0.35rem 0.6rem;border-bottom:1px solid var(--border);color:var(--text); }
 .net-table tr:last-child td { border-bottom:none; }
 .net-table .net-val { color:var(--accent);font-weight:600;font-family:var(--ff-mono); }
 .net-table .total-row td { color:var(--accent2);font-weight:600;border-top:1px solid var(--border2); }
 
 /* Konu yanlış */
 .wrong-topics-section { margin-top:0.8rem; }
-.wrong-topics-title { font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.6rem;font-family:var(--ff-mono); }
+.wrong-topics-title { font-size:0.71rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:0.6rem;font-family:var(--ff-mono); }
 .wrong-subject { margin-bottom:0.8rem; }
-.wrong-subject-name { font-size:0.78rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;padding:0.3rem 0;border-bottom:1px solid var(--border); }
+.wrong-subject-name { font-size:0.81rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;padding:0.3rem 0;border-bottom:1px solid var(--border); }
 .wrong-topics-grid { display:flex;flex-direction:column;gap:0.2rem; }
-.wrong-topic-row { display:flex;align-items:center;gap:0.5rem;font-size:0.72rem;color:var(--text-muted);padding:0.15rem 0; }
+.wrong-topic-row { display:flex;align-items:center;gap:0.5rem;font-size:0.76rem;color:var(--text-muted);padding:0.15rem 0; }
 .wrong-topic-name { flex:1; }
 .wrong-topic-count { font-family:var(--ff-mono);color:var(--accent);font-weight:600;min-width:20px;text-align:right; }
 .wrong-topic-count.zero { color:var(--text-dim); }
 
 /* Deneme modal */
 .exam-modal-tabs { display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:1rem; }
-.exam-tab { padding:0.6rem 1rem;font-size:0.75rem;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);font-family:var(--ff-body);border-bottom:2px solid transparent;transition:all 0.2s; }
+.exam-tab { padding:0.6rem 1rem;font-size:0.79rem;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text-muted);font-family:var(--ff-body);border-bottom:2px solid transparent;transition:all 0.2s; }
 .exam-tab.active { color:var(--accent);border-bottom-color:var(--accent); }
 
 .net-input-grid { display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem; }
 @media (max-width:480px) { .net-input-grid { grid-template-columns:1fr 1fr; } }
 .net-input-group { display:flex;flex-direction:column;gap:0.3rem; }
-.net-input-label { font-size:0.6rem;color:var(--text-muted);letter-spacing:0.06em;font-family:var(--ff-mono); }
+.net-input-label { font-size:0.67rem;color:var(--text-muted);letter-spacing:0.06em;font-family:var(--ff-mono); }
 .net-input-row { display:flex;gap:0.3rem;align-items:center; }
-.net-mini-input { flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--ff-mono);font-size:0.78rem;padding:0.35rem 0.5rem;width:100%;text-align:center; }
+.net-mini-input { flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:var(--ff-mono);font-size:0.81rem;padding:0.35rem 0.5rem;width:100%;text-align:center; }
 .net-mini-input:focus { outline:none;border-color:var(--accent); }
-.net-mini-sep { color:var(--text-dim);font-size:0.7rem; }
-.net-result { font-size:0.7rem;font-family:var(--ff-mono);color:var(--accent);text-align:center;margin-top:0.2rem;font-weight:600; }
+.net-mini-sep { color:var(--text-dim);font-size:0.75rem; }
+.net-result { font-size:0.75rem;font-family:var(--ff-mono);color:var(--accent);text-align:center;margin-top:0.2rem;font-weight:600; }
 
 /* Konu counter */
 .topic-counter-grid { display:flex;flex-direction:column;gap:0.4rem; }
 .topic-subject-section { margin-bottom:0.6rem; }
-.topic-subject-label { font-size:0.7rem;font-weight:600;color:var(--text);padding:0.4rem 0;border-bottom:1px solid var(--border);margin-bottom:0.3rem;font-family:var(--ff-head); }
+.topic-subject-label { font-size:0.75rem;font-weight:600;color:var(--text);padding:0.4rem 0;border-bottom:1px solid var(--border);margin-bottom:0.3rem;font-family:var(--ff-head); }
 .topic-counter-row { display:flex;align-items:center;gap:0.5rem;padding:0.2rem 0; }
-.topic-counter-name { flex:1;font-size:0.72rem;color:var(--text-muted); }
+.topic-counter-name { flex:1;font-size:0.76rem;color:var(--text-muted); }
 .counter-btn { width:22px;height:22px;border-radius:3px;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0; }
 .counter-btn:hover { border-color:var(--accent);color:var(--accent); }
-.counter-val { font-family:var(--ff-mono);font-size:0.75rem;min-width:20px;text-align:center;color:var(--text); }
+.counter-val { font-family:var(--ff-mono);font-size:0.79rem;min-width:20px;text-align:center;color:var(--text); }
 .counter-val.nonzero { color:var(--accent);font-weight:600; }
 
 /* Analiz modal */
 .analysis-filter { display:flex;gap:0.4rem;margin-bottom:1rem;flex-wrap:wrap; }
-.filter-btn { padding:0.35rem 0.8rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);font-family:var(--ff-body);font-size:0.72rem;cursor:pointer;transition:all 0.2s; }
+.filter-btn { padding:0.35rem 0.8rem;border:1px solid var(--border);border-radius:4px;background:transparent;color:var(--text-muted);font-family:var(--ff-body);font-size:0.76rem;cursor:pointer;transition:all 0.2s; }
 .filter-btn.active { border-color:var(--accent);color:var(--accent);background:var(--accent-glow); }
 .analysis-subject { margin-bottom:1.2rem; }
 .analysis-subject-name { font-family:var(--ff-head);font-size:1rem;font-weight:600;color:var(--text);margin-bottom:0.5rem;padding-bottom:0.3rem;border-bottom:1px solid var(--border); }
 .analysis-topic-row { display:flex;align-items:center;gap:0.6rem;padding:0.25rem 0; }
-.analysis-topic-name { flex:1;font-size:0.75rem;color:var(--text-muted); }
+.analysis-topic-name { flex:1;font-size:0.79rem;color:var(--text-muted); }
 .analysis-bar-wrap { width:100px;height:5px;background:var(--border);border-radius:3px;overflow:hidden; }
 .analysis-bar-fill { height:100%;border-radius:3px;background:var(--color-turkce);transition:width 0.4s; }
-.analysis-topic-count { font-family:var(--ff-mono);font-size:0.7rem;color:var(--accent);font-weight:600;min-width:24px;text-align:right; }
+.analysis-topic-count { font-family:var(--ff-mono);font-size:0.75rem;color:var(--accent);font-weight:600;min-width:24px;text-align:right; }
 
 /* ════════════════════════════════════
    NOTLAR
@@ -457,7 +458,7 @@ body::before {
 .notes-view-title { font-family:var(--ff-head);font-size:1.4rem;font-weight:600;color:var(--text); }
 
 .notes-tabs { display:flex;gap:0.4rem;margin-bottom:1.2rem;flex-wrap:wrap; }
-.note-tab-btn { padding:0.35rem 0.9rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-muted);font-family:var(--ff-body);font-size:0.75rem;cursor:pointer;transition:all 0.2s; }
+.note-tab-btn { padding:0.35rem 0.9rem;border:1px solid var(--border);border-radius:20px;background:transparent;color:var(--text-muted);font-family:var(--ff-body);font-size:0.79rem;cursor:pointer;transition:all 0.2s; }
 .note-tab-btn.active { border-color:var(--accent);color:var(--accent);background:var(--accent-glow); }
 
 .notes-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.8rem; }
@@ -466,13 +467,13 @@ body::before {
 .note-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;transition:border-color 0.2s; }
 .note-card:hover { border-color:var(--border2); }
 .note-card-header { padding:0.6rem 0.8rem;background:var(--surface2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between; }
-.note-card-date { font-size:0.58rem;color:var(--text-dim);font-family:var(--ff-mono); }
+.note-card-date { font-size:0.65rem;color:var(--text-dim);font-family:var(--ff-mono); }
 .note-card-actions { display:flex;gap:0.3rem; }
-.note-card-body { padding:0.8rem;flex:1;font-size:0.8rem;line-height:1.6;color:var(--text-muted);white-space:pre-wrap;word-break:break-word; }
+.note-card-body { padding:0.8rem;flex:1;font-size:0.83rem;line-height:1.6;color:var(--text-muted);white-space:pre-wrap;word-break:break-word; }
 
 /* Rich text toolbar */
 .rich-toolbar { display:flex;gap:0.3rem;flex-wrap:wrap;padding:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px 6px 0 0;border-bottom:none; }
-.rich-btn { padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text-muted);font-size:0.7rem;cursor:pointer;transition:all 0.15s;font-family:var(--ff-body); }
+.rich-btn { padding:0.2rem 0.5rem;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text-muted);font-size:0.75rem;cursor:pointer;transition:all 0.15s;font-family:var(--ff-body); }
 .rich-btn:hover { border-color:var(--accent);color:var(--accent); }
 .rich-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
 .rich-color.active { outline:2px solid rgba(255,255,255,0.9); outline-offset:2px; }
@@ -486,12 +487,12 @@ body::before {
 
 /* ── KAYNAKLAR ── */
 .resource-type-group { margin-bottom:1.3rem; }
-.resource-type-label { font-family:var(--ff-mono);font-size:0.65rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.5rem; }
-.resource-items { display:flex;flex-direction:column;gap:0.4rem; }
-.resource-item { display:flex;align-items:center;gap:0.6rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:0.55rem 0.7rem;transition:border-color 0.2s; }
+.resource-type-label { font-family:var(--ff-mono);font-size:0.71rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.5rem; }
+.resource-items { display:flex;flex-wrap:wrap;gap:0.55rem; }
+.resource-item { display:inline-flex;align-items:center;gap:0.5rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:0.45rem 0.55rem 0.45rem 0.95rem;transition:border-color 0.2s; }
 .resource-item:hover { border-color:var(--border2); }
-.resource-name { flex:1;font-size:0.8rem;color:var(--text);word-break:break-word; }
-.resource-tooltip { position:fixed;display:none;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.55rem 0.75rem;font-size:0.7rem;color:var(--text);z-index:800;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,0.5);pointer-events:none; }
+.resource-name { font-size:0.83rem;color:var(--text);white-space:nowrap; }
+.resource-tooltip { position:fixed;display:none;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.55rem 0.75rem;font-size:0.75rem;color:var(--text);z-index:800;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,0.5);pointer-events:none; }
 .resource-tooltip.open { display:block; }
 .resource-tooltip-item { padding:0.2rem 0;border-bottom:1px solid var(--border); }
 .resource-tooltip-item:last-child { border-bottom:none; }
@@ -505,18 +506,22 @@ body::before {
 .plan-head-cell { position:sticky;top:0;z-index:5;background:var(--surface2);border-bottom:1px solid var(--border);border-right:1px solid var(--border);padding:0.5rem 0.3rem;text-align:center; }
 .plan-head-cell.corner { z-index:6; }
 .plan-head-cell.today-col { background:linear-gradient(var(--accent-glow),var(--accent-glow)),var(--surface2); }
-.plan-head-day { font-size:0.6rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;font-family:var(--ff-mono); }
+.plan-head-day { font-size:0.67rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase;font-family:var(--ff-mono); }
 .plan-head-date { font-family:var(--ff-head);font-size:1.15rem;font-weight:600;color:var(--text);margin-top:0.15rem; }
 .plan-head-date.today { color:var(--accent); }
-.plan-hour-label { border-right:1px solid var(--border);border-bottom:1px solid var(--border);font-size:0.6rem;color:var(--text-dim);font-family:var(--ff-mono);text-align:right;padding:0.2rem 0.4rem;box-sizing:border-box; }
+.plan-hour-label { border-right:1px solid var(--border);border-bottom:1px solid var(--border);font-size:0.67rem;color:var(--text-dim);font-family:var(--ff-mono);text-align:right;padding:0.2rem 0.4rem;box-sizing:border-box; }
 .plan-hour-cell { height:56px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);box-sizing:border-box;cursor:pointer; }
 .plan-hour-cell:hover { background:rgba(196,163,90,0.06); }
 .plan-hour-cell.today-col-bg { background:rgba(196,163,90,0.03); }
 .plan-block { position:absolute;border-radius:5px;padding:0.25rem 0.45rem;overflow:hidden;cursor:grab;box-shadow:0 2px 10px rgba(0,0,0,0.4);z-index:2;touch-action:none; }
+.plan-block.dragging-move { transition:left 0.14s ease-out, width 0.14s ease-out; }
+.plan-day-actions { display:flex;gap:0.25rem;justify-content:center;margin-top:0.35rem; }
+.plan-day-action-btn { font-size:0.63rem;padding:0.15rem 0.4rem;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
+.plan-day-action-btn:hover { border-color:var(--accent);color:var(--accent); }
 .plan-block:active { cursor:grabbing; }
-.plan-block-title { font-size:0.7rem;font-weight:600;color:#fff;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.6); }
-.plan-block-time { font-size:0.58rem;color:rgba(255,255,255,0.85);font-family:var(--ff-mono);text-shadow:0 1px 2px rgba(0,0,0,0.5); }
-.plan-block-desc { font-size:0.6rem;color:rgba(255,255,255,0.85);margin-top:0.15rem;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.5); }
+.plan-block-title { font-size:0.75rem;font-weight:600;color:#fff;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.6); }
+.plan-block-time { font-size:0.65rem;color:rgba(255,255,255,0.85);font-family:var(--ff-mono);text-shadow:0 1px 2px rgba(0,0,0,0.5); }
+.plan-block-desc { font-size:0.67rem;color:rgba(255,255,255,0.85);margin-top:0.15rem;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.5); }
 .plan-resize-handle { position:absolute;left:0;right:0;height:7px;cursor:ns-resize;touch-action:none; }
 .plan-resize-handle.top { top:0; }
 .plan-resize-handle.bottom { bottom:0; }
@@ -654,18 +659,31 @@ body::before {
       <button class="modal-close" onclick="closeModal('task-modal')">×</button>
     </div>
     <div class="modal-body">
-      <div class="form-group"><label class="form-label">Ders *</label><input class="form-input" id="f-lesson" placeholder="TYT Türkçe, AYT Matematik..."></div>
+      <div class="form-group"><label class="form-label">Ders *</label>
+        <select class="form-select" id="f-lesson">
+          <option value="">Ders seç...</option>
+          <option value="Türkçe">Türkçe</option>
+          <option value="Sosyal">Sosyal</option>
+          <option value="Matematik">Matematik</option>
+          <option value="Fizik">Fizik</option>
+          <option value="Kimya">Kimya</option>
+          <option value="Biyoloji">Biyoloji</option>
+          <option value="Diğer">Diğer</option>
+        </select>
+      </div>
       <div class="form-group"><label class="form-label">Konu</label><input class="form-input" id="f-topic" placeholder="Paragraf, Logaritma..."></div>
       <div class="form-group"><label class="form-label">TYT / AYT / GEO</label>
         <div class="toggle-group">
           <button class="toggle-btn" data-val="TYT" onclick="selectToggle(this,'exam-type')">TYT</button>
           <button class="toggle-btn" data-val="AYT" onclick="selectToggle(this,'exam-type')">AYT</button>
           <button class="toggle-btn" data-val="GEO" onclick="selectToggle(this,'exam-type')">GEO</button>
-          <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type')">Boş</button>
+          <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type')">Diğer</button>
         </div>
       </div>
       <div class="form-group"><label class="form-label">Görev Türü</label><input class="form-input" id="f-type" placeholder="Test, Konu Anlatımı, Video, Deneme..."></div>
-      <div class="form-group"><label class="form-label">Kaynak</label><select class="form-select" id="f-source"><option value="">Önce ders yaz...</option></select></div>
+      <div class="form-group"><label class="form-label">Kaynak</label><select class="form-select" id="f-source"><option value="">Önce ders seç...</option></select>
+        <input class="form-input" id="f-source-custom" placeholder="Kaynak adını yaz..." style="display:none;margin-top:0.5rem">
+      </div>
       <div class="form-group"><label class="form-label">Ayrıntılar</label><textarea class="form-textarea" id="f-note" placeholder="Ek notlar..."></textarea></div>
       <div class="form-group"><label class="form-label">Tekrarlayan Görev</label>
         <div class="toggle-group">
@@ -787,8 +805,8 @@ body::before {
           <button class="rich-btn" id="rich-underline-btn" onclick="execRich('underline')" style="text-decoration:underline">A</button>
           
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
-          <button class="rich-btn" data-font="sm" onclick="execFontSize('sm')" style="font-size:0.6rem">A</button>
-          <button class="rich-btn" data-font="md" onclick="execFontSize('md')" style="font-size:0.75rem">A</button>
+          <button class="rich-btn" data-font="sm" onclick="execFontSize('sm')" style="font-size:0.67rem">A</button>
+          <button class="rich-btn" data-font="md" onclick="execFontSize('md')" style="font-size:0.79rem">A</button>
           <button class="rich-btn" data-font="lg" onclick="execFontSize('lg')" style="font-size:0.9rem">A</button>
           <button class="rich-btn" data-font="xl" onclick="execFontSize('xl')" style="font-size:1.05rem">A</button>
           <span style="color:var(--border2);margin:0 0.1rem">|</span>
@@ -826,6 +844,7 @@ body::before {
           <option value="Fizik">Fizik</option>
           <option value="Kimya">Kimya</option>
           <option value="Biyoloji">Biyoloji</option>
+          <option value="Diğer">Diğer</option>
         </select>
       </div>
       <div class="form-group" id="r-examtype-group"><label class="form-label">TYT / AYT / GEO</label>
@@ -1078,7 +1097,8 @@ function subscribeData() {
     _resources=s.docs.map(d=>({id:d.id,...d.data()})); renderResources(); refreshSourceOptions();
   });
   _unsubPlan = onSnapshot(collection(_db,`users/${_uid}/planBlocks`), s => {
-    _planBlocks=s.docs.map(d=>({id:d.id,...d.data()})); if(document.getElementById('view-plan').classList.contains('active')) renderPlanGrid();
+    _planBlocks=s.docs.map(d=>({id:d.id,...d.data()}));
+    if(document.getElementById('view-plan').classList.contains('active')) renderPlanBlocks(currentPlanDays());
   });
 }
 
@@ -1220,14 +1240,23 @@ function createTaskCard(task) {
       e.dataTransfer.effectAllowed='move';
       e.dataTransfer.setData('text/plain',task.id);
       setTimeout(()=>card.style.opacity='0.4',0);
+      document.querySelectorAll('.day-tasks,#pool-tasks').forEach(el=>el.classList.add('drag-possible'));
     });
-    card.addEventListener('dragend',()=>{card.style.opacity=''; stopDesktopAutoScroll(); _dragTaskId=null;});
+    card.addEventListener('dragend',()=>{
+      card.style.opacity=''; stopDesktopAutoScroll(); _dragTaskId=null;
+      document.querySelectorAll('.day-tasks,#pool-tasks').forEach(el=>el.classList.remove('drag-possible'));
+    });
     card.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';card.classList.add('drag-target');});
     card.addEventListener('dragleave',()=>card.classList.remove('drag-target'));
     card.addEventListener('drop',e=>{
       e.preventDefault();e.stopPropagation();
       card.classList.remove('drag-target');
-      handleReorder(_dragTaskId, task.id);
+      const dragged=_tasks.find(t=>t.id===_dragTaskId);
+      if(dragged && (dragged.dayKey||null)!==(task.dayKey||null)){
+        moveTaskToZone(_dragTaskId, task.dayKey||null);
+      } else {
+        handleReorder(_dragTaskId, task.id);
+      }
     });
     _setupTouch(card,task.id);
   }
@@ -1285,6 +1314,7 @@ function _setupTouch(card,taskId) {
   card.addEventListener('touchend', async e => {
     clearTimeout(_tTmr); _tTmr = null;
     if (_tRaf) { cancelAnimationFrame(_tRaf); _tRaf = null; }
+    document.querySelectorAll('.day-tasks,#pool-tasks').forEach(el=>el.classList.remove('drag-possible'));
     if (!_tOn || !_tc) { _tOn = false; return; }
     _tc.remove(); _tc = null;
     if (_tZone) _tZone.classList.remove('drag-over');
@@ -1307,6 +1337,7 @@ function _setupTouch(card,taskId) {
     if(_tc){_tc.remove();_tc=null;}
     if(_tEl){_tEl.style.opacity='';_tEl=null;}
     if(_tZone)_tZone.classList.remove('drag-over');
+    document.querySelectorAll('.day-tasks,#pool-tasks').forEach(el=>el.classList.remove('drag-possible'));
     _tOn=false;_dragTaskId=null;_tId=null;_tZone=null;
   });
 }
@@ -1316,6 +1347,7 @@ function _beginDrag(card,touch) {
   _tc._ox=touch.clientX-r.left;_tc._oy=touch.clientY-r.top;
   _tc.style.cssText=`position:fixed;width:${r.width}px;left:${r.left}px;top:${r.top}px;opacity:0.93;z-index:99999;pointer-events:none;transform:scale(1.04) rotate(0.5deg);box-shadow:0 12px 36px rgba(0,0,0,0.7);border:1px solid var(--accent)!important;border-radius:6px;transition:none;margin:0;background:var(--surface3);`;
   document.body.appendChild(_tc);card.style.opacity='0.15';_dragTaskId=_tId;
+  document.querySelectorAll('.day-tasks,#pool-tasks').forEach(el=>el.classList.add('drag-possible'));
 }
 function _moveDrag() {
   _tRaf=null;if(!_tc)return;
@@ -1324,15 +1356,18 @@ function _moveDrag() {
 }
 async function _dropTouch(dayKey, targetCardId) {
   if(!_dragTaskId||_isGuest)return;
-  if(targetCardId&&targetCardId!==_dragTaskId) {
-    await handleReorder(_dragTaskId, targetCardId);
-    return;
-  }
   const dragged=_tasks.find(t=>t.id===_dragTaskId);
   if(!dragged)return;
-  const zoneTasks=_tasks.filter(t=>t.dayKey===(dayKey||null)&&t.id!==_dragTaskId);
-  const maxOrder=zoneTasks.length?Math.max(...zoneTasks.map(t=>t.order||t.createdAt||0)):0;
-  try{const{doc,updateDoc}=_firestore;await updateDoc(doc(_db,`users/${_uid}/tasks`,_dragTaskId),{dayKey:dayKey||null,order:maxOrder+1});showToast(dayKey?'Görev güne atandı':'Görev havuza taşındı');}catch(e){showToast('Hata: '+e.message);}
+  if(targetCardId && targetCardId!==_dragTaskId) {
+    const target=_tasks.find(t=>t.id===targetCardId);
+    if(target && (dragged.dayKey||null)===(target.dayKey||null)) {
+      await handleReorder(_dragTaskId, targetCardId);
+    } else {
+      await moveTaskToZone(_dragTaskId, dayKey||null);
+    }
+    return;
+  }
+  await moveTaskToZone(_dragTaskId, dayKey||null);
 }
 
 function startDesktopAutoScroll() {
@@ -1369,20 +1404,23 @@ document.addEventListener('dragend',()=>stopDesktopAutoScroll());
 // ══════════════════════════════════════════
 // DRAG & DROP (desktop) + REORDER
 // ══════════════════════════════════════════
-async function handleDrop(e,dayKey) {
-  e.preventDefault();e.currentTarget.classList.remove('drag-over');
-  if(!_dragTaskId||_isGuest)return;
-  // Sadece gün/havuz değişikliği — sıralama card drop ile yapılıyor
-  const dragged=_tasks.find(t=>t.id===_dragTaskId);
-  if(!dragged)return;
-  // Hedef zone'daki görevlerin en sonuna ekle
-  const zoneTasks=_tasks.filter(t=>t.dayKey===(dayKey||null)&&t.id!==_dragTaskId);
+async function moveTaskToZone(taskId, dayKey) {
+  if(!taskId||_isGuest) return;
+  const dragged=_tasks.find(t=>t.id===taskId);
+  if(!dragged) return;
+  const zoneTasks=_tasks.filter(t=>t.dayKey===(dayKey||null)&&t.id!==taskId);
   const maxOrder=zoneTasks.length?Math.max(...zoneTasks.map(t=>t.order||t.createdAt||0)):0;
   try{
     const{doc,updateDoc}=_firestore;
-    await updateDoc(doc(_db,`users/${_uid}/tasks`,_dragTaskId),{dayKey:dayKey||null,order:maxOrder+1});
+    await updateDoc(doc(_db,`users/${_uid}/tasks`,taskId),{dayKey:dayKey||null,order:maxOrder+1});
     showToast(dayKey?'Görev güne atandı':'Görev havuza taşındı');
-  }catch(err){showToast('Hata: '+err.message);}
+  }catch(err){ showToast('Hata: '+err.message); }
+}
+
+async function handleDrop(e,dayKey) {
+  e.preventDefault();e.currentTarget.classList.remove('drag-over');
+  if(!_dragTaskId||_isGuest)return;
+  await moveTaskToZone(_dragTaskId, dayKey||null);
   _dragTaskId=null;
   stopDesktopAutoScroll();
 }
@@ -1425,7 +1463,7 @@ async function handleReorder(draggedId, targetId) {
 // ══════════════════════════════════════════
 function renderArchive() {
   const c=document.getElementById('archive-list');c.innerHTML='';
-  if(!_archivedWeeks.length){c.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.75rem;padding:3rem">henüz arşivlenmiş hafta yok</div>';return;}
+  if(!_archivedWeeks.length){c.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.79rem;padding:3rem">henüz arşivlenmiş hafta yok</div>';return;}
   [..._archivedWeeks].sort((a,b)=>b.weekStart-a.weekStart).forEach(week=>{
     c.appendChild(createArchiveWeekBlock(week));
   });
@@ -1658,13 +1696,15 @@ document.getElementById('add-task-btn').onclick=()=>{
   refreshSourceOptions();
   document.getElementById('task-modal').classList.add('open');
 };
-document.getElementById('f-lesson').addEventListener('input', ()=>{ if(typeof refreshSourceOptions==='function') refreshSourceOptions(); });
+document.getElementById('f-lesson').addEventListener('change', ()=>{ if(typeof refreshSourceOptions==='function') refreshSourceOptions(); });
 
 document.getElementById('save-task-btn').onclick=async()=>{
   _snd('save');
   const lesson=document.getElementById('f-lesson').value.trim();
   if(!lesson){showToast('Ders alanı zorunlu');return;}
-  const data={lesson,topic:document.getElementById('f-topic').value.trim(),examType:_examTypeVal,taskType:document.getElementById('f-type').value.trim(),source:document.getElementById('f-source').value,note:document.getElementById('f-note').value.trim(),recurring:_recurringVal,completed:false};
+  const sourceSelVal=document.getElementById('f-source').value;
+  const source = sourceSelVal==='__other__' ? document.getElementById('f-source-custom').value.trim() : sourceSelVal;
+  const data={lesson,topic:document.getElementById('f-topic').value.trim(),examType:_examTypeVal,taskType:document.getElementById('f-type').value.trim(),source,note:document.getElementById('f-note').value.trim(),recurring:_recurringVal,completed:false};
   if(!_editingTaskId){
     data.createdAt=Date.now();
     data.dayKey=null;
@@ -1981,7 +2021,7 @@ document.getElementById('save-exam-btn').onclick=async()=>{
 // ══════════════════════════════════════════
 function renderExams() {
   const c=document.getElementById('exam-list');c.innerHTML='';
-  if(!_exams.length){c.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.8rem;padding:3rem">henüz deneme yok</div>';return;}
+  if(!_exams.length){c.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.83rem;padding:3rem">henüz deneme yok</div>';return;}
   [..._exams].sort((a,b)=>b.createdAt-a.createdAt).forEach(exam=>{
     const el=document.createElement('div');el.className='exam-card';
     const netStr=Object.entries(exam.nets||{}).map(([s,v])=>`${s.replace(' (TYT)','').replace(' (AYT)','')}: <span>${v.net}</span>`).join(' · ');
@@ -1995,7 +2035,7 @@ function renderExams() {
           </div>
         </div>
         <div class="exam-card-actions" onclick="event.stopPropagation()">
-          <button class="btn-secondary" style="font-size:0.65rem;padding:0.3rem 0.6rem" onclick="_snd('click');editExam('${exam.id}')">düzenle</button>
+          <button class="btn-secondary" style="font-size:0.71rem;padding:0.3rem 0.6rem" onclick="_snd('click');editExam('${exam.id}')">düzenle</button>
           <button class="delete-btn" style="border:1px solid var(--border);padding:0.3rem 0.6rem" onclick="_snd('delete');deleteExam('${exam.id}')">sil</button>
         </div>
       </div>
@@ -2025,7 +2065,7 @@ function renderWrongTopics(exam) {
     subjWrongs.forEach(({t,count})=>{html+=`<div class="wrong-topic-row"><div class="wrong-topic-name">${t}</div><div class="wrong-topic-count">${count}</div></div>`;});
     html+='</div></div>';
   }
-  return html||'<div style="color:var(--text-dim);font-size:0.72rem">Hata girilmemiş</div>';
+  return html||'<div style="color:var(--text-dim);font-size:0.76rem">Hata girilmemiş</div>';
 }
 
 async function editExam(id) {
@@ -2081,7 +2121,7 @@ function renderAnalysis() {
   const body=document.getElementById('analysis-body');
   let exams=[..._exams].sort((a,b)=>b.createdAt-a.createdAt);
   if(_analysisN>0)exams=exams.slice(0,_analysisN);
-  if(!exams.length){body.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;padding:2rem;text-align:center">Yeterli deneme yok</div>';return;}
+  if(!exams.length){body.innerHTML='<div style="color:var(--text-dim);font-size:0.83rem;padding:2rem;text-align:center">Yeterli deneme yok</div>';return;}
 
   // Tüm konu yanlışlarını topla
   const totals={};
@@ -2116,7 +2156,7 @@ function renderAnalysis() {
     });
     html+='</div>';
   }
-  body.innerHTML=html||'<div style="color:var(--text-dim);font-size:0.8rem;padding:2rem;text-align:center">Hiç yanlış konu girilmemiş</div>';
+  body.innerHTML=html||'<div style="color:var(--text-dim);font-size:0.83rem;padding:2rem;text-align:center">Hiç yanlış konu girilmemiş</div>';
 }
 
 // ══════════════════════════════════════════
@@ -2135,7 +2175,7 @@ function renderNotes() {
   // Grid
   const grid=document.getElementById('notes-grid');
   const filtered=_notes.filter(n=>n.category===_activeNoteTab);
-  if(!filtered.length){grid.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;padding:2rem;grid-column:1/-1">bu kategoride henüz not yok</div>';return;}
+  if(!filtered.length){grid.innerHTML='<div style="color:var(--text-dim);font-size:0.83rem;padding:2rem;grid-column:1/-1">bu kategoride henüz not yok</div>';return;}
   grid.innerHTML='';
   [...filtered].sort((a,b)=>b.createdAt-a.createdAt).forEach(note=>{
     const el=document.createElement('div');el.className='note-card';
@@ -2324,7 +2364,7 @@ function renderRecentDeletedList() {
   const list = document.getElementById('recent-deleted-list');
   if (!list) return;
   if (!_recentDeleted.length) {
-    list.innerHTML = '<div style="color:var(--text-dim);font-size:0.78rem;padding:0.6rem 0">Son 12 saatte silinen görev yok.</div>';
+    list.innerHTML = '<div style="color:var(--text-dim);font-size:0.81rem;padding:0.6rem 0">Son 12 saatte silinen görev yok.</div>';
     return;
   }
   list.innerHTML = _recentDeleted.map(item => {
@@ -2405,24 +2445,9 @@ setInterval(() => {
 // ══════════════════════════════════════════
 // KAYNAKLAR
 // ══════════════════════════════════════════
-const RESOURCE_SUBJECTS = ['Türkçe','Sosyal','Matematik','Fizik','Kimya','Biyoloji'];
-const RESOURCE_SUBJECT_KEYWORDS = {
-  'Türkçe': ['türkçe','turkce'],
-  'Sosyal': ['tarih','coğrafya','cografya','felsefe','din kültür','din kultur','sosyal'],
-  'Matematik': ['matematik','geometri'],
-  'Fizik': ['fizik'],
-  'Kimya': ['kimya'],
-  'Biyoloji': ['biyoloji']
-};
+const RESOURCE_SUBJECTS = ['Türkçe','Sosyal','Matematik','Fizik','Kimya','Biyoloji','Diğer'];
 const RESOURCE_TYPES = ['Soru Bankası','Konu Anlatımlı','Oynatma Listesi'];
 
-function detectSubjectFromLesson(text) {
-  const l=(text||'').toLowerCase();
-  for (const subj of RESOURCE_SUBJECTS) {
-    if (RESOURCE_SUBJECT_KEYWORDS[subj].some(k=>l.includes(k))) return subj;
-  }
-  return null;
-}
 function subjectHasExamSplit(subj) { return subj==='Matematik'||subj==='Fizik'||subj==='Kimya'||subj==='Biyoloji'; }
 function subjectExamOptions(subj) {
   if (subj==='Matematik') return ['TYT','AYT','GEO'];
@@ -2449,7 +2474,7 @@ function renderResources() {
   const listEl=document.getElementById('resource-groups');
   const relevant=_resources.filter(r=>r.subject===_activeResSubject && (opts.length>1 ? r.examType===_activeResExamType : true));
   if(!relevant.length){
-    listEl.innerHTML='<div style="color:var(--text-dim);font-size:0.8rem;padding:2rem 0.2rem">bu kategoride henüz kaynak yok</div>';
+    listEl.innerHTML='<div style="color:var(--text-dim);font-size:0.83rem;padding:2rem 0.2rem">bu kategoride henüz kaynak yok</div>';
     return;
   }
   listEl.innerHTML=RESOURCE_TYPES.map(type=>{
@@ -2566,8 +2591,8 @@ function refreshSourceOptions() {
   const sel=document.getElementById('f-source');
   if(!lessonEl||!sel) return;
   const currentVal=sel.value;
-  const subject=detectSubjectFromLesson(lessonEl.value);
-  if(!subject){ sel.innerHTML='<option value="">Önce ders yaz...</option>'; return; }
+  const subject=lessonEl.value;
+  if(!subject){ sel.innerHTML='<option value="">Önce ders seç...</option>'; toggleSourceCustom(false); return; }
   const opts=subjectExamOptions(subject);
   let matches;
   if(opts.length<=1){ matches=_resources.filter(r=>r.subject===subject); }
@@ -2575,20 +2600,27 @@ function refreshSourceOptions() {
     const want=['TYT','AYT','GEO'].includes(_examTypeVal) ? _examTypeVal : null;
     matches = want ? _resources.filter(r=>r.subject===subject && r.examType===want) : _resources.filter(r=>r.subject===subject);
   }
-  if(!matches.length){ sel.innerHTML='<option value="">bu ders için kaynak yok</option>'; return; }
-  sel.innerHTML='<option value="">Kaynak seç...</option>'+matches.map(r=>`<option value="${escHtml(r.name)}">${escHtml(r.name)} (${r.type})</option>`).join('');
-  if(currentVal && matches.some(r=>r.name===currentVal)) sel.value=currentVal;
+  let html='<option value="">Kaynak seç...</option>';
+  html += matches.map(r=>`<option value="${escHtml(r.name)}">${escHtml(r.name)} (${r.type})</option>`).join('');
+  html += '<option value="__other__">Diğer (elle yaz)</option>';
+  sel.innerHTML=html;
+  if(currentVal && (currentVal==='__other__' || matches.some(r=>r.name===currentVal))) sel.value=currentVal;
+  toggleSourceCustom(sel.value==='__other__');
 }
+function toggleSourceCustom(show) {
+  const custom=document.getElementById('f-source-custom');
+  if(!custom) return;
+  custom.style.display = show ? '' : 'none';
+  if(show) setTimeout(()=>custom.focus(), 30); else custom.value='';
+}
+document.getElementById('f-source').addEventListener('change', e=>{ toggleSourceCustom(e.target.value==='__other__'); });
 function _setSourceValuePreserving(value) {
   const sel=document.getElementById('f-source');
-  if(!sel||!value) return;
+  if(!sel) return;
+  if(!value){ toggleSourceCustom(false); return; }
   const exists=[...sel.options].some(o=>o.value===value);
-  if(!exists){
-    const opt=document.createElement('option');
-    opt.value=value; opt.textContent=value+' (eski)';
-    sel.insertBefore(opt, sel.firstChild ? sel.firstChild.nextSibling : null);
-  }
-  sel.value=value;
+  if(exists){ sel.value=value; toggleSourceCustom(false); }
+  else { sel.value='__other__'; toggleSourceCustom(true); document.getElementById('f-source-custom').value=value; }
 }
 
 // ══════════════════════════════════════════
@@ -2596,14 +2628,19 @@ function _setSourceValuePreserving(value) {
 // ══════════════════════════════════════════
 const PLAN_HOUR_HEIGHT = 56; // .plan-hour-cell yüksekliğiyle birebir eşleşmeli
 const PLAN_COLORS = ['#5c9ee0','#5ce0a8','#e08c5c','#e05c7a','#a05ce0','#e8c97a','#5ce0d4','#8a8aa8'];
+let _planDayClipboard=null;
 
 function minToHHMM(min) { const h=Math.floor(min/60)%24, m=((min%60)+60)%60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; }
 function hhmmToMin(str) { const parts=String(str||'0:0').split(':'); return (parseInt(parts[0],10)||0)*60+(parseInt(parts[1],10)||0); }
+function currentPlanDays() { return getDaysOfWeek(getWeekStart(_planWeekOffset)); }
+function getDayBlocksExcept(dayKey, exceptId) {
+  return [..._planBlocks,..._planPendingBlocks].filter(b=>b.dateKey===dayKey && b.id!==exceptId);
+}
 
 function renderPlanGrid() {
   const grid=document.getElementById('plan-grid');
   if(!grid) return;
-  const ws=getWeekStart(_planWeekOffset), days=getDaysOfWeek(ws);
+  const days=currentPlanDays();
   document.getElementById('plan-week-label').textContent=formatWeekRange(days);
 
   grid.innerHTML='';
@@ -2613,9 +2650,14 @@ function renderPlanGrid() {
   grid.appendChild(corner);
 
   days.forEach(d=>{
+    const key=dateKey(d);
     const cell=document.createElement('div');
     cell.className='plan-head-cell'+(isToday(d)?' today-col':'');
-    cell.innerHTML=`<div class="plan-head-day">${DAYS_SHORT[d.getDay()]}</div><div class="plan-head-date ${isToday(d)?'today':''}">${d.getDate()}</div>`;
+    cell.innerHTML=`<div class="plan-head-day">${DAYS_SHORT[d.getDay()]}</div><div class="plan-head-date ${isToday(d)?'today':''}">${d.getDate()}</div>
+      <div class="plan-day-actions">
+        <button class="plan-day-action-btn" title="Günü kopyala" onclick="copyPlanDay('${key}')">Kopyala</button>
+        <button class="plan-day-action-btn" title="Kopyalanan günü buraya yapıştır" onclick="pastePlanDay('${key}')">Yapıştır</button>
+      </div>`;
     grid.appendChild(cell);
   });
 
@@ -2688,8 +2730,34 @@ function renderPlanBlocks(days) {
 function createPlanBlockAt(dayKey, startMin) {
   const id='_pending_'+Date.now();
   _planPendingBlocks=[{ id, dateKey:dayKey, startMin, endMin:Math.min(startMin+60,1440), title:'', description:'', color:PLAN_COLORS[0], _isNew:true }];
-  renderPlanGrid();
+  renderPlanBlocks(currentPlanDays());
   openPlanBlockModal(id, true);
+}
+
+function copyPlanDay(dayKey) {
+  _snd('click');
+  const blocks=_planBlocks.filter(b=>b.dateKey===dayKey).map(b=>({title:b.title,startMin:b.startMin,endMin:b.endMin,color:b.color,description:b.description||''}));
+  _planDayClipboard=blocks;
+  showToast(blocks.length ? `${blocks.length} etkinlik kopyalandı` : 'Bu günde kopyalanacak etkinlik yok');
+}
+
+async function pastePlanDay(dayKey) {
+  _snd('click');
+  if(!_planDayClipboard || !_planDayClipboard.length){ showToast('Önce bir gün kopyala'); return; }
+  if(_isGuest) return;
+  const existing=_planBlocks.filter(b=>b.dateKey===dayKey).map(b=>({startMin:b.startMin,endMin:b.endMin}));
+  let pasted=0, skipped=0;
+  const{collection,addDoc}=_firestore;
+  for(const b of _planDayClipboard){
+    const overlaps=existing.some(e=>b.startMin<e.endMin && b.endMin>e.startMin);
+    if(overlaps){ skipped++; continue; }
+    try{
+      await addDoc(collection(_db,`users/${_uid}/planBlocks`), { title:b.title, startMin:b.startMin, endMin:b.endMin, color:b.color, description:b.description, dateKey:dayKey, createdAt:Date.now() });
+      existing.push({startMin:b.startMin,endMin:b.endMin});
+      pasted++;
+    }catch(e){ skipped++; }
+  }
+  showToast(`${pasted} etkinlik yapıştırıldı${skipped?`, ${skipped} tanesi çakıştığı için atlandı`:''}`);
 }
 
 function renderPlanColorPicker(activeColor) {
@@ -2721,7 +2789,7 @@ function openPlanBlockModal(id, isNew) {
 }
 
 function cancelPlanModal() {
-  if(_planModalIsNew){ _planPendingBlocks=[]; renderPlanGrid(); }
+  if(_planModalIsNew){ _planPendingBlocks=[]; renderPlanBlocks(currentPlanDays()); }
   closeModal('plan-block-modal');
 }
 document.getElementById('plan-modal-close-btn').onclick=cancelPlanModal;
@@ -2741,6 +2809,11 @@ document.getElementById('plan-save-btn').onclick=async()=>{
   const source = _planModalIsNew ? _planPendingBlocks : _planBlocks;
   const b=source.find(x=>x.id===_editingPlanId);
   if(!b) return;
+  const neighbors=getDayBlocksExcept(b.dateKey, b.id);
+  if(neighbors.some(n=>startMin<n.endMin && endMin>n.startMin)){
+    showToast('Bu saat aralığında başka bir etkinlik var');
+    return;
+  }
   const data={ dateKey:b.dateKey, title: title||'(Başlıksız)', startMin, endMin, color, description };
   try{
     const{collection,doc,addDoc,updateDoc}=_firestore;
@@ -2753,7 +2826,7 @@ document.getElementById('plan-save-btn').onclick=async()=>{
     }
     closeModal('plan-block-modal');
     showToast('Kaydedildi');
-    renderPlanGrid();
+    renderPlanBlocks(currentPlanDays());
   }catch(e){ showToast('Hata: '+e.message); }
 };
 
@@ -2766,7 +2839,7 @@ document.getElementById('plan-delete-btn').onclick=async()=>{
     await deleteDoc(doc(_db,`users/${_uid}/planBlocks`,_editingPlanId));
     closeModal('plan-block-modal');
     showToast('Etkinlik silindi');
-    renderPlanGrid();
+    renderPlanBlocks(currentPlanDays());
   }catch(e){ showToast('Hata: '+e.message); }
 };
 
@@ -2776,7 +2849,7 @@ async function savePlanBlockFields(id, fields) {
     await updateDoc(doc(_db,`users/${_uid}/planBlocks`,id),fields);
   }catch(e){
     showToast('Değişiklik kaydedilemedi');
-    renderPlanGrid();
+    renderPlanBlocks(currentPlanDays());
   }
 }
 
@@ -2788,7 +2861,7 @@ function attachPlanBlockDrag(el, block) {
     const grid=document.getElementById('plan-grid');
     const startY=e.clientY, startX=e.clientX;
     const startTop=parseFloat(el.style.top);
-    let moved=false, newDateKey=block.dateKey;
+    let moved=false, newDateKey=block.dateKey, crossedDay=false;
     try{ el.setPointerCapture(e.pointerId); }catch(err){}
     el.style.zIndex='10';
 
@@ -2801,8 +2874,9 @@ function attachPlanBlockDrag(el, block) {
       el.style.top=snappedTop+'px';
       const under=document.elementFromPoint(ev.clientX, ev.clientY);
       const cell=under && under.closest ? under.closest('.plan-hour-cell') : null;
-      if(cell && cell.dataset.dateKey){
+      if(cell && cell.dataset.dateKey && cell.dataset.dateKey!==newDateKey){
         newDateKey=cell.dataset.dateKey;
+        if(!crossedDay){ el.classList.add('dragging-move'); crossedDay=true; }
         const refCell=grid.querySelector(`.plan-hour-cell[data-date-key="${newDateKey}"][data-hour="0"]`);
         if(refCell){ el.style.left=refCell.offsetLeft+'px'; el.style.width=refCell.offsetWidth+'px'; }
       }
@@ -2812,6 +2886,7 @@ function attachPlanBlockDrag(el, block) {
       document.removeEventListener('pointermove',onMove);
       document.removeEventListener('pointerup',onUp);
       el.style.zIndex='';
+      el.classList.remove('dragging-move');
       if(!moved) return;
       _planJustDragged=true;
       const zeroCell=grid.querySelector('.plan-hour-cell[data-hour="0"]');
@@ -2821,9 +2896,15 @@ function attachPlanBlockDrag(el, block) {
       let newStart=Math.round(((newTop-baseTop)/PLAN_HOUR_HEIGHT)*60/15)*15;
       newStart=Math.max(0, Math.min(1440-duration, newStart));
       const newEnd=newStart+duration;
+      const neighbors=getDayBlocksExcept(newDateKey, block.id);
+      if(neighbors.some(n=>newStart<n.endMin && newEnd>n.startMin)){
+        showToast('Bu saat aralığında başka bir etkinlik var');
+        renderPlanBlocks(currentPlanDays());
+        return;
+      }
       if(block._isNew){
         block.dateKey=newDateKey; block.startMin=newStart; block.endMin=newEnd;
-        renderPlanGrid();
+        renderPlanBlocks(currentPlanDays());
       } else {
         await savePlanBlockFields(block.id, { dateKey:newDateKey, startMin:newStart, endMin:newEnd });
       }
@@ -2841,6 +2922,12 @@ function attachPlanResize(handleEl, block, edge) {
     const baseTop=parseFloat(parentBlock.dataset.baseTop);
     const startY=e.clientY;
     const origStart=block.startMin, origEnd=block.endMin;
+    const neighbors=getDayBlocksExcept(block.dateKey, block.id);
+    let minStart=0, maxEnd=1440;
+    neighbors.forEach(n=>{
+      if(n.endMin<=origStart && n.endMin>minStart) minStart=n.endMin;
+      if(n.startMin>=origEnd && n.startMin<maxEnd) maxEnd=n.startMin;
+    });
     let curStart=origStart, curEnd=origEnd;
     try{ handleEl.setPointerCapture(e.pointerId); }catch(err){}
 
@@ -2848,10 +2935,10 @@ function attachPlanResize(handleEl, block, edge) {
       const dy=ev.clientY-startY;
       const deltaMin=Math.round(dy/(PLAN_HOUR_HEIGHT/4))*15;
       if(edge==='start'){
-        curStart=Math.max(0, Math.min(origEnd-15, origStart+deltaMin));
+        curStart=Math.max(minStart, Math.min(origEnd-15, origStart+deltaMin));
         curEnd=origEnd;
       } else {
-        curEnd=Math.min(1440, Math.max(origStart+15, origEnd+deltaMin));
+        curEnd=Math.min(maxEnd, Math.max(origStart+15, origEnd+deltaMin));
         curStart=origStart;
       }
       parentBlock.style.top=(baseTop+(curStart/60)*PLAN_HOUR_HEIGHT)+'px';
@@ -2866,7 +2953,7 @@ function attachPlanResize(handleEl, block, edge) {
       if(curStart===origStart && curEnd===origEnd) return;
       if(block._isNew){
         block.startMin=curStart; block.endMin=curEnd;
-        renderPlanGrid();
+        renderPlanBlocks(currentPlanDays());
       } else {
         await savePlanBlockFields(block.id, { startMin:curStart, endMin:curEnd });
       }
@@ -2893,7 +2980,7 @@ function escHtml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&
       <button class="modal-close" onclick="closeModal('recent-deleted-modal')">×</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:0.78rem;color:var(--text-dim);margin-bottom:0.6rem">12 saat içinde geri alınmayan görevler tamamen silinir.</div>
+      <div style="font-size:0.81rem;color:var(--text-dim);margin-bottom:0.6rem">12 saat içinde geri alınmayan görevler tamamen silinir.</div>
       <div id="recent-deleted-list" class="recent-deleted-list"></div>
     </div>
   </div>
