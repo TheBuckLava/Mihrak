@@ -386,12 +386,17 @@ body::before {
 .exam-view-actions { display:flex;gap:0.5rem; }
 
 .exam-list { display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start; }
+.exam-col { display:flex;flex-direction:column;min-width:0; }
+.exam-col:first-child { border-right:1px solid var(--border);padding-right:1.5rem; }
+.exam-col:last-child { padding-left:1.5rem; }
 .exam-col-title { font-family:var(--ff-mono);font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);text-align:center;font-weight:600;margin-bottom:0.8rem; }
-.exam-col-items { display:flex;flex-direction:column;gap:0.8rem; }
+.exam-col-items { display:flex;flex-direction:column;align-items:center;gap:0.8rem; }
 .exam-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.2s;max-width:440px;width:100%; }
 @media (max-width:768px) {
   .exam-list { grid-template-columns:1fr; }
   .exam-card { max-width:100%; }
+  .exam-col:first-child { border-right:none;padding-right:0;border-bottom:1px solid var(--border);padding-bottom:1.5rem;margin-bottom:0.5rem; }
+  .exam-col:last-child { padding-left:0; }
 }
 .exam-card:hover { border-color:var(--border2); }
 .exam-card-header { padding:0.9rem 1.2rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--surface2); }
@@ -516,11 +521,9 @@ body::before {
 }
 .resource-item:hover { border-color:var(--border2); }
 .resource-name { font-size:0.83rem;color:var(--text);white-space:nowrap; }
-.resource-tooltip { position:fixed;display:none;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.55rem 0.75rem;font-size:0.75rem;color:var(--text);z-index:800;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,0.5);pointer-events:none; }
+.resource-tooltip { position:fixed;display:none;background:transparent;border:none;border-radius:8px;padding:0;font-size:0.75rem;color:var(--text);z-index:800;width:250px;box-shadow:none;pointer-events:none; }
 .resource-tooltip.open { display:block; }
-.resource-tooltip-item { padding:0.2rem 0;border-bottom:1px solid var(--border); }
-.resource-tooltip-item:last-child { border-bottom:none; }
-.resource-tooltip-empty { color:var(--text-dim); }
+.resource-tooltip-empty { color:var(--text-dim);background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.6rem 0.8rem;box-shadow:0 8px 24px rgba(0,0,0,0.5); }
 
 /* ── GÜNLÜK PLAN ── */
 .plan-week-nav { display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1rem;flex-wrap:wrap; }
@@ -545,9 +548,11 @@ body::before {
 .plan-day-action-btn { font-size:0.63rem;padding:0.15rem 0.4rem;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
 .plan-day-action-btn:hover { border-color:var(--accent);color:var(--accent); }
 .plan-block:active { cursor:grabbing; }
-.plan-block-title { font-size:0.75rem;font-weight:600;color:#fff;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.6); }
-.plan-block-time { font-size:0.65rem;color:rgba(255,255,255,0.85);font-family:var(--ff-mono);text-shadow:0 1px 2px rgba(0,0,0,0.5); }
-.plan-block-desc { font-size:0.67rem;color:rgba(255,255,255,0.85);margin-top:0.15rem;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.5); }
+.plan-block-title { font-size:0.75rem;font-weight:600;color:#fff;line-height:1.25;text-shadow:0 1px 3px rgba(0,0,0,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.plan-block-time { font-size:0.65rem;color:rgba(255,255,255,0.85);font-family:var(--ff-mono);text-shadow:0 1px 2px rgba(0,0,0,0.5);white-space:nowrap; }
+.plan-block-desc { font-size:0.67rem;color:rgba(255,255,255,0.85);margin-top:0.15rem;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.5);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+.plan-block.plan-block-compact { display:flex;align-items:center;padding:0 0.45rem; }
+.plan-block.plan-block-compact .plan-block-title { font-size:0.68rem;line-height:1; }
 .plan-resize-handle { position:absolute;left:0;right:0;height:7px;cursor:ns-resize;touch-action:none; }
 .plan-resize-handle.top { top:0; }
 .plan-resize-handle.bottom { bottom:0; }
@@ -2612,8 +2617,21 @@ function showResourceTooltip(el,id) {
   const r=_resources.find(x=>x.id===id); if(!r) return;
   const recent=getRecentTasksForResource(r.name);
   const tip=document.getElementById('resource-tooltip');
-  if(!recent.length){ tip.innerHTML='<div class="resource-tooltip-empty">bu kaynakla henüz görev yapılmamış</div>'; }
-  else { tip.innerHTML=recent.map(t=>`<div class="resource-tooltip-item">${escHtml(t.lesson||'')}${t.topic?' · '+escHtml(t.topic):''}</div>`).join(''); }
+  if(!recent.length){
+    tip.innerHTML='<div class="resource-tooltip-empty">bu kaynakla henüz görev yapılmamış</div>';
+  } else {
+    tip.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.5rem">${recent.map(t=>{
+      const exam=t.examType?`<span class="task-badge badge-${t.examType.toLowerCase()}">${t.examType}</span>`:'';
+      const rep=(t.recurring===true||t.recurring==='true')?`<span class="repeat-badge">↻</span>`:'';
+      const dur=t.duration?`<span class="task-duration">${t.duration}dk</span>`:'';
+      const noteChip=t.note?`<div class="task-note-chip-wrap"><span class="task-note-chip">${escHtml(t.note.substring(0,40))}${t.note.length>40?'…':''}</span></div>`:'';
+      return `<div class="task-card" data-lesson="${(t.lesson||'').toLowerCase()}" style="cursor:default;">
+        <div class="task-name">${escHtml(t.lesson||'')}${t.topic?' · '+escHtml(t.topic):''}</div>
+        ${noteChip}
+        <div class="task-meta">${exam}${rep}${dur}</div>
+      </div>`;
+    }).join('')}</div>`;
+  }
   const rect=el.getBoundingClientRect();
   tip.style.left=rect.left+'px';
   tip.style.top=(rect.bottom+6)+'px';
@@ -2777,7 +2795,9 @@ function renderPlanBlocks(days) {
     const top=rawTop+1;
     const height=Math.max(10, rawHeight-2);
     const el=document.createElement('div');
-    el.className='plan-block';
+    const compact = height < 30;
+    const tight = !compact && height < 44;
+    el.className='plan-block'+(compact?' plan-block-compact':'');
     el.dataset.id=b.id;
     el.dataset.baseTop=String(baseTop);
     el.style.left=left+'px'; el.style.width=width+'px';
@@ -2786,8 +2806,8 @@ function renderPlanBlocks(days) {
     el.innerHTML=`
       <div class="plan-resize-handle top"></div>
       <div class="plan-block-title">${escHtml(b.title||'(Başlıksız)')}</div>
-      <div class="plan-block-time">${minToHHMM(b.startMin)}–${minToHHMM(b.endMin)}</div>
-      ${b.description?`<div class="plan-block-desc">${escHtml(b.description)}</div>`:''}
+      ${!compact ? `<div class="plan-block-time">${minToHHMM(b.startMin)}–${minToHHMM(b.endMin)}</div>` : ''}
+      ${(!compact && !tight && b.description) ? `<div class="plan-block-desc">${escHtml(b.description)}</div>` : ''}
       <div class="plan-resize-handle bottom"></div>`;
     el.addEventListener('click', e=>{
       if(e.target.classList.contains('plan-resize-handle')) return;
