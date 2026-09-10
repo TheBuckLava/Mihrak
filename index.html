@@ -69,7 +69,10 @@
   --color-cografya: #7ae05c;
   --color-felsefe: #e05ce0;
   --color-dil: #5c7ae0;
+  --color-sosyal: #e0c55c;
+  --color-diger: #8a93ad;
   --ff-head: 'Sora', 'Outfit', sans-serif;
+  --ff-logo: 'Playfair Display', serif;
   --ff-body: 'Outfit', sans-serif;
   --ff-mono: 'JetBrains Mono', monospace;
 }
@@ -95,7 +98,7 @@ body::before {
   min-height:100vh;gap:2rem;padding:2rem;
   background:radial-gradient(ellipse at 50% 40%, rgba(196,163,90,0.08) 0%, transparent 70%);
 }
-.login-logo { font-family:var(--ff-head);font-size:clamp(3rem,10vw,5rem);font-weight:600;letter-spacing:0.3em;color:var(--accent);text-shadow:0 0 60px rgba(196,163,90,0.4);animation:fadeUp 0.8s ease both; }
+.login-logo { font-family:var(--ff-logo);font-size:clamp(3rem,10vw,5rem);font-weight:600;letter-spacing:0.3em;color:var(--accent);text-shadow:0 0 60px rgba(196,163,90,0.4);animation:fadeUp 0.8s ease both; }
 .login-subtitle { font-size:0.79rem;letter-spacing:0.2em;color:var(--text-muted);text-transform:uppercase;animation:fadeUp 0.8s 0.2s ease both; }
 .login-btn { display:flex;align-items:center;gap:0.8rem;padding:0.9rem 2rem;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:var(--ff-body);font-size:0.9rem;cursor:pointer;transition:all 0.3s;animation:fadeUp 0.8s 0.4s ease both; }
 .login-btn:hover { background:var(--surface3);border-color:var(--accent);color:var(--accent);box-shadow:0 0 20px var(--accent-glow); }
@@ -112,7 +115,7 @@ body::before {
   padding:0.9rem 1.5rem;border-bottom:1px solid var(--border);
   background:var(--surface);position:sticky;top:0;z-index:100;backdrop-filter:blur(10px);
 }
-.header-logo { font-family:var(--ff-head);font-size:1.5rem;font-weight:600;letter-spacing:0.2em;color:var(--accent);text-shadow:0 0 20px rgba(196,163,90,0.3);display:flex;flex-direction:column;justify-content:center;line-height:1.15; }
+.header-logo { font-family:var(--ff-logo);font-size:1.5rem;font-weight:600;letter-spacing:0.2em;color:var(--accent);text-shadow:0 0 20px rgba(196,163,90,0.3);display:flex;flex-direction:column;justify-content:center;line-height:1.15; }
 .header-byline { font-family:var(--ff-mono);font-size:0.53rem;letter-spacing:0.1em;color:var(--text-dim);font-weight:300;text-shadow:none;margin-left:72px; }
 .header-logo-img { width:64px; height:64px; object-fit:contain; display:block; flex-shrink:0; }
 .header-actions { display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap; }
@@ -240,6 +243,8 @@ body::before {
 .task-card[data-lesson*="ografya"]::before { background:var(--color-cografya); }
 .task-card[data-lesson*="elsefe"]::before { background:var(--color-felsefe); }
 .task-card[data-lesson*="ngiliz"]::before,.task-card[data-lesson*="il "]::before { background:var(--color-dil); }
+.task-card[data-lesson="sosyal"]::before { background:var(--color-sosyal); }
+.task-card[data-lesson="diğer"]::before { background:var(--color-diger); }
 
 .task-note-chip-wrap { display:flex; gap:0.3rem; flex-wrap:wrap; margin:0.18rem 0 0.22rem; width:100%; }
 .task-note-chip {
@@ -380,8 +385,14 @@ body::before {
 .exam-view-title { font-family:var(--ff-head);font-size:1.4rem;font-weight:600;color:var(--text); }
 .exam-view-actions { display:flex;gap:0.5rem; }
 
-.exam-list { display:flex;flex-direction:column;gap:0.8rem; }
-.exam-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.2s; }
+.exam-list { display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;align-items:start; }
+.exam-col-title { font-family:var(--ff-mono);font-size:0.78rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);text-align:center;font-weight:600;margin-bottom:0.8rem; }
+.exam-col-items { display:flex;flex-direction:column;gap:0.8rem; }
+.exam-card { background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.2s;max-width:440px;width:100%; }
+@media (max-width:768px) {
+  .exam-list { grid-template-columns:1fr; }
+  .exam-card { max-width:100%; }
+}
 .exam-card:hover { border-color:var(--border2); }
 .exam-card-header { padding:0.9rem 1.2rem;display:flex;align-items:center;justify-content:space-between;cursor:pointer;background:var(--surface2); }
 .exam-card-header:hover { background:var(--surface3); }
@@ -486,10 +497,23 @@ body::before {
 .note-editor [style] { display:inline; }
 
 /* ── KAYNAKLAR ── */
-.resource-type-group { margin-bottom:1.3rem; }
-.resource-type-label { font-family:var(--ff-mono);font-size:0.71rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.5rem; }
-.resource-items { display:flex;flex-wrap:wrap;gap:0.55rem; }
-.resource-item { display:inline-flex;align-items:center;gap:0.5rem;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:0.45rem 0.55rem 0.45rem 0.95rem;transition:border-color 0.2s; }
+.resource-columns { display:grid;gap:1.3rem;align-items:start; }
+.resource-columns.cols-1 { grid-template-columns:1fr;max-width:460px; }
+.resource-columns.cols-2 { grid-template-columns:1fr 1fr; }
+.resource-columns.cols-3 { grid-template-columns:1fr 1fr 1fr; }
+.resource-col { background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem 1rem 0.4rem; }
+.resource-col-title { font-family:var(--ff-mono);font-size:0.75rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);text-align:center;font-weight:600;margin-bottom:0.9rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border2); }
+.resource-type-group { margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border); }
+.resource-type-group:last-child { margin-bottom:0.6rem;padding-bottom:0.6rem;border-bottom:none; }
+.resource-type-label { font-family:var(--ff-mono);font-size:0.71rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;font-weight:600; }
+.resource-empty-hint { color:var(--text-dim);font-size:0.75rem;padding:0.3rem 0; }
+.resource-items { display:flex;flex-direction:column;gap:0.55rem; }
+.resource-item { display:flex;align-items:center;gap:0.5rem;background:var(--surface2);border:1px solid var(--border);border-radius:16px;min-height:3.6rem;padding:0.5rem 0.6rem 0.5rem 1rem;transition:border-color 0.2s; }
+.resource-item:hover { border-color:var(--border2); }
+.resource-name { flex:1;font-size:0.83rem;color:var(--text);word-break:break-word; }
+@media (max-width:768px) {
+  .resource-columns.cols-2,.resource-columns.cols-3 { grid-template-columns:1fr; }
+}
 .resource-item:hover { border-color:var(--border2); }
 .resource-name { font-size:0.83rem;color:var(--text);white-space:nowrap; }
 .resource-tooltip { position:fixed;display:none;background:var(--surface3);border:1px solid var(--border2);border-radius:8px;padding:0.55rem 0.75rem;font-size:0.75rem;color:var(--text);z-index:800;max-width:260px;box-shadow:0 8px 24px rgba(0,0,0,0.5);pointer-events:none; }
@@ -513,7 +537,9 @@ body::before {
 .plan-hour-cell { height:56px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);box-sizing:border-box;cursor:pointer; }
 .plan-hour-cell:hover { background:rgba(196,163,90,0.06); }
 .plan-hour-cell.today-col-bg { background:rgba(196,163,90,0.03); }
-.plan-block { position:absolute;border-radius:5px;padding:0.25rem 0.45rem;overflow:hidden;cursor:grab;box-shadow:0 2px 10px rgba(0,0,0,0.4);z-index:2;touch-action:none; }
+.plan-block { position:absolute;border-radius:5px;padding:0.25rem 0.45rem;overflow:hidden;cursor:grab;box-shadow:0 1px 4px rgba(0,0,0,0.35);z-index:2;touch-action:none; }
+.plan-now-line { position:absolute;right:0;height:0;border-top:1px solid #fff;z-index:6;pointer-events:none;box-shadow:0 0 4px rgba(255,255,255,0.5); }
+.plan-now-handle { position:absolute;left:1px;height:20px;background:#fff;color:#0c0c14;font-family:var(--ff-mono);font-size:0.66rem;font-weight:700;display:flex;align-items:center;justify-content:center;border-radius:4px;z-index:7;transform:translateY(-50%);pointer-events:none;box-shadow:0 1px 6px rgba(0,0,0,0.5); }
 .plan-block.dragging-move { transition:left 0.14s ease-out, width 0.14s ease-out; }
 .plan-day-actions { display:flex;gap:0.25rem;justify-content:center;margin-top:0.35rem; }
 .plan-day-action-btn { font-size:0.63rem;padding:0.15rem 0.4rem;border-radius:5px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;font-family:var(--ff-body);transition:all 0.2s; }
@@ -612,7 +638,16 @@ body::before {
         <button class="btn-primary" id="new-exam-btn">+ Yeni Deneme</button>
       </div>
     </div>
-    <div class="exam-list" id="exam-list"></div>
+    <div class="exam-list" id="exam-list">
+      <div class="exam-col">
+        <div class="exam-col-title">AYT</div>
+        <div class="exam-col-items" id="exam-list-ayt"></div>
+      </div>
+      <div class="exam-col">
+        <div class="exam-col-title">TYT</div>
+        <div class="exam-col-items" id="exam-list-tyt"></div>
+      </div>
+    </div>
   </div>
 
   <!-- Notes -->
@@ -632,7 +667,6 @@ body::before {
       <button class="btn-primary" id="add-resource-btn">+ Yeni Kaynak Ekle</button>
     </div>
     <div class="notes-tabs" id="resource-subject-tabs"></div>
-    <div class="toggle-group" id="resource-examtype-tabs" style="max-width:360px;margin-bottom:1rem"></div>
     <div id="resource-groups"></div>
   </div>
 
@@ -974,7 +1008,7 @@ let _examTypeVal='',_recurringVal='false';
 let _duplicateMode=false;
 let _unsubTasks=null,_unsubNotes=null,_unsubArchive=null,_unsubExams=null,_unsubNotesDb=null,_unsubResources=null,_unsubPlan=null;
 let _resources=[],_planBlocks=[],_planPendingBlocks=[];
-let _activeResSubject='Türkçe',_activeResExamType='TYT',_editingResourceId=null;
+let _activeResSubject='Türkçe',_editingResourceId=null;
 let _planWeekOffset=0,_editingPlanId=null,_planModalIsNew=false,_selectedPlanColor=null,_planJustDragged=false;
 let _editingExamId=null,_editingNoteId=null;
 let _examSineType='TYT';
@@ -2019,13 +2053,10 @@ document.getElementById('save-exam-btn').onclick=async()=>{
 // ══════════════════════════════════════════
 // EXAM RENDER
 // ══════════════════════════════════════════
-function renderExams() {
-  const c=document.getElementById('exam-list');c.innerHTML='';
-  if(!_exams.length){c.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.83rem;padding:3rem">henüz deneme yok</div>';return;}
-  [..._exams].sort((a,b)=>b.createdAt-a.createdAt).forEach(exam=>{
-    const el=document.createElement('div');el.className='exam-card';
-    const netStr=Object.entries(exam.nets||{}).map(([s,v])=>`${s.replace(' (TYT)','').replace(' (AYT)','')}: <span>${v.net}</span>`).join(' · ');
-    el.innerHTML=`
+function examCardHtml(exam) {
+  const netStr=Object.entries(exam.nets||{}).map(([s,v])=>`${s.replace(' (TYT)','').replace(' (AYT)','')}: <span>${v.net}</span>`).join(' · ');
+  return `
+    <div class="exam-card" data-id="${exam.id}">
       <div class="exam-card-header" onclick="this.nextElementSibling.classList.toggle('open')">
         <div>
           <div class="exam-card-title">${escHtml(exam.name)}</div>
@@ -2051,8 +2082,22 @@ function renderExams() {
           ${renderWrongTopics(exam)}
         </div>`:''}
       </div>`;
-    c.appendChild(el);
-  });
+}
+
+function renderExams() {
+  const aytCol=document.getElementById('exam-list-ayt');
+  const tytCol=document.getElementById('exam-list-tyt');
+  if(!aytCol||!tytCol) return;
+  if(!_exams.length){
+    aytCol.innerHTML='';
+    tytCol.innerHTML='<div style="text-align:center;color:var(--text-dim);font-size:0.83rem;padding:3rem">henüz deneme yok</div>';
+    return;
+  }
+  const sorted=[..._exams].sort((a,b)=>b.createdAt-a.createdAt);
+  const aytExams=sorted.filter(e=>e.type==='AYT');
+  const tytExams=sorted.filter(e=>e.type!=='AYT');
+  aytCol.innerHTML = aytExams.length ? aytExams.map(examCardHtml).join('') : '<div style="text-align:center;color:var(--text-dim);font-size:0.75rem;padding:2rem 0.5rem">AYT denemesi yok</div>';
+  tytCol.innerHTML = tytExams.length ? tytExams.map(examCardHtml).join('') : '<div style="text-align:center;color:var(--text-dim);font-size:0.75rem;padding:2rem 0.5rem">TYT denemesi yok</div>';
 }
 
 function renderWrongTopics(exam) {
@@ -2446,6 +2491,10 @@ setInterval(() => {
 // KAYNAKLAR
 // ══════════════════════════════════════════
 const RESOURCE_SUBJECTS = ['Türkçe','Sosyal','Matematik','Fizik','Kimya','Biyoloji','Diğer'];
+const SUBJECT_COLORS = {
+  'Türkçe':'#e05c7a','Sosyal':'#e0c55c','Matematik':'#5c9ee0','Fizik':'#e08c5c',
+  'Kimya':'#5ce0a8','Biyoloji':'#a05ce0','Diğer':'#8a93ad'
+};
 const RESOURCE_TYPES = ['Soru Bankası','Konu Anlatımlı','Oynatma Listesi'];
 
 function subjectHasExamSplit(subj) { return subj==='Matematik'||subj==='Fizik'||subj==='Kimya'||subj==='Biyoloji'; }
@@ -2460,42 +2509,35 @@ function renderResources() {
   if(!tabsEl) return;
   tabsEl.innerHTML=RESOURCE_SUBJECTS.map(s=>`<button class="note-tab-btn ${s===_activeResSubject?'active':''}" onclick="switchResourceSubject('${s}')">${s}</button>`).join('');
 
-  const examWrap=document.getElementById('resource-examtype-tabs');
-  const opts=subjectExamOptions(_activeResSubject);
-  if(opts.length>1){
-    examWrap.style.display='flex';
-    if(!opts.includes(_activeResExamType)) _activeResExamType=opts[0];
-    examWrap.innerHTML=opts.map(o=>`<button class="toggle-btn ${o===_activeResExamType?'active':''}" onclick="switchResourceExamType('${o}')">${o==='GEO'?'Geometri':o}</button>`).join('');
-  } else {
-    examWrap.style.display='none';
-    _activeResExamType='TYT';
-  }
-
   const listEl=document.getElementById('resource-groups');
-  const relevant=_resources.filter(r=>r.subject===_activeResSubject && (opts.length>1 ? r.examType===_activeResExamType : true));
-  if(!relevant.length){
-    listEl.innerHTML='<div style="color:var(--text-dim);font-size:0.83rem;padding:2rem 0.2rem">bu kategoride henüz kaynak yok</div>';
-    return;
-  }
-  listEl.innerHTML=RESOURCE_TYPES.map(type=>{
-    const items=relevant.filter(r=>r.type===type);
-    if(!items.length) return '';
-    return `<div class="resource-type-group">
-      <div class="resource-type-label">${type}</div>
-      <div class="resource-items">
-        ${items.map(r=>`
-          <div class="resource-item" data-id="${r.id}" onmouseenter="scheduleResourceTooltip(this,'${r.id}')" onmouseleave="hideResourceTooltip()">
-            <span class="resource-name">${escHtml(r.name)}</span>
-            <button class="view-btn" onclick="event.stopPropagation();openEditResource('${r.id}')">düzenle</button>
-            <button class="delete-btn" style="border:1px solid var(--border)" onclick="event.stopPropagation();deleteResource('${r.id}')">sil</button>
-          </div>`).join('')}
-      </div>
+  const opts=subjectExamOptions(_activeResSubject);
+  const color=SUBJECT_COLORS[_activeResSubject]||'#8a93ad';
+
+  listEl.className='resource-columns cols-'+opts.length;
+  listEl.innerHTML=opts.map(examType=>{
+    const items=_resources.filter(r=>r.subject===_activeResSubject && r.examType===examType);
+    const colLabel = opts.length>1 ? (examType==='GEO'?'Geometri':examType) : null;
+    return `<div class="resource-col">
+      ${colLabel?`<div class="resource-col-title">${colLabel}</div>`:''}
+      ${RESOURCE_TYPES.map(type=>{
+        const typeItems=items.filter(r=>r.type===type);
+        return `<div class="resource-type-group">
+          <div class="resource-type-label">${type}</div>
+          <div class="resource-items">
+            ${typeItems.length ? typeItems.map(r=>`
+              <div class="resource-item" data-id="${r.id}" style="border-right:4px solid ${color}" onmouseenter="scheduleResourceTooltip(this,'${r.id}')" onmouseleave="hideResourceTooltip()">
+                <span class="resource-name">${escHtml(r.name)}</span>
+                <button class="view-btn" onclick="event.stopPropagation();openEditResource('${r.id}')">düzenle</button>
+                <button class="delete-btn" style="border:1px solid var(--border)" onclick="event.stopPropagation();deleteResource('${r.id}')">sil</button>
+              </div>`).join('') : '<div class="resource-empty-hint">henüz kaynak yok</div>'}
+          </div>
+        </div>`;
+      }).join('')}
     </div>`;
   }).join('');
 }
 
 function switchResourceSubject(s){ _snd('click'); _activeResSubject=s; renderResources(); }
-function switchResourceExamType(o){ _snd('click'); _activeResExamType=o; renderResources(); }
 
 function populateResourceExamSelect(subject) {
   const sel=document.getElementById('r-examtype');
@@ -2512,8 +2554,7 @@ document.getElementById('add-resource-btn').onclick=()=>{
   document.getElementById('r-name').value='';
   document.getElementById('r-subject').value=_activeResSubject;
   populateResourceExamSelect(_activeResSubject);
-  const opts=subjectExamOptions(_activeResSubject);
-  document.getElementById('r-examtype').value=opts.includes(_activeResExamType)?_activeResExamType:opts[0];
+  document.getElementById('r-examtype').value=subjectExamOptions(_activeResSubject)[0];
   document.getElementById('r-type').value=RESOURCE_TYPES[0];
   document.getElementById('resource-modal').classList.add('open');
 };
@@ -2678,11 +2719,44 @@ function renderPlanGrid() {
   }
 
   renderPlanBlocks(days);
+  renderPlanNowLine();
 
   const wrap=document.getElementById('plan-grid-wrap');
   const refCell=grid.querySelector('.plan-hour-cell[data-hour="7"]');
   if(refCell && wrap) wrap.scrollTop = Math.max(0, refCell.offsetTop - 40);
 }
+
+function renderPlanNowLine() {
+  const grid=document.getElementById('plan-grid');
+  if(!grid) return;
+  grid.querySelectorAll('.plan-now-line,.plan-now-handle').forEach(el=>el.remove());
+  const todayKey=dateKey(new Date());
+  if(!currentPlanDays().some(d=>dateKey(d)===todayKey)) return;
+  const zeroCell=grid.querySelector('.plan-hour-cell[data-hour="0"]');
+  const labelCell=grid.querySelector('.plan-hour-label');
+  if(!zeroCell||!labelCell) return;
+  const baseTop=zeroCell.offsetTop;
+  const now=new Date();
+  const minutes=now.getHours()*60+now.getMinutes();
+  const top=baseTop+(minutes/60)*PLAN_HOUR_HEIGHT;
+  const gutterWidth=labelCell.offsetWidth;
+
+  const line=document.createElement('div');
+  line.className='plan-now-line';
+  line.style.top=top+'px';
+  line.style.left=gutterWidth+'px';
+  grid.appendChild(line);
+
+  const handle=document.createElement('div');
+  handle.className='plan-now-handle';
+  handle.style.top=top+'px';
+  handle.style.width=(gutterWidth-2)+'px';
+  handle.textContent=minToHHMM(minutes);
+  grid.appendChild(handle);
+}
+setInterval(()=>{
+  if(document.getElementById('view-plan')?.classList.contains('active')) renderPlanNowLine();
+}, 30000);
 
 function renderPlanBlocks(days) {
   const grid=document.getElementById('plan-grid');
@@ -2698,8 +2772,10 @@ function renderPlanBlocks(days) {
     const refCell=grid.querySelector(`.plan-hour-cell[data-date-key="${b.dateKey}"][data-hour="0"]`);
     if(!refCell) return;
     const left=refCell.offsetLeft, width=refCell.offsetWidth;
-    const top=baseTop+(b.startMin/60)*PLAN_HOUR_HEIGHT;
-    const height=Math.max(18, ((b.endMin-b.startMin)/60)*PLAN_HOUR_HEIGHT);
+    const rawTop=baseTop+(b.startMin/60)*PLAN_HOUR_HEIGHT;
+    const rawHeight=((b.endMin-b.startMin)/60)*PLAN_HOUR_HEIGHT;
+    const top=rawTop+1;
+    const height=Math.max(10, rawHeight-2);
     const el=document.createElement('div');
     el.className='plan-block';
     el.dataset.id=b.id;
@@ -2941,8 +3017,8 @@ function attachPlanResize(handleEl, block, edge) {
         curEnd=Math.min(maxEnd, Math.max(origStart+15, origEnd+deltaMin));
         curStart=origStart;
       }
-      parentBlock.style.top=(baseTop+(curStart/60)*PLAN_HOUR_HEIGHT)+'px';
-      parentBlock.style.height=Math.max(18, ((curEnd-curStart)/60)*PLAN_HOUR_HEIGHT)+'px';
+      parentBlock.style.top=(baseTop+(curStart/60)*PLAN_HOUR_HEIGHT+1)+'px';
+      parentBlock.style.height=Math.max(10, ((curEnd-curStart)/60)*PLAN_HOUR_HEIGHT-2)+'px';
       const timeEl=parentBlock.querySelector('.plan-block-time');
       if(timeEl) timeEl.textContent=`${minToHHMM(curStart)}–${minToHHMM(curEnd)}`;
     }
