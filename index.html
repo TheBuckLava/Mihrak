@@ -554,6 +554,9 @@ body::before {
 .plan-block-desc { font-size:0.67rem;color:rgba(255,255,255,0.85);margin-top:0.15rem;line-height:1.25;text-shadow:0 1px 2px rgba(0,0,0,0.5);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
 .plan-block.plan-block-compact { display:flex;align-items:center;padding:0 0.45rem; }
 .plan-block.plan-block-compact .plan-block-title { font-size:0.68rem;line-height:1; }
+.plan-block-title-row { display:flex;align-items:baseline;gap:0.3rem;min-width:0; }
+.plan-block-title-row .plan-block-title { flex:1;min-width:0; }
+.plan-block-time-inline { font-size:0.63rem;color:rgba(255,255,255,0.8);font-family:var(--ff-mono);white-space:nowrap;flex-shrink:0;text-shadow:0 1px 2px rgba(0,0,0,0.5); }
 .plan-resize-handle { position:absolute;left:0;right:0;height:7px;cursor:ns-resize;touch-action:none; }
 .plan-resize-handle.top { top:0; }
 .plan-resize-handle.bottom { bottom:0; }
@@ -720,7 +723,14 @@ body::before {
           <button class="toggle-btn active" data-val="" onclick="selectToggle(this,'exam-type')">Diğer</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Görev Türü</label><input class="form-input" id="f-type" placeholder="Test, Konu Anlatımı, Video, Deneme..."></div>
+      <div class="form-group"><label class="form-label">Görev Türü</label>
+        <select class="form-select" id="f-type">
+          <option value="">Görev türü seç...</option>
+          <option value="Video">Video</option>
+          <option value="Test">Test</option>
+          <option value="Diğer">Diğer</option>
+        </select>
+      </div>
       <div class="form-group"><label class="form-label">Kaynak</label><select class="form-select" id="f-source"><option value="">Önce ders seç...</option></select>
         <input class="form-input" id="f-source-custom" placeholder="Kaynak adını yaz..." style="display:none;margin-top:0.5rem">
       </div>
@@ -925,6 +935,7 @@ body::before {
     </div>
     <div class="modal-footer">
       <button class="btn-secondary" id="plan-cancel-btn">İptal</button>
+      <button class="btn-secondary" id="plan-copy-btn" style="border:1px solid var(--border)">kopyala</button>
       <button class="delete-btn" id="plan-delete-btn" style="border:1px solid var(--border);padding:0.6rem 1rem">Sil</button>
       <button class="btn-primary" id="plan-save-btn">Kaydet</button>
     </div>
@@ -1077,7 +1088,7 @@ window.addEventListener('load', () => {
     m.onAuthStateChanged(_auth, user => {
       document.getElementById('loading').style.display='none';
       if (user) {
-        if (!['musaorunn@gmail.com', 'huseyinbakibarutcu86@gmail.com'].includes(user.email)) {
+        if (!['musaorunn@gmail.com', 'mhmetor@gmail.com'].includes(user.email)) {
           alert('Bu hesapla giriş izni yok.');
           m.signOut(_auth);
           document.getElementById('login-screen').style.display='flex';
@@ -1737,6 +1748,7 @@ document.getElementById('add-task-btn').onclick=()=>{
   document.getElementById('task-modal').classList.add('open');
 };
 document.getElementById('f-lesson').addEventListener('change', ()=>{ if(typeof refreshSourceOptions==='function') refreshSourceOptions(); });
+document.getElementById('f-type').addEventListener('change', ()=>{ if(typeof refreshSourceOptions==='function') refreshSourceOptions(); });
 
 document.getElementById('save-task-btn').onclick=async()=>{
   _snd('save');
@@ -2649,9 +2661,21 @@ function getRecentTasksForResource(name) {
 function refreshSourceOptions() {
   const lessonEl=document.getElementById('f-lesson');
   const sel=document.getElementById('f-source');
+  const typeEl=document.getElementById('f-type');
   if(!lessonEl||!sel) return;
   const currentVal=sel.value;
   const subject=lessonEl.value;
+  const taskType=typeEl?typeEl.value:'';
+
+  if(taskType==='Diğer'){
+    sel.style.display='none';
+    sel.innerHTML='<option value="__other__">Diğer (elle yaz)</option>';
+    sel.value='__other__';
+    toggleSourceCustom(true);
+    return;
+  }
+  sel.style.display='';
+
   if(!subject){ sel.innerHTML='<option value="">Önce ders seç...</option>'; toggleSourceCustom(false); return; }
   const opts=subjectExamOptions(subject);
   let matches;
@@ -2660,6 +2684,9 @@ function refreshSourceOptions() {
     const want=['TYT','AYT','GEO'].includes(_examTypeVal) ? _examTypeVal : null;
     matches = want ? _resources.filter(r=>r.subject===subject && r.examType===want) : _resources.filter(r=>r.subject===subject);
   }
+  if(taskType==='Video') matches=matches.filter(r=>r.type==='Oynatma Listesi');
+  else if(taskType==='Test') matches=matches.filter(r=>r.type==='Soru Bankası');
+
   let html='<option value="">Kaynak seç...</option>';
   html += matches.map(r=>`<option value="${escHtml(r.name)}">${escHtml(r.name)} (${r.type})</option>`).join('');
   html += '<option value="__other__">Diğer (elle yaz)</option>';
@@ -2688,7 +2715,7 @@ function _setSourceValuePreserving(value) {
 // ══════════════════════════════════════════
 const PLAN_HOUR_HEIGHT = 56; // .plan-hour-cell yüksekliğiyle birebir eşleşmeli
 const PLAN_COLORS = ['#5c9ee0','#5ce0a8','#e08c5c','#e05c7a','#a05ce0','#e8c97a','#5ce0d4','#8a8aa8'];
-let _planDayClipboard=null;
+let _planClipboard=null;
 
 function minToHHMM(min) { const h=Math.floor(min/60)%24, m=((min%60)+60)%60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; }
 function hhmmToMin(str) { const parts=String(str||'0:0').split(':'); return (parseInt(parts[0],10)||0)*60+(parseInt(parts[1],10)||0); }
@@ -2798,18 +2825,28 @@ function renderPlanBlocks(days) {
     const el=document.createElement('div');
     const compact = height < 30;
     const tight = !compact && height < 44;
-    el.className='plan-block'+(compact?' plan-block-compact':'');
+    el.className='plan-block'+(compact?' plan-block-compact':'')+(tight?' plan-block-tight':'');
     el.dataset.id=b.id;
     el.dataset.baseTop=String(baseTop);
     el.style.left=left+'px'; el.style.width=width+'px';
     el.style.top=top+'px'; el.style.height=height+'px';
     el.style.background=b.color||PLAN_COLORS[0];
-    el.innerHTML=`
-      <div class="plan-resize-handle top"></div>
-      <div class="plan-block-title">${escHtml(b.title||'(Başlıksız)')}</div>
-      ${!compact ? `<div class="plan-block-time">${minToHHMM(b.startMin)}–${minToHHMM(b.endMin)}</div>` : ''}
-      ${(!compact && !tight && b.description) ? `<div class="plan-block-desc">${escHtml(b.description)}</div>` : ''}
-      <div class="plan-resize-handle bottom"></div>`;
+    if(tight){
+      el.innerHTML=`
+        <div class="plan-resize-handle top"></div>
+        <div class="plan-block-title-row">
+          <span class="plan-block-title">${escHtml(b.title||'(Başlıksız)')}</span>
+          <span class="plan-block-time-inline">- ${minToHHMM(b.startMin)}–${minToHHMM(b.endMin)}</span>
+        </div>
+        <div class="plan-resize-handle bottom"></div>`;
+    } else {
+      el.innerHTML=`
+        <div class="plan-resize-handle top"></div>
+        <div class="plan-block-title">${escHtml(b.title||'(Başlıksız)')}</div>
+        ${!compact ? `<div class="plan-block-time">${minToHHMM(b.startMin)}–${minToHHMM(b.endMin)}</div>` : ''}
+        ${(!compact && b.description) ? `<div class="plan-block-desc">${escHtml(b.description)}</div>` : ''}
+        <div class="plan-resize-handle bottom"></div>`;
+    }
     el.addEventListener('click', e=>{
       if(e.target.classList.contains('plan-resize-handle')) return;
       if(_planJustDragged){ _planJustDragged=false; return; }
@@ -2834,18 +2871,49 @@ function createPlanBlockAt(dayKey, startMin) {
 function copyPlanDay(dayKey) {
   _snd('click');
   const blocks=_planBlocks.filter(b=>b.dateKey===dayKey).map(b=>({title:b.title,startMin:b.startMin,endMin:b.endMin,color:b.color,description:b.description||''}));
-  _planDayClipboard=blocks;
-  showToast(blocks.length ? `${blocks.length} etkinlik kopyalandı` : 'Bu günde kopyalanacak etkinlik yok');
+  if(!blocks.length){ showToast('Bu günde kopyalanacak etkinlik yok'); return; }
+  _planClipboard={type:'day',blocks};
+  showToast(`${blocks.length} etkinlik kopyalandı`);
+}
+
+function copyPlanBlock(id) {
+  const b=_planBlocks.find(x=>x.id===id) || _planPendingBlocks.find(x=>x.id===id);
+  if(!b) return;
+  _snd('click');
+  _planClipboard={type:'single',block:{title:b.title,startMin:b.startMin,endMin:b.endMin,color:b.color,description:b.description||''}};
+  showToast('Görev kopyalandı');
+}
+
+function findFirstEmptySlot(existingRanges, durationMin) {
+  const sorted=[...existingRanges].sort((a,b)=>a.startMin-b.startMin);
+  for(let t=0; t+durationMin<=1440; t+=15){
+    const end=t+durationMin;
+    if(!sorted.some(e=>t<e.endMin && end>e.startMin)) return t;
+  }
+  return null;
 }
 
 async function pastePlanDay(dayKey) {
   _snd('click');
-  if(!_planDayClipboard || !_planDayClipboard.length){ showToast('Önce bir gün kopyala'); return; }
   if(_isGuest) return;
+  if(!_planClipboard){ showToast('Önce bişey kopyala'); return; }
   const existing=_planBlocks.filter(b=>b.dateKey===dayKey).map(b=>({startMin:b.startMin,endMin:b.endMin}));
-  let pasted=0, skipped=0;
   const{collection,addDoc}=_firestore;
-  for(const b of _planDayClipboard){
+
+  if(_planClipboard.type==='single'){
+    const src=_planClipboard.block;
+    const dur=src.endMin-src.startMin;
+    const slot=findFirstEmptySlot(existing, dur);
+    if(slot==null){ showToast('Bu günde sığacak boş yer yok'); return; }
+    try{
+      await addDoc(collection(_db,`users/${_uid}/planBlocks`), { title:src.title, startMin:slot, endMin:slot+dur, color:src.color, description:src.description, dateKey:dayKey, createdAt:Date.now() });
+      showToast('Görev yapıştırıldı');
+    }catch(e){ showToast('Yapıştırılamadı'); }
+    return;
+  }
+
+  let pasted=0, skipped=0;
+  for(const b of _planClipboard.blocks){
     const overlaps=existing.some(e=>b.startMin<e.endMin && b.endMin>e.startMin);
     if(overlaps){ skipped++; continue; }
     try{
@@ -2881,6 +2949,7 @@ function openPlanBlockModal(id, isNew) {
   document.getElementById('p-desc').value=b.description||'';
   renderPlanColorPicker(b.color||PLAN_COLORS[0]);
   document.getElementById('plan-delete-btn').style.display = isNew ? 'none' : '';
+  document.getElementById('plan-copy-btn').style.display = isNew ? 'none' : '';
   document.getElementById('plan-block-modal').classList.add('open');
   setTimeout(()=>document.getElementById('p-title').focus(), 60);
 }
@@ -2938,6 +3007,10 @@ document.getElementById('plan-delete-btn').onclick=async()=>{
     showToast('Etkinlik silindi');
     renderPlanBlocks(currentPlanDays());
   }catch(e){ showToast('Hata: '+e.message); }
+};
+document.getElementById('plan-copy-btn').onclick=()=>{
+  if(_planModalIsNew) return;
+  copyPlanBlock(_editingPlanId);
 };
 
 async function savePlanBlockFields(id, fields) {
@@ -3041,7 +3114,9 @@ function attachPlanResize(handleEl, block, edge) {
       parentBlock.style.top=(baseTop+(curStart/60)*PLAN_HOUR_HEIGHT+1)+'px';
       parentBlock.style.height=Math.max(10, ((curEnd-curStart)/60)*PLAN_HOUR_HEIGHT-2)+'px';
       const timeEl=parentBlock.querySelector('.plan-block-time');
+      const timeInlineEl=parentBlock.querySelector('.plan-block-time-inline');
       if(timeEl) timeEl.textContent=`${minToHHMM(curStart)}–${minToHHMM(curEnd)}`;
+      if(timeInlineEl) timeInlineEl.textContent=`- ${minToHHMM(curStart)}–${minToHHMM(curEnd)}`;
     }
     async function onUp(){
       try{ handleEl.releasePointerCapture(e.pointerId); }catch(err){}
