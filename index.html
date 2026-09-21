@@ -1782,23 +1782,24 @@ document.getElementById('save-task-btn').onclick=async()=>{
 
 async function toggleComplete(id) {
   const task=_tasks.find(t=>t.id===id); if(!task) return;
-  const {doc,updateDoc,deleteDoc,getDoc,setDoc}= _firestore;
+  const {doc,updateDoc,getDoc,setDoc}= _firestore;
+  const newCompleted=!task.completed;
 
-  if(task.isPastClone && !task.completed){
-    // Arşivdeki orijinal görevi tamamlandı yap, klonu sil
-    const archiveRef=doc(_db,`users/${_uid}/archivedWeeks`,task.originalArchiveWeekId);
-    const snap=await getDoc(archiveRef);
-    if(snap.exists()){
-      const data=snap.data();
-      const tasks=(data.tasks||[]).map(t=> t.id===task.originalArchivedTaskId ? {...t, completed:true} : t);
-      await setDoc(archiveRef,{...data,tasks});
-    }
-    await deleteDoc(doc(_db,`users/${_uid}/tasks`,id));
-    showToast('Geçmiş görev tamamlandı');
-    return;
+  if(task.isPastClone && task.originalArchiveWeekId && task.originalArchivedTaskId){
+    // Arşivdeki orijinal görevin durumunu da senkron tutuyoruz, ama klonu SİLMİYORUZ —
+    // normal bi görev gibi görünür kalsın, tamamlandı/bekliyor arası geçiş yapabilsin.
+    try{
+      const archiveRef=doc(_db,`users/${_uid}/archivedWeeks`,task.originalArchiveWeekId);
+      const snap=await getDoc(archiveRef);
+      if(snap.exists()){
+        const data=snap.data();
+        const tasks=(data.tasks||[]).map(t=> t.id===task.originalArchivedTaskId ? {...t, completed:newCompleted} : t);
+        await setDoc(archiveRef,{...data,tasks});
+      }
+    }catch(e){}
   }
 
-  await updateDoc(doc(_db,`users/${_uid}/tasks`,id),{completed:!task.completed});
+  await updateDoc(doc(_db,`users/${_uid}/tasks`,id),{completed:newCompleted});
 }
 
 async function deleteTask(id, skipConfirm=false) {
@@ -2823,7 +2824,7 @@ function renderPlanBlocks(days) {
     const top=rawTop+1;
     const height=Math.max(10, rawHeight-2);
     const el=document.createElement('div');
-    const compact = height < 30;
+    const compact = height < 20;
     const tight = !compact && height < 44;
     el.className='plan-block'+(compact?' plan-block-compact':'')+(tight?' plan-block-tight':'');
     el.dataset.id=b.id;
