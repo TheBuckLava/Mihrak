@@ -212,6 +212,13 @@ body::before {
 .task-card::before { content:'';position:absolute;left:0;top:0;bottom:0;width:3px; }
 .task-card:hover { border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,0.35); }
 .task-card:active { cursor:grabbing; }
+.task-card[data-ttype="video"] { background:#4a4a63; }
+.task-card[data-ttype="test"] { background:#0a0a11; }
+@keyframes flashTwice {
+  0%,100% { box-shadow:0 0 0 0 rgba(196,163,90,0); }
+  50% { box-shadow:0 0 0 3px var(--accent),0 0 20px rgba(196,163,90,0.7); }
+}
+.task-card.flash-twice { animation:flashTwice 0.6s ease-in-out 2; }
 .task-card.completed { opacity:0.4; }
 .task-card.completed .task-name { text-decoration:line-through; }
 
@@ -1281,6 +1288,8 @@ function createTaskCard(task) {
   card.dataset.id=task.id;
   card.dataset.order=task.order||task.createdAt||0;
   card.dataset.lesson=(task.lesson||'').toLowerCase();
+  card.dataset.ttype=(task.taskType||'').toLowerCase();
+  if(task._archiveView){ card.dataset.archiveWeek=task._archiveWeekId; card.dataset.archiveTask=task.id; }
   card.draggable=!_isGuest && !task._archiveView;
   if (!_isGuest && !task._archiveView) {
     card.addEventListener('dragstart',e=>{
@@ -1315,7 +1324,13 @@ function createTaskCard(task) {
   const rep=(task.recurring===true||task.recurring==='true')?`<span class="repeat-badge">↻</span>`:'';
   const dur=task.duration?`<span class="task-duration">${task.duration}dk</span>`:'';
   const noteChip=task.note?`<div class="task-note-chip-wrap"><span class="task-note-chip" title="${escHtml(task.note)}">${escHtml(task.note.substring(0,40))}${task.note.length>40?'…':''}</span>${task.isPastClone?'<span class="task-origin-chip">Geçmiş görev</span>':''}</div>`:(task.isPastClone?`<div class="task-note-chip-wrap"><span class="task-origin-chip">Geçmiş görev</span></div>`:'');
-  const actions = task._archiveView
+  const frozenClone = task._archiveView && task.isPastClone && !task.completed && !task.mergedFromOriginal;
+  const actions = frozenClone
+    ? `<div class="task-actions">
+        <button class="view-btn" onclick="_snd('click');showOriginalArchiveTask('${task._archiveWeekId}','${task.id}')">orijinali göster</button>
+        <button class="delete-btn" onclick="_snd('delete');deleteArchiveTask('${task._archiveWeekId}','${task.id}')">sil</button>
+      </div>`
+    : task._archiveView
     ? `<div class="task-actions">
         <button class="complete-btn" onclick="_snd('complete');toggleArchiveComplete('${task._archiveWeekId}','${task.id}')">${task.completed?'✓ tamamlandı':'tamamlandı'}</button>
         <button class="view-btn" onclick="_snd('click');openArchiveDetail('${task._archiveWeekId}','${task.id}')">detay</button>
@@ -1588,16 +1603,31 @@ async function restoreUnfinishedFromArchive(weekId) {
     return;
   }
 
-  const existingCloneKeys=new Set(
+  // Her görevin "kökü": zaten bi klonsa onun işaret ettiği en baştaki orijinal, değilse kendisi
+  const rootOf=(task)=>({
+    weekId: task.isPastClone && task.originalArchiveWeekId ? task.originalArchiveWeekId : weekId,
+    taskId: task.isPastClone && task.originalArchivedTaskId ? task.originalArchivedTaskId : task.id
+  });
+
+  // Sadece şu an AKTİF (arşivlenmemiş) klonlara bakıyoruz — arşive düşmüş donuk klonlar engel olmaz
+  const liveCloneKeys=new Set(
     _tasks
-      .filter(t=>t.isPastClone && t.originalArchiveWeekId===weekId && t.originalArchivedTaskId)
+      .filter(t=>t.isPastClone && t.originalArchiveWeekId && t.originalArchivedTaskId)
       .map(t=>`${t.originalArchiveWeekId}__${t.originalArchivedTaskId}`)
   );
 
-  const tasksToAdd=unfinished.filter(task=>!existingCloneKeys.has(`${weekId}__${task.id}`));
+  // Aynı zincirden birden fazla kayıt (orijinal + donuk klonlar) aynı arşivde olabilir, tekrarı ele
+  const seenRoots=new Set();
+  const tasksToAdd=unfinished.filter(task=>{
+    const r=rootOf(task);
+    const key=`${r.weekId}__${r.taskId}`;
+    if(liveCloneKeys.has(key) || seenRoots.has(key)) return false;
+    seenRoots.add(key);
+    return true;
+  });
 
   if(!tasksToAdd.length){
-    showToast('Eklenmemiş tamamlanmayan görev yok');
+    showToast('Aktarılacak görev yok, hepsi zaten aktif görevlerde (havuzda ya da bi günde)');
     return;
   }
 
@@ -1607,14 +1637,19 @@ async function restoreUnfinishedFromArchive(weekId) {
 
   for(const task of tasksToAdd){
     maxOrder+=10;
+    const r=rootOf(task);
     const clone={...task};
     delete clone.id;
+    delete clone._archiveView; delete clone._archiveWeekId;
+    delete clone.mergedFromOriginal; delete clone.completedAt;
     clone.dayKey=null;
     clone.order=maxOrder;
     clone.completed=false;
     clone.isPastClone=true;
-    clone.originalArchiveWeekId=weekId;
-    clone.originalArchivedTaskId=task.id;
+    clone.originalArchiveWeekId=r.weekId;
+    clone.originalArchivedTaskId=r.taskId;
+    clone.originalCreatedAt=task.originalCreatedAt || task.createdAt || Date.now();
+    delete clone.targetWeekStart;
     await addDoc(collection(_db,`users/${_uid}/tasks`),clone);
   }
 
@@ -1633,46 +1668,172 @@ async function restoreUnfinishedFromArchive(weekId) {
 // ══════════════════════════════════════════
 // WEEK ARCHIVE CHECK — geçmiş haftaları otomatik arşivle
 // ══════════════════════════════════════════
-async function checkWeekArchive() {
-  if(_isGuest||!_uid||!_tasks.length)return;
-  const currentWeekStart=getWeekStart(0).getTime();
-  const pastAssigned=_tasks.filter(t=>t.dayKey && getWeekStartFromDayKey(t.dayKey).getTime() < currentWeekStart && !t.isPastClone);
-  if(!pastAssigned.length)return;
+let _archiveRunning=false;
 
+// Klonun ait olduğu haftanın başlangıcı: sadece güne atanmış klonlar bi haftaya ait sayılır.
+// Güne atanmamış klon havuzda istediği kadar durabilir, arşive düşmez.
+function cloneWeekStartMs(t) {
+  if(t.dayKey) return getWeekStartFromDayKey(t.dayKey).getTime();
+  return null;
+}
+
+async function checkWeekArchive() {
+  if(_isGuest||!_uid||!_tasks.length||_archiveRunning)return;
+  const currentWeekStart=getWeekStart(0).getTime();
+  const pastAssigned=_tasks.filter(t=>!t.isPastClone && t.dayKey && getWeekStartFromDayKey(t.dayKey).getTime() < currentWeekStart);
+  const pastClones=_tasks.filter(t=>{
+    if(!t.isPastClone) return false;
+    const ms=cloneWeekStartMs(t);
+    return ms!==null && ms<currentWeekStart;
+  });
+  if(!pastAssigned.length && !pastClones.length)return;
+
+  _archiveRunning=true;
+  try{
+    const {doc,setDoc,deleteDoc,updateDoc}= _firestore;
+
+    // 1) Normal görevler — mevcut davranış
+    const groups={};
+    for(const task of pastAssigned){
+      const ws=getWeekStartFromDayKey(task.dayKey);
+      const key=dateKey(ws);
+      if(!groups[key]) groups[key]={ weekStart:ws, tasks:[] };
+      groups[key].tasks.push(task);
+    }
+
+    for(const [archiveKey,group] of Object.entries(groups)){
+      const exists=_archivedWeeks.find(w=>w.id===archiveKey);
+      if(!exists){
+        const days=getDaysOfWeek(group.weekStart);
+        const keys=days.map(dateKey);
+        const dayNotesSnapshot={};
+        keys.forEach(k=>{ if(_dayNotes[k]) dayNotesSnapshot[k]=_dayNotes[k]; });
+        await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,archiveKey),{
+          weekStart:group.weekStart.getTime(),
+          label:formatWeekRange(days),
+          tasks:group.tasks.map(t=>({...t})),
+          dayNotes:dayNotesSnapshot,
+          archivedAt:Date.now()
+        });
+      }
+
+      for(const t of group.tasks){
+        if(t.recurring===true||t.recurring==='true'){
+          await updateDoc(doc(_db,`users/${_uid}/tasks`,t.id),{dayKey:null,completed:false,order:Date.now()+Math.floor(Math.random()*1000)});
+        } else {
+          await deleteDoc(doc(_db,`users/${_uid}/tasks`,t.id));
+        }
+      }
+    }
+
+    // 2) Geçmiş görev klonları
+    if(pastClones.length) await archivePastClones(pastClones);
+  } finally {
+    _archiveRunning=false;
+  }
+}
+
+// Klonları kendi haftalarının arşivine taşır.
+// Tamamlanmamış klon: donuk kayıt olarak arşive girer.
+// Tamamlanmış klon: zincirdeki (orijinal + ara klonlar) eski kayıtlar silinir, tek birleşik kayıt kalır.
+async function archivePastClones(pastClones) {
+  const {doc,getDoc,setDoc,deleteDoc}= _firestore;
   const groups={};
-  for(const task of pastAssigned){
-    const ws=getWeekStartFromDayKey(task.dayKey);
+  for(const t of pastClones){
+    const ws=new Date(cloneWeekStartMs(t));
     const key=dateKey(ws);
     if(!groups[key]) groups[key]={ weekStart:ws, tasks:[] };
-    groups[key].tasks.push(task);
+    groups[key].tasks.push(t);
   }
 
-  const {doc,setDoc,deleteDoc,updateDoc}= _firestore;
+  const cache=new Map();
+  const loadArchive=async(id)=>{
+    if(cache.has(id)) return cache.get(id);
+    const snap=await getDoc(doc(_db,`users/${_uid}/archivedWeeks`,id));
+    const entry={exists:snap.exists(), data:null, dirty:false};
+    if(snap.exists()){
+      const d=snap.data();
+      entry.data={...d, tasks:[...(d.tasks||[])]};
+    }
+    cache.set(id,entry);
+    return entry;
+  };
 
   for(const [archiveKey,group] of Object.entries(groups)){
-    const exists=_archivedWeeks.find(w=>w.id===archiveKey);
-    if(!exists){
+    const target=await loadArchive(archiveKey);
+    if(!target.exists){
       const days=getDaysOfWeek(group.weekStart);
-      const keys=days.map(dateKey);
       const dayNotesSnapshot={};
-      keys.forEach(k=>{ if(_dayNotes[k]) dayNotesSnapshot[k]=_dayNotes[k]; });
-      await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,archiveKey),{
-        weekStart:group.weekStart.getTime(),
-        label:formatWeekRange(days),
-        tasks:group.tasks.map(t=>({...t})),
-        dayNotes:dayNotesSnapshot,
-        archivedAt:Date.now()
-      });
+      days.map(dateKey).forEach(k=>{ if(_dayNotes[k]) dayNotesSnapshot[k]=_dayNotes[k]; });
+      target.data={weekStart:group.weekStart.getTime(), label:formatWeekRange(days), tasks:[], dayNotes:dayNotesSnapshot, archivedAt:Date.now()};
+      target.exists=true;
+      target.dirty=true;
     }
 
     for(const t of group.tasks){
-      if(t.recurring===true||t.recurring==='true'){
-        await updateDoc(doc(_db,`users/${_uid}/tasks`,t.id),{dayKey:null,completed:false,order:Date.now()+Math.floor(Math.random()*1000)});
-      } else {
-        await deleteDoc(doc(_db,`users/${_uid}/tasks`,t.id));
+      const record={...t};
+      if(t.completed){
+        record.mergedFromOriginal=true;
+        record.originalCreatedAt=t.originalCreatedAt||t.createdAt||null;
+        record.completedAt=t.completedAt||Date.now();
+        const rootWeekId=t.originalArchiveWeekId, rootTaskId=t.originalArchivedTaskId;
+        if(rootWeekId && rootTaskId){
+          const isLineage=(wid,x)=>(wid===rootWeekId && x.id===rootTaskId)||(x.isPastClone && x.originalArchiveWeekId===rootWeekId && x.originalArchivedTaskId===rootTaskId);
+          const affectedIds=_archivedWeeks.filter(w=>(w.tasks||[]).some(x=>isLineage(w.id,x))).map(w=>w.id);
+          if(!affectedIds.includes(archiveKey) && target.data.tasks.some(x=>isLineage(archiveKey,x))) affectedIds.push(archiveKey);
+          for(const wid of affectedIds){
+            const e=await loadArchive(wid);
+            if(!e.exists) continue;
+            const before=e.data.tasks.length;
+            e.data.tasks=e.data.tasks.filter(x=>!isLineage(wid,x));
+            if(e.data.tasks.length!==before) e.dirty=true;
+          }
+        }
       }
+      target.data.tasks=target.data.tasks.filter(x=>x.id!==record.id);
+      target.data.tasks.push(record);
+      target.dirty=true;
     }
   }
+
+  for(const [id,e] of cache){
+    if(!e.dirty||!e.exists) continue;
+    const hasTasks=(e.data.tasks||[]).length>0;
+    const hasNotes=e.data.dayNotes && Object.keys(e.data.dayNotes).length>0;
+    const ref=doc(_db,`users/${_uid}/archivedWeeks`,id);
+    if(!hasTasks && !hasNotes) await deleteDoc(ref);
+    else await setDoc(ref,e.data);
+  }
+
+  for(const t of pastClones){
+    await deleteDoc(doc(_db,`users/${_uid}/tasks`,t.id));
+  }
+}
+
+// Bi klonun tamamlandı durumunu, aynı zincirdeki arşiv kayıtlarına (orijinal + donuk klonlar) yansıtır — geri alınabilir
+async function syncLineageCompleted(rootWeekId, rootTaskId, completed) {
+  const {doc,setDoc}= _firestore;
+  const isLineage=(wid,x)=>(wid===rootWeekId && x.id===rootTaskId)||(x.isPastClone && x.originalArchiveWeekId===rootWeekId && x.originalArchivedTaskId===rootTaskId);
+  for(const w of _archivedWeeks){
+    const tasks=w.tasks||[];
+    if(!tasks.some(x=>isLineage(w.id,x))) continue;
+    const updated=tasks.map(x=>isLineage(w.id,x)?{...x,completed}:x);
+    const {id,...rest}=w;
+    await setDoc(doc(_db,`users/${_uid}/archivedWeeks`,w.id),{...rest,tasks:updated});
+  }
+}
+
+// Arşivde donuk klonun "orijinali göster" tuşu: en baştaki orijinale kaydır ve 2 kez yanıp söndür
+function showOriginalArchiveTask(weekId, taskId) {
+  const week=_archivedWeeks.find(w=>w.id===weekId); if(!week) return;
+  const t=(week.tasks||[]).find(x=>x.id===taskId); if(!t) return;
+  const el=document.querySelector(`.task-card[data-archive-week="${t.originalArchiveWeekId}"][data-archive-task="${t.originalArchivedTaskId}"]`);
+  if(!el){ showToast('Orijinal görev bulunamadı'); return; }
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>{
+    el.classList.remove('flash-twice'); void el.offsetWidth; el.classList.add('flash-twice');
+    setTimeout(()=>el.classList.remove('flash-twice'),1500);
+  },450);
 }
 
 function _fillTaskForm(task) {
@@ -1720,11 +1881,29 @@ async function deleteArchiveTask(weekId, taskId) {
   showToast('Arşiv görevi silindi');
 }
 
+// Geçmiş görevler için: oluşturulduğu hafta, tamamlandığı hafta ve kaç hafta ertelendiği
+function postponeRows(task, fallbackCompletedMs) {
+  if(!task.isPastClone) return [];
+  const created=task.originalCreatedAt||task.createdAt;
+  const weekLabel=(ms)=>formatWeekRange(getDaysOfWeek(getMondayStart(new Date(ms))));
+  const rows=[];
+  if(created) rows.push(['Oluşturulduğu hafta',weekLabel(created)]);
+  const doneMs=task.completed ? (task.completedAt||fallbackCompletedMs||null) : null;
+  if(doneMs){
+    rows.push(['Tamamlandığı hafta',weekLabel(doneMs)]);
+    if(created){
+      const w=Math.round((getMondayStart(new Date(doneMs)).getTime()-getMondayStart(new Date(created)).getTime())/(7*86400000));
+      rows.push(['Ertelenme',w<=0?'Aynı hafta':`${w} hafta`]);
+    }
+  }
+  return rows;
+}
+
 function openArchiveDetail(weekId, taskId) {
   const week=_archivedWeeks.find(w=>w.id===weekId); if(!week) return;
   const task=(week.tasks||[]).find(t=>t.id===taskId); if(!task) return;
   document.getElementById('detail-title').textContent=task.lesson||'Görev';
-  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Öncelik',task.priority?'Verildi':'—'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
+  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Öncelik',task.priority?'Verildi':'—'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],...postponeRows(task,week.weekStart),['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
   document.getElementById('detail-body').innerHTML=rows.map(([k,v])=>`<div class="detail-row"><div class="detail-key">${k}</div><div class="detail-val ${k==='Durum'&&task.completed?'detail-completed':''}">${escHtml(String(v))}</div></div>`).join('');
   document.getElementById('detail-edit-btn').style.display='none';
   document.getElementById('detail-copy-btn').style.display='none';
@@ -1782,24 +1961,17 @@ document.getElementById('save-task-btn').onclick=async()=>{
 
 async function toggleComplete(id) {
   const task=_tasks.find(t=>t.id===id); if(!task) return;
-  const {doc,updateDoc,getDoc,setDoc}= _firestore;
+  const {doc,updateDoc}= _firestore;
   const newCompleted=!task.completed;
+  const patch={completed:newCompleted};
+  if(task.isPastClone) patch.completedAt = newCompleted ? Date.now() : null;
+  await updateDoc(doc(_db,`users/${_uid}/tasks`,id),patch);
 
+  // Klonsa: zincirdeki arşiv kayıtlarını (orijinal + donuk klonlar) görsel olarak senkron tut.
+  // Burada hiçbi şey silinmiyor, tamamen geri alınabilir — birleşme sadece hafta arşive giderken olur.
   if(task.isPastClone && task.originalArchiveWeekId && task.originalArchivedTaskId){
-    // Arşivdeki orijinal görevin durumunu da senkron tutuyoruz, ama klonu SİLMİYORUZ —
-    // normal bi görev gibi görünür kalsın, tamamlandı/bekliyor arası geçiş yapabilsin.
-    try{
-      const archiveRef=doc(_db,`users/${_uid}/archivedWeeks`,task.originalArchiveWeekId);
-      const snap=await getDoc(archiveRef);
-      if(snap.exists()){
-        const data=snap.data();
-        const tasks=(data.tasks||[]).map(t=> t.id===task.originalArchivedTaskId ? {...t, completed:newCompleted} : t);
-        await setDoc(archiveRef,{...data,tasks});
-      }
-    }catch(e){}
+    try{ await syncLineageCompleted(task.originalArchiveWeekId, task.originalArchivedTaskId, newCompleted); }catch(e){}
   }
-
-  await updateDoc(doc(_db,`users/${_uid}/tasks`,id),{completed:newCompleted});
 }
 
 async function deleteTask(id, skipConfirm=false) {
@@ -1817,7 +1989,7 @@ async function deleteTask(id, skipConfirm=false) {
 function openDetail(id) {
   const task=_tasks.find(t=>t.id===id);if(!task)return;
   document.getElementById('detail-title').textContent=task.lesson||'Görev';
-  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Öncelik',task.priority?'Verildi':'—'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
+  const rows=[['Ders',task.lesson],['Konu',task.topic],['TYT/AYT',task.examType||'—'],['Tür',task.taskType],['Kaynak',task.source],['Soru Sayısı',task.questions],['Süre',task.duration?task.duration+' dakika':null],['Not',task.note],['Tekrarlayan',(task.recurring===true||task.recurring==='true')?'Evet':'Hayır'],['Öncelik',task.priority?'Verildi':'—'],['Durum',task.completed?'✓ Tamamlandı':'Bekliyor'],['Oluşturma',task.createdAt?new Date(task.createdAt).toLocaleDateString('tr-TR'):'—'],...postponeRows(task,null),['Gün',task.dayKey||'Havuzda']].filter(([k,v])=>v);
   document.getElementById('detail-body').innerHTML=rows.map(([k,v])=>`<div class="detail-row"><div class="detail-key">${k}</div><div class="detail-val ${k==='Durum'&&task.completed?'detail-completed':''}">${escHtml(String(v))}</div></div>`).join('');
   document.getElementById('detail-edit-btn').style.display='';
   document.getElementById('detail-copy-btn').style.display='';
@@ -2639,7 +2811,7 @@ function showResourceTooltip(el,id) {
       const rep=(t.recurring===true||t.recurring==='true')?`<span class="repeat-badge">↻</span>`:'';
       const dur=t.duration?`<span class="task-duration">${t.duration}dk</span>`:'';
       const noteChip=t.note?`<div class="task-note-chip-wrap"><span class="task-note-chip">${escHtml(t.note.substring(0,40))}${t.note.length>40?'…':''}</span></div>`:'';
-      return `<div class="task-card" data-lesson="${(t.lesson||'').toLowerCase()}" style="cursor:default;">
+      return `<div class="task-card" data-lesson="${(t.lesson||'').toLowerCase()}" data-ttype="${(t.taskType||'').toLowerCase()}" style="cursor:default;">
         <div class="task-name">${escHtml(t.lesson||'')}${t.topic?' · '+escHtml(t.topic):''}</div>
         ${noteChip}
         <div class="task-meta">${exam}${rep}${dur}</div>
