@@ -212,8 +212,16 @@ body::before {
 .task-card::before { content:'';position:absolute;left:0;top:0;bottom:0;width:3px; }
 .task-card:hover { border-color:var(--border2);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,0.35); }
 .task-card:active { cursor:grabbing; }
-.task-card[data-ttype="video"] { background:#4a4a63; }
-.task-card[data-ttype="test"] { background:#0a0a11; }
+.task-card[data-ttype="video"] { background:#343449; }
+.task-card[data-ttype="test"] { background:#141420; }
+/* Kart rengi değişse de içindeki buton, rozet ve çipler eski (normal kart) görünümünde kalsın */
+.task-card:is([data-ttype="video"],[data-ttype="test"]) :is(.complete-btn,.view-btn,.delete-btn) { background:var(--surface3); }
+.task-card.completed:is([data-ttype="video"],[data-ttype="test"]) .complete-btn { background:linear-gradient(rgba(92,224,168,0.08),rgba(92,224,168,0.08)),var(--surface3); }
+.task-card:is([data-ttype="video"],[data-ttype="test"]) .badge-tyt { background:linear-gradient(rgba(94,148,224,0.15),rgba(94,148,224,0.15)),var(--surface3); }
+.task-card:is([data-ttype="video"],[data-ttype="test"]) .badge-ayt { background:linear-gradient(rgba(224,92,122,0.15),rgba(224,92,122,0.15)),var(--surface3); }
+.task-card:is([data-ttype="video"],[data-ttype="test"]) .badge-geo { background:linear-gradient(rgba(92,224,212,0.15),rgba(92,224,212,0.15)),var(--surface3); }
+.task-card:is([data-ttype="video"],[data-ttype="test"]) .task-note-chip { background:linear-gradient(rgba(232,201,122,0.12),rgba(232,201,122,0.12)),var(--surface3); }
+.task-card:is([data-ttype="video"],[data-ttype="test"]) .task-origin-chip { background:linear-gradient(rgba(224,92,122,0.12),rgba(224,92,122,0.12)),var(--surface3); }
 @keyframes flashTwice {
   0%,100% { box-shadow:0 0 0 0 rgba(196,163,90,0); }
   50% { box-shadow:0 0 0 3px var(--accent),0 0 20px rgba(196,163,90,0.7); }
